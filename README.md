@@ -1,0 +1,3 @@
+git remote add origin https://github.com/laviduarte1992-sketch/lavi-duarte-tech.git
+git branch -M main
+git push -u origin main
