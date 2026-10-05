@@ -1,0 +1,22 @@
+{
+  "short_name": "ROTA GB",
+  "name": "ROTA GB - Super App de Bissau",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192.png?text=ROTA+GB",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://via.placeholder.com/512.png?text=ROTA+GB",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#1a1a1a",
+  "theme_color": "#00e676",
+  "display": "standalone",
+  "orientation": "portrait",
+  "description": "Plataforma de Mobilidade, Entregas e Serviços de Bissau — Direção Geral: Eng. Lavi Duarte Indeque"
+}
