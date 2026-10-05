@@ -43,7 +43,7 @@
         .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 11px; color: #666; font-weight: bold; }
-        select, input { padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; }
+        select, input { padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; width: 100%; }
 
         /* Service Cards */
         .service-options { display: flex; gap: 6px; }
@@ -91,7 +91,7 @@
         
         <div class="ceo-badge">
             <div>
-                <div style="font-size: 8px; color: #aaa; text-transform: uppercase;">CEO & Fundador</div>
+                <div style="font-size: 8px; color: #aaa; text-transform: uppercase;">CEO & FUNDADOR</div>
                 <div style="color: #fff; font-weight: bold; font-size: 11px;">Engenheiro Lavi Duarte Indeque</div>
             </div>
             <span style="color: #00e676; font-size: 10px; font-weight: bold; background: rgba(0,230,118,0.15); padding: 2px 6px; border-radius: 10px;">✔ Oficial</span>
@@ -104,6 +104,7 @@
         <div class="nav-item" onclick="switchServiceTab('comida')">🍲 Comida</div>
         <div class="nav-item" onclick="switchServiceTab('lojas')">🛒 Lojas</div>
         <div class="nav-item" onclick="switchServiceTab('hoteis')">🏨 Hotéis & Apts</div>
+        <div class="nav-item" onclick="switchServiceTab('recargas')">📱 Recargas</div>
     </div>
 
     <!-- Map Engine -->
@@ -156,7 +157,7 @@
         </div>
 
         <div class="payment-methods">
-            Pagamento: <span class="pay-tag">💵 Dinheiro</span> <span class="pay-tag">🟧 Orange Money</span> <span class="pay-tag">🟨 MTN</span>
+            Pagamento: <span class="pay-tag">💵 Dinheiro</span> <span class="pay-tag">🟧 Orange Money</span> <span class="pay-tag">🟥 Telecel</span>
         </div>
     </div>
 
@@ -242,6 +243,34 @@
         </div>
     </div>
 
+    <!-- Panel 5: Recargas de Saldo / Redes Móveis -->
+    <div class="bottom-panel" id="panel-recargas" style="display: none;">
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Comprar Saldo de Telemóvel</div>
+        
+        <div class="sub-tabs">
+            <button class="sub-tab-btn active" id="btn-orange-op" onclick="selectOperator('Orange')">🟧 Orange Bissau</button>
+            <button class="sub-tab-btn" id="btn-telecel-op" onclick="selectOperator('Telecel')">🟥 Telecel Bissau</button>
+        </div>
+
+        <div class="form-group" style="margin-top: 6px;">
+            <label>NÚMERO DE TELEMÓVEL (+245)</label>
+            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX" pattern="[0-9]{9}" required>
+        </div>
+
+        <div class="form-group" style="margin-top: 6px;">
+            <label>VALOR DA RECARGA (XOF)</label>
+            <select id="amountRecarga">
+                <option value="500">500 XOF</option>
+                <option value="1000" selected>1.000 XOF</option>
+                <option value="2000">2.000 XOF</option>
+                <option value="5000">5.000 XOF</option>
+                <option value="10000">10.000 XOF</option>
+            </select>
+        </div>
+
+        <button class="btn-primary" style="margin-top: 10px;" onclick="processarRecarga()">Pagar Recarga Agora</button>
+    </div>
+
     <!-- Panel Motorista -->
     <div class="bottom-panel" id="panel-motorista" style="display: none;">
         <div class="sub-tabs">
@@ -272,7 +301,7 @@
             <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo / Entregador</div>
             <form id="formCadastroMotorista" onsubmit="cadastrarMotorista(event)" style="display: flex; flex-direction: column; gap: 8px;">
                 <input type="text" id="nomeMotorista" placeholder="Nome Completo" required>
-                <input type="tel" id="telefoneMotorista" placeholder="Telefone (Orange / MTN)" required>
+                <input type="tel" id="telefoneMotorista" placeholder="Telefone (Orange / Telecel)" required>
                 <select id="tipoTransporte">
                     <option value="Taxi">Táxi Azul/Amarelo</option>
                     <option value="CarroPrivado">Carro Privado / Particular</option>
@@ -340,6 +369,7 @@
     let timerInterval = null;
     let secondsElapsed = 0;
     let activePrice = 0;
+    let currentOperator = 'Orange';
 
     function switchServiceTab(tab) {
         document.querySelectorAll('.service-nav .nav-item').forEach(el => el.classList.remove('active'));
@@ -347,6 +377,7 @@
         document.getElementById('panel-comida').style.display = 'none';
         document.getElementById('panel-lojas').style.display = 'none';
         document.getElementById('panel-hoteis').style.display = 'none';
+        document.getElementById('panel-recargas').style.display = 'none';
 
         if(tab === 'taxi') {
             document.querySelectorAll('.service-nav .nav-item')[0].classList.add('active');
@@ -360,6 +391,9 @@
         } else if(tab === 'hoteis') {
             document.querySelectorAll('.service-nav .nav-item')[3].classList.add('active');
             document.getElementById('panel-hoteis').style.display = 'flex';
+        } else if(tab === 'recargas') {
+            document.querySelectorAll('.service-nav .nav-item')[4].classList.add('active');
+            document.getElementById('panel-recargas').style.display = 'flex';
         }
     }
 
@@ -377,6 +411,7 @@
             document.getElementById('panel-comida').style.display = 'none';
             document.getElementById('panel-lojas').style.display = 'none';
             document.getElementById('panel-hoteis').style.display = 'none';
+            document.getElementById('panel-recargas').style.display = 'none';
             document.getElementById('panel-motorista').style.display = 'flex';
         }
     }
@@ -428,6 +463,24 @@
         
         document.getElementById('waitingPanel').style.display = 'none';
         document.getElementById('rideFormControls').style.display = 'block';
+    }
+
+    function selectOperator(op) {
+        currentOperator = op;
+        document.getElementById('btn-orange-op').classList.toggle('active', op === 'Orange');
+        document.getElementById('btn-telecel-op').classList.toggle('active', op === 'Telecel');
+    }
+
+    function processarRecarga() {
+        const phone = document.getElementById('phoneRecarga').value;
+        const amount = document.getElementById('amountRecarga').value;
+        
+        if(!phone) {
+            alert('Por favor, insira o número de telemóvel.');
+            return;
+        }
+        
+        alert(`A processar recarga de ${parseInt(amount).toLocaleString()} XOF para o número +245 ${phone} via ${currentOperator}...\n\nConfirme o código PIN no seu ecrã!`);
     }
 
     function pedirDelivery(restaurante) {
