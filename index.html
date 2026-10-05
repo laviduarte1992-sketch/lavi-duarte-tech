@@ -1,215 +1,129 @@
-<!-- ======================================================== -->
-<!-- MÓDULO DE RECARGAS DE SALDO (ORANGE & MTN GUINÉ-BISSAU)  -->
-<!-- ======================================================== -->
-<section id="airtime-recharge-section" class="recharge-container">
-  <div class="recharge-header">
-    <h2>📱 Comprar Saldo / Recargas</h2>
-    <p>Selecione a operadora e recarregue o seu telemóvel instantaneamente em Bissau</p>
-  </div>
-
-  <!-- Seleção da Operadora -->
-  <div class="operator-selector">
-    <button type="button" class="operator-btn active" id="btn-orange" onclick="selectOperator('Orange')">
-      <span class="dot orange-dot"></span> Orange Bissau
-    </button>
-    <button type="button" class="operator-btn" id="btn-mtn" onclick="selectOperator('MTN')">
-      <span class="dot mtn-dot"></span> MTN Guiné-Bissau
-    </button>
-  </div>
-
-  <!-- Formulário de Recarga -->
-  <form id="recharge-form" onsubmit="processRecharge(event)">
-    <div class="input-group">
-      <label for="phone-number">Número de Telemóvel (+245)</label>
-      <input 
-        type="tel" 
-        id="phone-number" 
-        placeholder="Ex: 955XXXXXX ou 966XXXXXX" 
-        pattern="[0-9]{9}" 
-        required
-      />
-    </div>
-
-    <!-- Valores Pré-definidos -->
-    <label>Escolha o Valor (XOF / Francos CFA)</label>
-    <div class="amount-grid">
-      <button type="button" class="amount-btn" onclick="setAmount(500)">500 XOF</button>
-      <button type="button" class="amount-btn" onclick="setAmount(1000)">1.000 XOF</button>
-      <button type="button" class="amount-btn" onclick="setAmount(2000)">2.000 XOF</button>
-      <button type="button" class="amount-btn" onclick="setAmount(5000)">5.000 XOF</button>
-    </div>
-
-    <div class="input-group" style="margin-top: 15px;">
-      <label for="custom-amount">Ou digite outro valor (XOF)</label>
-      <input 
-        type="number" 
-        id="custom-amount" 
-        placeholder="Ex: 1500" 
-        min="200" 
-        max="50000" 
-        required
-      />
-    </div>
-
-    <button type="submit" class="submit-recharge-btn">
-      Confirmar e Pagar Recarga
-    </button>
-  </form>
-
-  <div id="recharge-status" class="status-message"></div>
-</section>
-
-<!-- ESTILOS CSS DO MÓDULO -->
-<style>
-  .recharge-container {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px;
-    max-width: 480px;
-    margin: 20px auto;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    font-family: Arial, sans-serif;
-  }
-  .recharge-header h2 {
-    margin: 0 0 5px 0;
-    color: #1a1a1a;
-    font-size: 1.3rem;
-  }
-  .recharge-header p {
-    margin: 0 0 20px 0;
-    color: #666;
-    font-size: 0.9rem;
-  }
-  .operator-selector {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .operator-btn {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    background: #f9f9f9;
-    cursor: pointer;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-  }
-  .operator-btn.active {
-    border-color: #00e676;
-    background: #e8f5e9;
-    color: #1a1a1a;
-  }
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  }
-  .orange-dot { background-color: #ff6600; }
-  .mtn-dot { background-color: #ffcc00; }
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 15px;
-  }
-  .input-group label {
-    font-size: 0.85rem;
-    font-weight: bold;
-    color: #333;
-  }
-  .input-group input {
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-  }
-  .amount-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-top: 6px;
-  }
-  .amount-btn {
-    padding: 10px;
-    border: 1px solid #00e676;
-    background: #fff;
-    color: #00a855;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 0.85rem;
-  }
-  .amount-btn:hover {
-    background: #00e676;
-    color: #fff;
-  }
-  .submit-recharge-btn {
-    width: 100%;
-    padding: 14px;
-    background: #00e676;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 15px;
-  }
-  .submit-recharge-btn:hover {
-    background: #00c853;
-  }
-  .status-message {
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 6px;
-    display: none;
-    font-size: 0.9rem;
-    text-align: center;
-  }
-  .status-success {
-    background: #e8f5e9;
-    color: #2e7d32;
-    display: block;
-  }
-</style>
-
-<!-- LÓGICA JAVASCRIPT DA RECARGA -->
-<script>
-  let selectedOperator = 'Orange';
-
-  function selectOperator(operator) {
-    selectedOperator = operator;
-    document.getElementById('btn-orange').classList.remove('active');
-    document.getElementById('btn-mtn').classList.remove('active');
-
-    if (operator === 'Orange') {
-      document.getElementById('btn-orange').classList.add('active');
-    } else {
-      document.getElementById('btn-mtn').classList.add('active');
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROTA GB - Super App Guiné-Bissau</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
     }
-  }
+    body {
+      background-color: #f4f6f8;
+      color: #333;
+      padding: 15px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding: 10px 0;
+    }
+    .header h1 {
+      color: #1a1a1a;
+      font-size: 1.8rem;
+    }
+    .header span {
+      color: #00e676;
+    }
+    .header p {
+      color: #666;
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
 
-  function setAmount(val) {
-    document.getElementById('custom-amount').value = val;
-  }
+    /* GRELHA DE SERVIÇOS PRINCIPAIS */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .service-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px 15px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .service-card:hover {
+      border-color: #00e676;
+      transform: translateY(-2px);
+    }
+    .service-icon {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+    .service-card h3 {
+      font-size: 1.05rem;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    .service-card p {
+      font-size: 0.8rem;
+      color: #777;
+    }
 
-  function processRecharge(event) {
-    event.preventDefault();
-    const phone = document.getElementById('phone-number').value;
-    const amount = document.getElementById('custom-amount').value;
-    const statusDiv = document.getElementById('recharge-status');
+    @media (max-width: 360px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
 
-    statusDiv.className = 'status-message status-success';
-    statusDiv.innerHTML = `⏳ A processar pedido de recarga de <strong>${amount} XOF</strong> para o número <strong>+245 ${phone}</strong> (${selectedOperator}). Confirme o PIN no seu telemóvel...`;
+  <!-- CABEÇALHO -->
+  <header class="header">
+    <h1>ROTA <span>GB</span></h1>
+    <p>O Super App da Guiné-Bissau</p>
+  </header>
 
-    // Aqui fará a chamada para a API no servidor (Back-end)
-    setTimeout(() => {
-      statusDiv.innerHTML = `✅ Recarga de <strong>${amount} XOF</strong> efetuada com sucesso no número +245 ${phone} via ${selectedOperator}!`;
-    }, 3000);
-  }
-</script>
+  <!-- MENU DOS SERVIÇOS PRINCIPAIS -->
+  <main class="services-grid">
+    
+    <!-- 1. TRANSPORTE -->
+    <div class="service-card" onclick="openService('Transporte')">
+      <div class="service-icon">🚗</div>
+      <h3>Transporte</h3>
+      <p>Táxi Azul, Carro Privado e Moto-Táxi</p>
+    </div>
+
+    <!-- 2. RESTAURANTE -->
+    <div class="service-card" onclick="openService('Restaurantes')">
+      <div class="service-icon">🍔</div>
+      <h3>Restaurante</h3>
+      <p>Entrega de refeições em Bissau</p>
+    </div>
+
+    <!-- 3. MERCADO -->
+    <div class="service-card" onclick="openService('Mercado')">
+      <div class="service-icon">🛍️</div>
+      <h3>Mercado</h3>
+      <p>Compras em supermercados e lojas</p>
+    </div>
+
+    <!-- 4. HOTEL -->
+    <div class="service-card" onclick="openService('Hotéis')">
+      <div class="service-icon">🏨</div>
+      <h3>Hotel</h3>
+      <p>Reservas de hotéis e alojamentos</p>
+    </div>
+
+  </main>
+
+  <script>
+    function openService(serviceName) {
+      alert('A abrir serviço: ' + serviceName);
+      // Aqui conecta com as respetivas páginas/módulos do app
+    }
+  </script>
+
+</body>
+</html>
