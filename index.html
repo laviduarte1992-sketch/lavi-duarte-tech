@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ROTA GB - Super App de Bissau</title>
     
-    <!-- Configurações PWA para Android e iOS -->
+    <!-- Configurações PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00e676">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,58 +14,71 @@
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
-        .app-container { width: 100%; max-width: 414px; height: 100vh; max-height: 896px; background: #fff; display: flex; flex-direction: column; position: relative; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border-radius: 20px; }
+        body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; padding: 10px; }
+        
+        .app-container { 
+            width: 100%; 
+            max-width: 414px; 
+            background: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+            border-radius: 20px;
+            overflow: hidden;
+        }
         
         /* Header */
-        .header { background: #1a1a1a; color: #fff; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .header { background: #1a1a1a; color: #fff; padding: 16px; position: relative; z-index: 10; }
         .logo { font-size: 20px; font-weight: bold; color: #00e676; display: flex; align-items: center; gap: 6px; }
         .badge-gb { background: #ce1126; color: #fcd116; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
         .role-switch { background: #333; padding: 4px; border-radius: 20px; display: flex; }
         .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
         .role-btn.active { background: #00e676; color: #000; }
 
-        /* Navigation Services Tabs */
-        .service-nav { display: flex; background: #222; padding: 6px; gap: 4px; justify-content: space-around; overflow-x: auto; }
-        .nav-item { flex: 1; text-align: center; color: #ccc; font-size: 10px; font-weight: bold; padding: 8px 4px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-        .nav-item.active { background: #00e676; color: #000; }
+        /* Menu de Serviços Correto e Clicável */
+        .service-nav { display: flex; background: #222; padding: 6px; gap: 4px; justify-content: space-around; overflow-x: auto; position: relative; z-index: 10; }
+        .nav-item { flex: 1; text-align: center; color: #ccc; font-size: 10px; font-weight: bold; padding: 10px 4px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: 0.2s; user-select: none; }
+        .nav-item:hover { background: #333; color: #fff; }
+        .nav-item.active { background: #00e676 !important; color: #000 !important; }
 
-        /* Map Canvas */
-        .map-area { height: 160px; min-height: 160px; background: #e5e3df; position: relative; overflow: hidden; }
+        /* Área do Mapa */
+        .map-area { height: 140px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; }
         canvas { width: 100%; height: 100%; display: block; }
-        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); }
+        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); pointer-events: none; }
         .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
 
-        /* Bottom Sheet UI */
-        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+        /* Painel Inferior */
+        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 380px; position: relative; z-index: 10; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 11px; color: #666; font-weight: bold; }
-        select, input { padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; width: 100%; }
+        select, input { padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; width: 100%; cursor: pointer; }
 
-        /* Service Cards */
+        /* Cartões de Serviço */
         .service-options { display: flex; gap: 6px; }
-        .service-card { flex: 1; border: 2px solid #eee; border-radius: 10px; padding: 8px 4px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .service-card.selected { border-color: #00e676; background: rgba(0,230,118,0.05); }
+        .service-card { flex: 1; border: 2px solid #eee; border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: 0.2s; user-select: none; }
+        .service-card:hover { border-color: #00e676; }
+        .service-card.selected { border-color: #00e676; background: rgba(0,230,118,0.08); }
         .service-title { font-size: 10px; font-weight: bold; }
         .service-price { font-size: 12px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
 
-        /* Active Ride Waiting Panel */
-        .waiting-card { background: #fff3e0; border: 1px solid #ffe0b2; padding: 12px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; text-align: center; }
+        /* Painel de Espera */
+        .waiting-card { background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; text-align: center; }
         .waiting-title { font-size: 13px; font-weight: bold; color: #e65100; }
-        .timer-text { font-size: 20px; font-weight: 800; color: #d84315; margin: 4px 0; }
-        .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
-        .btn-cancel:active { transform: scale(0.98); }
+        .timer-text { font-size: 22px; font-weight: 800; color: #d84315; margin: 4px 0; }
+        .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
 
-        /* List Items */
-        .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; }
+        /* Listas */
+        .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; }
         .store-card { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; }
         .store-name { font-size: 13px; font-weight: bold; }
         .store-desc { font-size: 11px; color: #666; margin-top: 2px; }
         .price-tag { font-size: 11px; color: #00e676; font-weight: bold; margin-top: 4px; }
 
-        /* Buttons */
+        /* Botões */
         .btn-primary { background: #00e676; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
-        .payment-methods { display: flex; gap: 6px; font-size: 10px; color: #777; justify-content: center; margin-top: 4px; }
+        .btn-primary:active { transform: scale(0.98); }
+        .payment-methods { display: flex; gap: 6px; font-size: 10px; color: #777; justify-content: center; margin-top: 6px; }
         .pay-tag { background: #eee; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
         
         .sub-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
@@ -81,19 +94,19 @@
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div class="logo">ROTA GB <span class="badge-gb">GW</span></div>
             <div class="role-switch">
-                <button class="role-btn active" id="btn-passageiro" onclick="setRole('passageiro')">Cliente</button>
-                <button class="role-btn" id="btn-motorista" onclick="setRole('motorista')">Motorista</button>
+                <button type="button" class="role-btn active" id="btn-passageiro" onclick="setRole('passageiro')">Cliente</button>
+                <button type="button" class="role-btn" id="btn-motorista" onclick="setRole('motorista')">Motorista</button>
             </div>
         </div>
     </div>
 
     <!-- Navegação Principais Serviços -->
     <div class="service-nav" id="main-nav">
-        <div class="nav-item active" onclick="switchServiceTab('taxi')">🚗 Transporte</div>
-        <div class="nav-item" onclick="switchServiceTab('comida')">🍲 Comida</div>
-        <div class="nav-item" onclick="switchServiceTab('lojas')">🛒 Lojas</div>
-        <div class="nav-item" onclick="switchServiceTab('hoteis')">🏨 Hotéis & Apts</div>
-        <div class="nav-item" onclick="switchServiceTab('recargas')">📱 Recargas</div>
+        <div class="nav-item active" id="nav-taxi" onclick="switchServiceTab('taxi')">🚗 Transporte</div>
+        <div class="nav-item" id="nav-comida" onclick="switchServiceTab('comida')">🍲 Comida</div>
+        <div class="nav-item" id="nav-lojas" onclick="switchServiceTab('lojas')">🛒 Lojas</div>
+        <div class="nav-item" id="nav-hoteis" onclick="switchServiceTab('hoteis')">🏨 Hotéis & Apts</div>
+        <div class="nav-item" id="nav-recargas" onclick="switchServiceTab('recargas')">📱 Recargas</div>
     </div>
 
     <!-- Map Engine -->
@@ -102,7 +115,7 @@
         <canvas id="bissauMap"></canvas>
     </div>
 
-    <!-- Panel 1: Transporte (Táxi, Carro Privado e Moto) -->
+    <!-- Panel 1: Transporte -->
     <div class="bottom-panel" id="panel-taxi">
         <div id="rideFormControls">
             <div class="form-group">
@@ -118,31 +131,31 @@
             </div>
 
             <div class="service-options" style="margin-top: 10px;">
-                <div class="service-card selected" onclick="selectService(this, 1)">
+                <div class="service-card selected" id="card-taxi" onclick="selectService(this, 1)">
                     <div class="service-title">🚖 Táxi Azul</div>
                     <div class="service-price" id="price-taxi">1.500 XOF</div>
                 </div>
-                <div class="service-card" onclick="selectService(this, 1.3)">
+                <div class="service-card" id="card-privado" onclick="selectService(this, 1.3)">
                     <div class="service-title">🚘 Carro Privado</div>
                     <div class="service-price" id="price-privado">1.950 XOF</div>
                 </div>
-                <div class="service-card" onclick="selectService(this, 0.7)">
+                <div class="service-card" id="card-moto" onclick="selectService(this, 0.7)">
                     <div class="service-title">🛵 Moto-Táxi</div>
                     <div class="service-price" id="price-moto">1.050 XOF</div>
                 </div>
             </div>
 
-            <button class="btn-primary" style="margin-top: 12px;" onclick="requestRide()">Pedir Viagem Agora</button>
+            <button type="button" class="btn-primary" style="margin-top: 14px;" onclick="requestRide()">Pedir Viagem Agora</button>
         </div>
 
         <div class="waiting-card" id="waitingPanel">
             <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
             <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
             <div class="timer-text" id="waitingTimer">00:00</div>
-            <div style="font-size: 11px; color: #555; margin-bottom: 4px;">
+            <div style="font-size: 11px; color: #555; margin-bottom: 6px;">
                 Preço reservado: <strong id="reservedAmount">1.500 XOF</strong>
             </div>
-            <button class="btn-cancel" onclick="cancelRide()">Cancelar Viagem & Pedir Reembolso</button>
+            <button type="button" class="btn-cancel" onclick="cancelRide()">Cancelar Viagem & Pedir Reembolso</button>
         </div>
 
         <div class="payment-methods">
@@ -152,56 +165,56 @@
 
     <!-- Panel 2: Restaurantes -->
     <div class="bottom-panel" id="panel-comida" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Restaurantes em Bissau</div>
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Restaurantes em Bissau</div>
         <div class="store-list">
             <div class="store-card">
                 <div>
                     <div class="store-name">Papa Loca Bissau</div>
                     <div class="store-desc">Grelhados, Hambúrgueres e Fast Food</div>
                 </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Papa Loca')">Pedir</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Papa Loca')">Pedir</button>
             </div>
             <div class="store-card">
                 <div>
                     <div class="store-name">A Padeira Africana</div>
                     <div class="store-desc">Galinha Cafriela e Comida Típica</div>
                 </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('A Padeira Africana')">Pedir</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('A Padeira Africana')">Pedir</button>
             </div>
             <div class="store-card">
                 <div>
                     <div class="store-name">Restaurante Kalliste</div>
                     <div class="store-desc">Praça Che Guevara — Pizzas e Variedades</div>
                 </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Restaurante Kalliste')">Pedir</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Restaurante Kalliste')">Pedir</button>
             </div>
         </div>
     </div>
 
     <!-- Panel 3: Lojas -->
     <div class="bottom-panel" id="panel-lojas" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Supermercados e Lojas</div>
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Supermercados e Lojas</div>
         <div class="store-list">
             <div class="store-card">
                 <div>
                     <div class="store-name">Supermercado Hereso</div>
                     <div class="store-desc">Alimentação Geral e Produtos Frescos</div>
                 </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Supermercado Hereso')">Comprar</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Supermercado Hereso')">Comprar</button>
             </div>
             <div class="store-card">
                 <div>
                     <div class="store-name">Spar Bissau</div>
                     <div class="store-desc">Mercearia e Conveniência</div>
                 </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Spar Bissau')">Comprar</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Spar Bissau')">Comprar</button>
             </div>
         </div>
     </div>
 
-    <!-- Panel 4: Hotéis e Apartamentos -->
+    <!-- Panel 4: Hotéis -->
     <div class="bottom-panel" id="panel-hoteis" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Hotéis e Apartamentos em Bissau</div>
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Hotéis e Apartamentos em Bissau</div>
         <div class="store-list">
             <div class="store-card">
                 <div>
@@ -209,41 +222,31 @@
                     <div class="store-desc">Av. Amílcar Cabral — Quarto Duplo Executive</div>
                     <div class="price-tag">45.000 XOF / noite</div>
                 </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Hotel Ledra Bissau')">Reservar</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Hotel Ledra Bissau')">Reservar</button>
             </div>
-
             <div class="store-card">
                 <div>
                     <div class="store-name">Coqueiros Hotel & Apts</div>
                     <div class="store-desc">Bairro de Penha — Quarto com Piscina</div>
                     <div class="price-tag">35.000 XOF / noite</div>
                 </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Coqueiros Hotel')">Reservar</button>
-            </div>
-
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Bissau Royal Hotel</div>
-                    <div class="store-desc">Centro da Cidade — Suíte Luxo 5 Estrelas</div>
-                    <div class="price-tag">65.000 XOF / noite</div>
-                </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Bissau Royal Hotel')">Reservar</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Coqueiros Hotel')">Reservar</button>
             </div>
         </div>
     </div>
 
-    <!-- Panel 5: Recargas de Saldo / Redes Móveis -->
+    <!-- Panel 5: Recargas -->
     <div class="bottom-panel" id="panel-recargas" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Comprar Saldo de Telemóvel</div>
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Comprar Saldo de Telemóvel</div>
         
         <div class="sub-tabs">
-            <button class="sub-tab-btn active" id="btn-orange-op" onclick="selectOperator('Orange')">🟧 Orange Bissau</button>
-            <button class="sub-tab-btn" id="btn-telecel-op" onclick="selectOperator('Telecel')">🟥 Telecel Bissau</button>
+            <button type="button" class="sub-tab-btn active" id="btn-orange-op" onclick="selectOperator('Orange')">🟧 Orange Bissau</button>
+            <button type="button" class="sub-tab-btn" id="btn-telecel-op" onclick="selectOperator('Telecel')">🟥 Telecel Bissau</button>
         </div>
 
         <div class="form-group" style="margin-top: 6px;">
             <label>NÚMERO DE TELEMÓVEL (+245)</label>
-            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX" pattern="[0-9]{9}" required>
+            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX" pattern="[0-9]{9}">
         </div>
 
         <div class="form-group" style="margin-top: 6px;">
@@ -253,18 +256,17 @@
                 <option value="1000" selected>1.000 XOF</option>
                 <option value="2000">2.000 XOF</option>
                 <option value="5000">5.000 XOF</option>
-                <option value="10000">10.000 XOF</option>
             </select>
         </div>
 
-        <button class="btn-primary" style="margin-top: 10px;" onclick="processarRecarga()">Pagar Recarga Agora</button>
+        <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="processarRecarga()">Pagar Recarga Agora</button>
     </div>
 
     <!-- Panel Motorista -->
     <div class="bottom-panel" id="panel-motorista" style="display: none;">
         <div class="sub-tabs">
-            <button class="sub-tab-btn active" id="tab-painel-btn" onclick="toggleDriverTab('painel')">Painel do Condutor</button>
-            <button class="sub-tab-btn" id="tab-registo-btn" onclick="toggleDriverTab('registo')">Registar Veículo</button>
+            <button type="button" class="sub-tab-btn active" id="tab-painel-btn" onclick="toggleDriverTab('painel')">Painel do Condutor</button>
+            <button type="button" class="sub-tab-btn" id="tab-registo-btn" onclick="toggleDriverTab('registo')">Registar Veículo</button>
         </div>
 
         <div id="driver-dashboard">
@@ -275,7 +277,7 @@
 
             <div style="background: #f9f9f9; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <div>
-                    <div style="font-size: 10px; color: #888;">Ganhos Hoje (Viagens + Entregas)</div>
+                    <div style="font-size: 10px; color: #888;">Ganhos Hoje</div>
                     <div style="font-size: 16px; font-weight: bold; color: #1a1a1a;">28.000 XOF</div>
                 </div>
                 <div style="font-size: 11px; background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 6px; font-weight: bold;">
@@ -283,48 +285,225 @@
                 </div>
             </div>
 
-            <button class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas em Bissau...')">Aguardar Chamadas</button>
+            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas em Bissau...')">Aguardar Chamadas</button>
         </div>
 
         <div id="driver-register" style="display: none;">
-            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo / Entregador</div>
+            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo</div>
             <form id="formCadastroMotorista" onsubmit="cadastrarMotorista(event)" style="display: flex; flex-direction: column; gap: 8px;">
                 <input type="text" id="nomeMotorista" placeholder="Nome Completo" required>
                 <input type="tel" id="telefoneMotorista" placeholder="Telefone (Orange / Telecel)" required>
                 <select id="tipoTransporte">
                     <option value="Taxi">Táxi Azul/Amarelo</option>
-                    <option value="CarroPrivado">Carro Privado / Particular</option>
-                    <option value="Moto">Moto-Táxi / Entregador Express</option>
+                    <option value="CarroPrivado">Carro Privado</option>
+                    <option value="Moto">Moto-Táxi</option>
                 </select>
-                <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
+                <input type="text" id="marcaModelo" placeholder="Marca e Modelo" required>
                 <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula" required>
                 <button type="submit" class="btn-primary">Submeter para Aprovação</button>
             </form>
         </div>
     </div>
     
-    <div style="text-align: center; font-size: 9px; color: #888; padding: 6px; border-top: 1px solid #eee; background: #fff;">
+    <div style="text-align: center; font-size: 9px; color: #888; padding: 8px; border-top: 1px solid #eee; background: #fff;">
         ROTA GB © — Guiné-Bissau
     </div>
 </div>
 
 <script>
+    // Configuração do Canvas do Mapa
     const canvas = document.getElementById('bissauMap');
     const ctx = canvas.getContext('2d');
 
     function resizeCanvas() {
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
+        if(canvas && canvas.parentElement) {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
     }
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
     let driverX = 80;
-    let driverY = 90;
+    let driverY = 70;
 
     function drawMap() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 10;
+        ctx.lineWidth = 8;
         ctx.beginPath();
+        ctx.moveTo(0, canvas.height * 0.4);
+        ctx.lineTo(canvas.width, canvas.height * 0.6);
+        ctx.stroke();
+
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width * 0.5, 0);
+        ctx.lineTo(canvas.width * 0.3, canvas.height);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ce1126';
+        ctx.beginPath();
+        ctx.arc(driverX, driverY, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#000';
+        ctx.font = '10px sans-serif';
+        ctx.fillText("🚖 ROTA GB Express", driverX - 30, driverY - 10);
+
+        driverX += 0.5;
+        if (driverX > canvas.width) driverX = 0;
+
+        requestAnimationFrame(drawMap);
+    }
+    drawMap();
+
+    // Variáveis Globais
+    let currentMultiplier = 1;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let activePrice = 0;
+    let currentOperator = 'Orange';
+
+    // Troca de Módulos (Menu Superior)
+    function switchServiceTab(tab) {
+        document.querySelectorAll('.service-nav .nav-item').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('panel-taxi').style.display = 'none';
+        document.getElementById('panel-comida').style.display = 'none';
+        document.getElementById('panel-lojas').style.display = 'none';
+        document.getElementById('panel-hoteis').style.display = 'none';
+        document.getElementById('panel-recargas').style.display = 'none';
+
+        if(tab === 'taxi') {
+            document.getElementById('nav-taxi').classList.add('active');
+            document.getElementById('panel-taxi').style.display = 'flex';
+        } else if(tab === 'comida') {
+            document.getElementById('nav-comida').classList.add('active');
+            document.getElementById('panel-comida').style.display = 'flex';
+        } else if(tab === 'lojas') {
+            document.getElementById('nav-lojas').classList.add('active');
+            document.getElementById('panel-lojas').style.display = 'flex';
+        } else if(tab === 'hoteis') {
+            document.getElementById('nav-hoteis').classList.add('active');
+            document.getElementById('panel-hoteis').style.display = 'flex';
+        } else if(tab === 'recargas') {
+            document.getElementById('nav-recargas').classList.add('active');
+            document.getElementById('panel-recargas').style.display = 'flex';
+        }
+    }
+
+    // Troca Cliente / Motorista
+    function setRole(role) {
+        document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
+        document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
+        
+        if(role === 'passageiro') {
+            document.getElementById('main-nav').style.display = 'flex';
+            switchServiceTab('taxi');
+            document.getElementById('panel-motorista').style.display = 'none';
+        } else {
+            document.getElementById('main-nav').style.display = 'none';
+            document.getElementById('panel-taxi').style.display = 'none';
+            document.getElementById('panel-comida').style.display = 'none';
+            document.getElementById('panel-lojas').style.display = 'none';
+            document.getElementById('panel-hoteis').style.display = 'none';
+            document.getElementById('panel-recargas').style.display = 'none';
+            document.getElementById('panel-motorista').style.display = 'flex';
+        }
+    }
+
+    function toggleDriverTab(tab) {
+        document.getElementById('tab-painel-btn').classList.toggle('active', tab === 'painel');
+        document.getElementById('tab-registo-btn').classList.toggle('active', tab === 'registo');
+        document.getElementById('driver-dashboard').style.display = tab === 'painel' ? 'block' : 'none';
+        document.getElementById('driver-register').style.display = tab === 'registo' ? 'block' : 'none';
+    }
+
+    // Seleção de Tipo de Transporte (Táxi, Carro, Moto)
+    function selectService(element, multiplier) {
+        document.querySelectorAll('.service-card').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        currentMultiplier = multiplier;
+        updatePrice();
+    }
+
+    function updatePrice() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        document.getElementById('price-taxi').innerText = `${Math.round(basePrice * 1).toLocaleString()} XOF`;
+        document.getElementById('price-privado').innerText = `${Math.round(basePrice * 1.3).toLocaleString()} XOF`;
+        document.getElementById('price-moto').innerText = `${Math.round(basePrice * 0.7).toLocaleString()} XOF`;
+    }
+
+    // Pedido de Viagem
+    function requestRide() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        activePrice = Math.round(basePrice * currentMultiplier);
+
+        document.getElementById('reservedAmount').innerText = `${activePrice.toLocaleString()} XOF`;
+        document.getElementById('rideFormControls').style.display = 'none';
+        document.getElementById('waitingPanel').style.display = 'flex';
+
+        secondsElapsed = 0;
+        document.getElementById('waitingTimer').innerText = "00:00";
+        
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            document.getElementById('waitingTimer').innerText = `${mins}:${secs}`;
+        }, 1000);
+    }
+
+    function cancelRide() {
+        clearInterval(timerInterval);
+        alert(`Pedido de viagem cancelado com sucesso!\n\nReembolso Processado:\nValor retido de ${activePrice.toLocaleString()} XOF foi reembolsado na sua conta/carteira ROTA GB.`);
+        
+        document.getElementById('waitingPanel').style.display = 'none';
+        document.getElementById('rideFormControls').style.display = 'block';
+    }
+
+    function selectOperator(op) {
+        currentOperator = op;
+        document.getElementById('btn-orange-op').classList.toggle('active', op === 'Orange');
+        document.getElementById('btn-telecel-op').classList.toggle('active', op === 'Telecel');
+    }
+
+    function processarRecarga() {
+        const phone = document.getElementById('phoneRecarga').value;
+        const amount = document.getElementById('amountRecarga').value;
+        
+        if(!phone) {
+            alert('Por favor, insira o número de telemóvel.');
+            return;
+        }
+        
+        alert(`A processar recarga de ${parseInt(amount).toLocaleString()} XOF para o número +245 ${phone} via ${currentOperator}...\n\nConfirme o código PIN no seu ecrã!`);
+    }
+
+    function pedirDelivery(restaurante) {
+        alert(`A abrir menu de: ${restaurante}\n\nO estafeta Moto-Táxi do ROTA GB recolherá e entregará a refeição em Bissau!`);
+    }
+
+    function pedirLoja(loja) {
+        alert(`A abrir catálogo de: ${loja}\n\nEfetue as suas compras com entrega rápida via ROTA GB Express!`);
+    }
+
+    function reservarHotel(hotel) {
+        alert(`Pedido de Reserva enviado para: ${hotel}\n\nA receção entrará em contacto para confirmar. Pretende agendar também um Táxi ROTA GB para o Aeroporto?`);
+    }
+
+    function cadastrarMotorista(event) {
+        event.preventDefault();
+        const nome = document.getElementById('nomeMotorista').value;
+        const matricula = document.getElementById('matriculaVeiculo').value;
+        alert(`Cadastro submetido com sucesso!\n\nMotorista: ${nome}\nMatrícula: ${matricula}\n\nAguarda aprovação da administração.`);
+        document.getElementById('formCadastroMotorista').reset();
+        toggleDriverTab('painel');
+    }
+</script>
+
+</body>
+</html>
