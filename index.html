@@ -44,6 +44,13 @@
         .service-title { font-size: 10px; font-weight: bold; }
         .service-price { font-size: 12px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
 
+        /* Active Ride Waiting Panel */
+        .waiting-card { background: #fff3e0; border: 1px solid #ffe0b2; padding: 12px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; text-align: center; }
+        .waiting-title { font-size: 13px; font-weight: bold; color: #e65100; }
+        .timer-text { font-size: 20px; font-weight: 800; color: #d84315; margin: 4px 0; }
+        .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn-cancel:active { transform: scale(0.98); }
+
         /* List Items */
         .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; }
         .store-card { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; }
@@ -99,34 +106,48 @@
 
     <!-- Panel 1: Transporte (Táxi, Carro Privado e Moto) -->
     <div class="bottom-panel" id="panel-taxi">
-        <div class="form-group">
-            <label>ROTA E DESTINO EM BISSAU</label>
-            <select id="routeSelect" onchange="updatePrice()">
-                <option value="1500">Praça dos Heróis ➔ Aeroporto Osvaldo Vieira</option>
-                <option value="1000">Mercado de Bandim ➔ Bairro de Penha</option>
-                <option value="2000">Alto Bissau ➔ Santa Luzia</option>
-                <option value="800">Praça dos Heróis ➔ Mercado de Bandim</option>
-                <option value="1200">Bairro Militar ➔ Antula</option>
-                <option value="2500">Bissau Central ➔ Safim</option>
-            </select>
+        <!-- Formulário de Pedido (Visível quando não há corrida ativa) -->
+        <div id="rideFormControls">
+            <div class="form-group">
+                <label>ROTA E DESTINO EM BISSAU</label>
+                <select id="routeSelect" onchange="updatePrice()">
+                    <option value="1500">Praça dos Heróis ➔ Aeroporto Osvaldo Vieira</option>
+                    <option value="1000">Mercado de Bandim ➔ Bairro de Penha</option>
+                    <option value="2000">Alto Bissau ➔ Santa Luzia</option>
+                    <option value="800">Praça dos Heróis ➔ Mercado de Bandim</option>
+                    <option value="1200">Bairro Militar ➔ Antula</option>
+                    <option value="2500">Bissau Central ➔ Safim</option>
+                </select>
+            </div>
+
+            <div class="service-options" style="margin-top: 10px;">
+                <div class="service-card selected" onclick="selectService(this, 1)">
+                    <div class="service-title">🚖 Táxi Azul</div>
+                    <div class="service-price" id="price-taxi">1.500 XOF</div>
+                </div>
+                <div class="service-card" onclick="selectService(this, 1.3)">
+                    <div class="service-title">🚘 Carro Privado</div>
+                    <div class="service-price" id="price-privado">1.950 XOF</div>
+                </div>
+                <div class="service-card" onclick="selectService(this, 0.7)">
+                    <div class="service-title">🛵 Moto-Táxi</div>
+                    <div class="service-price" id="price-moto">1.050 XOF</div>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="margin-top: 12px;" onclick="requestRide()">Pedir Viagem Agora</button>
         </div>
 
-        <div class="service-options">
-            <div class="service-card selected" onclick="selectService(this, 1)">
-                <div class="service-title">🚖 Táxi Azul</div>
-                <div class="service-price" id="price-taxi">1.500 XOF</div>
+        <!-- Painel de Espera e Cancelamento (Ativado ao pedir a corrida) -->
+        <div class="waiting-card" id="waitingPanel">
+            <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
+            <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
+            <div class="timer-text" id="waitingTimer">00:00</div>
+            <div style="font-size: 11px; color: #555; margin-bottom: 4px;">
+                Preço reservado: <strong id="reservedAmount">1.500 XOF</strong>
             </div>
-            <div class="service-card" onclick="selectService(this, 1.3)">
-                <div class="service-title">🚘 Carro Privado</div>
-                <div class="service-price" id="price-privado">1.950 XOF</div>
-            </div>
-            <div class="service-card" onclick="selectService(this, 0.7)">
-                <div class="service-title">🛵 Moto-Táxi</div>
-                <div class="service-price" id="price-moto">1.050 XOF</div>
-            </div>
+            <button class="btn-cancel" onclick="cancelRide()">Cancelar Viagem & Pedir Reembolso</button>
         </div>
-
-        <button class="btn-primary" onclick="requestRide()">Pedir Viagem Agora</button>
 
         <div class="payment-methods">
             Pagamento: <span class="pay-tag">💵 Dinheiro</span> <span class="pay-tag">🟧 Orange Money</span> <span class="pay-tag">🟨 MTN</span>
@@ -310,6 +331,9 @@
     drawMap();
 
     let currentMultiplier = 1;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let activePrice = 0;
 
     function switchServiceTab(tab) {
         document.querySelectorAll('.service-nav .nav-item').forEach(el => el.classList.remove('active'));
@@ -374,8 +398,30 @@
 
     function requestRide() {
         const basePrice = parseInt(document.getElementById('routeSelect').value);
-        const finalPrice = Math.round(basePrice * currentMultiplier);
-        alert(`Pedido de Transporte enviado!\nValor estimado: ${finalPrice.toLocaleString()} XOF.\nA atribuir motorista ROTA GB próximo...`);
+        activePrice = Math.round(basePrice * currentMultiplier);
+
+        document.getElementById('reservedAmount').innerText = `${activePrice.toLocaleString()} XOF`;
+        document.getElementById('rideFormControls').style.display = 'none';
+        document.getElementById('waitingPanel').style.display = 'flex';
+
+        secondsElapsed = 0;
+        document.getElementById('waitingTimer').innerText = "00:00";
+        
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            document.getElementById('waitingTimer').innerText = `${mins}:${secs}`;
+        }, 1000);
+    }
+
+    function cancelRide() {
+        clearInterval(timerInterval);
+        alert(`Pedido de viagem cancelado com sucesso!\n\nReembolso Processado:\nValor retido de ${activePrice.toLocaleString()} XOF foi reembolsado na sua conta/carteira ROTA GB.`);
+        
+        document.getElementById('waitingPanel').style.display = 'none';
+        document.getElementById('rideFormControls').style.display = 'block';
     }
 
     function pedirDelivery(restaurante) {
