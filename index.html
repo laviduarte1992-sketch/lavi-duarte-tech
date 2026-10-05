@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROTA GB - Plataforma de Mobilidade de Guiné-Bissau</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
+        .app-container { width: 100%; max-width: 414px; height: 100vh; max-height: 896px; background: #fff; display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border-radius: 20px; }
+        
+        /* Header */
+        .header { background: #1a1a1a; color: #fff; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: bold; color: #00e676; display: flex; align-items: center; gap: 6px; }
+        .badge-gb { background: #ce1126; color: #fcd116; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .role-switch { background: #333; padding: 4px; border-radius: 20px; display: flex; }
+        .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .role-btn.active { background: #00e676; color: #000; }
+
+        /* Map Canvas */
+        .map-area { flex: 1; background: #e5e3df; position: relative; overflow: hidden; }
+        canvas { width: 100%; height: 100%; display: block; }
+        .status-pill { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); }
+        .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
+
+        /* Bottom Sheet UI */
+        .bottom-panel { background: #fff; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 14px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 12px; color: #666; font-weight: 600; }
+        select, input { padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; outline: none; background: #f9f9f9; }
+
+        /* Service Cards */
+        .service-options { display: flex; gap: 10px; }
+        .service-card { flex: 1; border: 2px solid #eee; border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .service-card.selected { border-color: #00e676; background: rgba(0,230,118,0.05); }
+        .service-title { font-size: 12px; font-weight: bold; }
+        .service-price { font-size: 14px; font-weight: 800; color: #1a1a1a; margin-top: 4px; }
+
+        /* Actions */
+        .btn-primary { background: #00e676; color: #000; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
+        .btn-primary:active { transform: scale(0.98); }
+        .payment-methods { display: flex; gap: 8px; font-size: 11px; color: #777; justify-content: center; }
+        .pay-tag { background: #eee; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">ROTA GB <span class="badge-gb">GW</span></div>
+        <div class="role-switch">
+            <button class="role-btn active" id="btn-passageiro" onclick="setRole('passageiro')">Passageiro</button>
+            <button class="role-btn" id="btn-motorista" onclick="setRole('motorista')">Motorista</button>
+        </div>
+    </div>
+
+    <!-- Map Engine -->
+    <div class="map-area">
+        <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
+        <canvas id="bissauMap"></canvas>
+    </div>
+
+    <!-- Passenger Panel -->
+    <div class="bottom-panel" id="panel-passageiro">
+        <div class="form-group">
+            <label>PONTO DE RECOLHA / DESTINO</label>
+            <select id="routeSelect" onchange="updatePrice()">
+                <option value="1500">Praça dos Heróis ➔ Aeroporto Osvaldo Vieira</option>
+                <option value="1000">Mercado de Bandim ➔ Bairro de Penha</option>
+                <option value="2000">Alto Bissau ➔ Santa Luzia</option>
+            </select>
+        </div>
+
+        <div class="service-options">
+            <div class="service-card selected" onclick="selectService(this, 1)">
+                <div class="service-title">Táxi Azul/Amarelo</div>
+                <div class="service-price" id="price-taxi">1.500 XOF</div>
+            </div>
+            <div class="service-card" onclick="selectService(this, 0.7)">
+                <div class="service-title">Moto-Táxi</div>
+                <div class="service-price" id="price-moto">1.050 XOF</div>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="requestRide()">Pedir Viagem Agora</button>
+
+        <div class="payment-methods">
+            Pagamento: <span class="pay-tag">💵 Dinheiro</span> <span class="pay-tag">🟧 Orange Money</span> <span class="pay-tag">🟨 MTN</span>
+        </div>
+    </div>
+
+    <!-- Driver Panel (Hidden by default) -->
+    <div class="bottom-panel" id="panel-motorista" style="display: none;">
+        <div style="text-align: center;">
+            <h3 style="font-size: 16px;">Painel do Condutor</h3>
+            <p style="font-size: 12px; color: #666; margin-top: 4px;">Status: <strong style="color: #00e676;">Disponível em Bissau</strong></p>
+        </div>
+
+        <div style="background: #f9f9f9; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-size: 11px; color: #888;">Ganhos de Hoje</div>
+                <div style="font-size: 18px; font-weight: bold; color: #1a1a1a;">18.500 XOF</div>
+            </div>
+            <div style="font-size: 12px; background: #e8f5e9; color: #2e7d32; padding: 6px 10px; border-radius: 8px; font-weight: bold;">
+                12 Corridas
+            </div>
+        </div>
+
+        <button class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas de passageiros próximos...')">Aguardar Pedidos</button>
+    </div>
+</div>
+
+<script>
+    // Simple Map Animation Simulator for Bissau
+    const canvas = document.getElementById('bissauMap');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let driverX = 100;
+    let driverY = 150;
+
+    function drawMap() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Roads
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 12;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height * 0.4);
+        ctx.lineTo(canvas.width, canvas.height * 0.6);
+        ctx.stroke();
+
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width * 0.5, 0);
+        ctx.lineTo(canvas.width * 0.3, canvas.height);
+        ctx.stroke();
+
+        // Animated Driver Marker
+        ctx.fillStyle = '#ce1126';
+        ctx.beginPath();
+        ctx.arc(driverX, driverY, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#000';
+        ctx.font = '10px sans-serif';
+        ctx.fillText("🚖 Taxi ROTA GB", driverX - 25, driverY - 12);
+
+        driverX += 0.5;
+        if (driverX > canvas.width) driverX = 0;
+
+        requestAnimationFrame(drawMap);
+    }
+    drawMap();
+
+    // UI Logic
+    let currentMultiplier = 1;
+
+    function setRole(role) {
+        document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
+        document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
+        document.getElementById('panel-passageiro').style.display = role === 'passageiro' ? 'flex' : 'none';
+        document.getElementById('panel-motorista').style.display = role === 'motorista' ? 'flex' : 'none';
+    }
+
+    function selectService(element, multiplier) {
+        document.querySelectorAll('.service-card').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        currentMultiplier = multiplier;
+        updatePrice();
+    }
+
+    function updatePrice() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        document.getElementById('price-taxi').innerText = `${Math.round(basePrice * 1).toLocaleString()} XOF`;
+        document.getElementById('price-moto').innerText = `${Math.round(basePrice * 0.7).toLocaleString()} XOF`;
+    }
+
+    function requestRide() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        const finalPrice = Math.round(basePrice * currentMultiplier);
+        alert(`Pedido enviado para a rede ROTA GB!\nPreço estimado: ${finalPrice.toLocaleString()} XOF.\nA procurar o motorista mais próximo...`);
+    }
+</script>
+
+</body>
+</html>
