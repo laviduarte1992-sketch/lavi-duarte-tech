@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROTA GB - Mobilidade & Delivery Bissau</title>
+    <title>ROTA GB - Super App de Bissau</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
@@ -21,18 +21,18 @@
         .ceo-badge { background: rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; border-left: 3px solid #00e676; }
 
         /* Navigation Services Tabs */
-        .service-nav { display: flex; background: #222; padding: 6px; gap: 4px; justify-content: space-around; }
-        .nav-item { flex: 1; text-align: center; color: #ccc; font-size: 11px; font-weight: bold; padding: 8px 4px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .service-nav { display: flex; background: #222; padding: 6px; gap: 4px; justify-content: space-around; overflow-x: auto; }
+        .nav-item { flex: 1; text-align: center; color: #ccc; font-size: 10px; font-weight: bold; padding: 8px 4px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
         .nav-item.active { background: #00e676; color: #000; }
 
         /* Map Canvas */
-        .map-area { height: 180px; min-height: 180px; background: #e5e3df; position: relative; overflow: hidden; }
+        .map-area { height: 160px; min-height: 160px; background: #e5e3df; position: relative; overflow: hidden; }
         canvas { width: 100%; height: 100%; display: block; }
         .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); }
         .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
 
         /* Bottom Sheet UI */
-        .bottom-panel { background: #fff; padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 11px; color: #666; font-weight: bold; }
         select, input { padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; }
@@ -44,12 +44,12 @@
         .service-title { font-size: 11px; font-weight: bold; }
         .service-price { font-size: 13px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
 
-        /* List Items (Food / Shops) */
-        .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; }
+        /* List Items */
+        .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; }
         .store-card { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; }
         .store-name { font-size: 13px; font-weight: bold; }
         .store-desc { font-size: 11px; color: #666; margin-top: 2px; }
-        .store-time { font-size: 10px; color: #00e676; font-weight: bold; background: #e8f5e9; padding: 3px 6px; border-radius: 6px; }
+        .price-tag { font-size: 11px; color: #00e676; font-weight: bold; margin-top: 4px; }
 
         /* Buttons */
         .btn-primary { background: #00e676; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
@@ -83,11 +83,12 @@
         </div>
     </div>
 
-    <!-- Navegação de Serviços em Bissau -->
+    <!-- Navegação Principais Serviços -->
     <div class="service-nav" id="main-nav">
-        <div class="nav-item active" onclick="switchServiceTab('taxi')">🚖 Táxi / Moto</div>
-        <div class="nav-item" onclick="switchServiceTab('comida')">🍲 Restaurantes</div>
-        <div class="nav-item" onclick="switchServiceTab('lojas')">🛒 Lojas & Super</div>
+        <div class="nav-item active" onclick="switchServiceTab('taxi')">🚖 Táxi/Moto</div>
+        <div class="nav-item" onclick="switchServiceTab('comida')">🍲 Comida</div>
+        <div class="nav-item" onclick="switchServiceTab('lojas')">🛒 Lojas</div>
+        <div class="nav-item" onclick="switchServiceTab('hoteis')">🏨 Hotéis & Apts</div>
     </div>
 
     <!-- Map Engine -->
@@ -128,88 +129,93 @@
         </div>
     </div>
 
-    <!-- Panel 2: Restaurantes em Bissau -->
+    <!-- Panel 2: Restaurantes -->
     <div class="bottom-panel" id="panel-comida" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Restaurantes Disponíveis em Bissau</div>
-        
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Restaurantes em Bissau</div>
         <div class="store-list">
             <div class="store-card">
                 <div>
                     <div class="store-name">Papa Loca Bissau</div>
-                    <div class="store-desc">Grelhados, Hambúrgueres e Cozinha Internacional</div>
+                    <div class="store-desc">Grelhados, Hambúrgueres e Fast Food</div>
                 </div>
                 <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Papa Loca')">Pedir</button>
             </div>
-
             <div class="store-card">
                 <div>
                     <div class="store-name">A Padeira Africana</div>
-                    <div class="store-desc">Galinha Cafriela, Caldo de Chabéu e Pratos Típicos</div>
+                    <div class="store-desc">Galinha Cafriela e Comida Típica</div>
                 </div>
                 <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('A Padeira Africana')">Pedir</button>
             </div>
-
             <div class="store-card">
                 <div>
                     <div class="store-name">Restaurante Kalliste</div>
-                    <div class="store-desc">Praça Che Guevara — Pizzas e Tostas Rápidas</div>
+                    <div class="store-desc">Praça Che Guevara — Pizzas e Variedades</div>
                 </div>
                 <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Restaurante Kalliste')">Pedir</button>
-            </div>
-
-            <div class="store-card">
-                <div>
-                    <div class="store-name">OASIS Churrascaria</div>
-                    <div class="store-desc">Centro da Cidade — Espetadas e Carnes no Carvão</div>
-                </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('OASIS Churrascaria')">Pedir</button>
-            </div>
-
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Coqueiros Bissau</div>
-                    <div class="store-desc">Pratos Portugueses e Peixe Fresco Grelhado</div>
-                </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Coqueiros Bissau')">Pedir</button>
             </div>
         </div>
     </div>
 
-    <!-- Panel 3: Lojas e Supermercados em Bissau -->
+    <!-- Panel 3: Lojas -->
     <div class="bottom-panel" id="panel-lojas" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Supermercados e Lojas em Bissau</div>
-        
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Supermercados e Lojas</div>
         <div class="store-list">
             <div class="store-card">
                 <div>
                     <div class="store-name">Supermercado Hereso</div>
-                    <div class="store-desc">Alimentação Geral, Bebidas e Produtos Frescos</div>
+                    <div class="store-desc">Alimentação Geral e Produtos Frescos</div>
                 </div>
                 <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Supermercado Hereso')">Comprar</button>
             </div>
-
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Supermercado Darling</div>
-                    <div class="store-desc">Importações, Mercearia e Higiene</div>
-                </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Supermercado Darling')">Comprar</button>
-            </div>
-
             <div class="store-card">
                 <div>
                     <div class="store-name">Spar Bissau</div>
-                    <div class="store-desc">Conveniência e Variedades do Dia a Dia</div>
+                    <div class="store-desc">Mercearia e Conveniência</div>
                 </div>
                 <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Spar Bissau')">Comprar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel 4: Hotéis e Apartamentos -->
+    <div class="bottom-panel" id="panel-hoteis" style="display: none;">
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">Hotéis e Apartamentos em Bissau</div>
+        <div class="store-list">
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Hotel Ledra Bissau</div>
+                    <div class="store-desc">Av. Amílcar Cabral — Quarto Duplo Executive</div>
+                    <div class="price-tag">45.000 XOF / noite</div>
+                </div>
+                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Hotel Ledra Bissau')">Reservar</button>
             </div>
 
             <div class="store-card">
                 <div>
-                    <div class="store-name">Mini Mercado Compre Mais</div>
-                    <div class="store-desc">Produtos Alimentares e Bebidas Rápidas</div>
+                    <div class="store-name">Coqueiros Hotel & Apts</div>
+                    <div class="store-desc">Bairro de Penha — Quarto com Piscina</div>
+                    <div class="price-tag">35.000 XOF / noite</div>
                 </div>
-                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Compre Mais')">Comprar</button>
+                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Coqueiros Hotel')">Reservar</button>
+            </div>
+
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Bissau Royal Hotel</div>
+                    <div class="store-desc">Centro da Cidade — Suíte Luxo 5 Estrelas</div>
+                    <div class="price-tag">65.000 XOF / noite</div>
+                </div>
+                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Bissau Royal Hotel')">Reservar</button>
+            </div>
+
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Aparthotel Bissau Central</div>
+                    <div class="store-desc">Apartamento T1 Totalmente Equipado</div>
+                    <div class="price-tag">25.000 XOF / noite</div>
+                </div>
+                <button style="background:#00e676; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Aparthotel Bissau Central')">Reservar</button>
             </div>
         </div>
     </div>
@@ -230,27 +236,27 @@
             <div style="background: #f9f9f9; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <div>
                     <div style="font-size: 10px; color: #888;">Ganhos Hoje (Viagens + Entregas)</div>
-                    <div style="font-size: 16px; font-weight: bold; color: #1a1a1a;">24.500 XOF</div>
+                    <div style="font-size: 16px; font-weight: bold; color: #1a1a1a;">28.000 XOF</div>
                 </div>
                 <div style="font-size: 11px; background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 6px; font-weight: bold;">
-                    15 Serviços
+                    18 Serviços
                 </div>
             </div>
 
-            <button class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas de transporte e pedidos de entrega em Bissau...')">Aguardar Pedidos de Entrega / Viagem</button>
+            <button class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas em Bissau...')">Aguardar Chamadas</button>
         </div>
 
         <div id="driver-register" style="display: none;">
             <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo / Entregador</div>
             <form id="formCadastroMotorista" onsubmit="cadastrarMotorista(event)" style="display: flex; flex-direction: column; gap: 8px;">
-                <input type="text" id="nomeMotorista" placeholder="Nome Completo do Motorista" required>
+                <input type="text" id="nomeMotorista" placeholder="Nome Completo" required>
                 <input type="tel" id="telefoneMotorista" placeholder="Telefone (Orange / MTN)" required>
                 <select id="tipoTransporte">
                     <option value="Taxi">Táxi Azul/Amarelo</option>
                     <option value="Moto">Moto-Táxi / Entregador Express</option>
                 </select>
-                <input type="text" id="marcaModelo" placeholder="Marca e Modelo (Ex: Toyota / KeeWay)" required>
-                <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula (Ex: GB-1234-A)" required>
+                <input type="text" id="marcaModelo" placeholder="Marca e Modelo" required>
+                <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula" required>
                 <button type="submit" class="btn-primary">Submeter para Aprovação do CEO</button>
             </form>
         </div>
@@ -273,7 +279,7 @@
     window.addEventListener('resize', resizeCanvas);
 
     let driverX = 80;
-    let driverY = 100;
+    let driverY = 90;
 
     function drawMap() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -314,6 +320,7 @@
         document.getElementById('panel-taxi').style.display = 'none';
         document.getElementById('panel-comida').style.display = 'none';
         document.getElementById('panel-lojas').style.display = 'none';
+        document.getElementById('panel-hoteis').style.display = 'none';
 
         if(tab === 'taxi') {
             document.querySelectorAll('.service-nav .nav-item')[0].classList.add('active');
@@ -324,6 +331,9 @@
         } else if(tab === 'lojas') {
             document.querySelectorAll('.service-nav .nav-item')[2].classList.add('active');
             document.getElementById('panel-lojas').style.display = 'flex';
+        } else if(tab === 'hoteis') {
+            document.querySelectorAll('.service-nav .nav-item')[3].classList.add('active');
+            document.getElementById('panel-hoteis').style.display = 'flex';
         }
     }
 
@@ -340,6 +350,7 @@
             document.getElementById('panel-taxi').style.display = 'none';
             document.getElementById('panel-comida').style.display = 'none';
             document.getElementById('panel-lojas').style.display = 'none';
+            document.getElementById('panel-hoteis').style.display = 'none';
             document.getElementById('panel-motorista').style.display = 'flex';
         }
     }
@@ -367,15 +378,19 @@
     function requestRide() {
         const basePrice = parseInt(document.getElementById('routeSelect').value);
         const finalPrice = Math.round(basePrice * currentMultiplier);
-        alert(`Pedido de Transporte enviado!\nValor estimado: ${finalPrice.toLocaleString()} XOF.\nA atribuir motorista ROTA GB próximo...`);
+        alert(`Pedido enviado!\nValor estimado: ${finalPrice.toLocaleString()} XOF.\nA atribuir motorista ROTA GB próximo...`);
     }
 
     function pedirDelivery(restaurante) {
-        alert(`A abrir menu de refeições de: ${restaurante}\n\nO estafeta Moto-Táxi do ROTA GB recolherá o seu pedido e entregará na sua localização em Bissau!`);
+        alert(`A abrir menu de: ${restaurante}\n\nO estafeta Moto-Táxi do ROTA GB recolherá e entregará a refeição em Bissau!`);
     }
 
     function pedirLoja(loja) {
-        alert(`A abrir lista de produtos de: ${loja}\n\nEfetue a compra e receba a sua encomenda através do serviço ROTA GB Express!`);
+        alert(`A abrir catálogo de: ${loja}\n\nEfetue as suas compras com entrega rápida via ROTA GB Express!`);
+    }
+
+    function reservarHotel(hotel) {
+        alert(`Pedido de Reserva enviado para: ${hotel}\n\nA receção entrará em contacto para confirmar. Pretende agendar também um Táxi ROTA GB para o Aeroporto?`);
     }
 
     function cadastrarMotorista(event) {
