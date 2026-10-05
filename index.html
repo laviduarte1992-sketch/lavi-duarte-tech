@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ROTA GB - Super App de Bissau</title>
+    
+    <!-- Configurações PWA para Android e iOS -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00e676">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ROTA GB">
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
@@ -106,7 +114,6 @@
 
     <!-- Panel 1: Transporte (Táxi, Carro Privado e Moto) -->
     <div class="bottom-panel" id="panel-taxi">
-        <!-- Formulário de Pedido (Visível quando não há corrida ativa) -->
         <div id="rideFormControls">
             <div class="form-group">
                 <label>ROTA E DESTINO EM BISSAU</label>
@@ -138,7 +145,6 @@
             <button class="btn-primary" style="margin-top: 12px;" onclick="requestRide()">Pedir Viagem Agora</button>
         </div>
 
-        <!-- Painel de Espera e Cancelamento (Ativado ao pedir a corrida) -->
         <div class="waiting-card" id="waitingPanel">
             <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
             <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
