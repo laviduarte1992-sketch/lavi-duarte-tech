@@ -10,47 +10,42 @@
 
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f2f2f7; margin: 0; padding: 0; color: #1c1c1e; }
-        header { background: #1c1c1e; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        header { background: #1c1c1e; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 100; }
         .logo-area { display: flex; align-items: center; gap: 8px; }
         .logo-text { color: #00e676; font-weight: bold; font-size: 22px; letter-spacing: 0.5px; }
         .gw-badge { background: #ff3b30; color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
         
-        .role-switcher { background: #2c2c2e; padding: 4px; border-radius: 20px; display: flex; gap: 4px; border: 1px solid #444; }
-        .role-btn { background: transparent; border: none; color: #8e8e93; font-weight: 600; padding: 6px 14px; border-radius: 16px; cursor: pointer; font-size: 13px; transition: all 0.2s; position: relative; z-index: 101; }
-        .role-btn.active { background: #00e676; color: #1c1c1e; font-weight: bold; }
+        .role-switcher { background: #2c2c2e; padding: 6px; border-radius: 20px; display: flex; gap: 4px; }
+        .role-btn { background: transparent; border: none; color: #8e8e93; font-weight: 600; padding: 6px 14px; border-radius: 16px; cursor: pointer; font-size: 13px; }
+        .role-btn.active { background: #00e676; color: #1c1c1e; }
 
-        .sub-nav { background: #1c1c1e; padding: 8px 20px 14px 20px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid #2c2c2e; position: relative; z-index: 100; }
+        .sub-nav { background: #1c1c1e; padding: 0 16px 12px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
         .sub-nav::-webkit-scrollbar { display: none; }
-        .nav-pill { background: #2c2c2e; border: none; color: white; padding: 8px 14px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; position: relative; z-index: 101; }
+        .nav-pill { background: #2c2c2e; border: none; color: white; padding: 8px 14px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
         .nav-pill.active { background: #00e676; color: #1c1c1e; font-weight: bold; }
 
-        /* Mapa Animado */
-        .map-banner { background: #e5e5ea; height: 160px; position: relative; overflow: hidden; border-bottom: 1px solid #d1d1d6; z-index: 1; }
-        #mapCanvas { width: 100%; height: 100%; display: block; pointer-events: none; }
-        
-        .gps-pill { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(5px); color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 5; border: 1px solid rgba(255,255,255,0.1); }
-        .gps-dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.4); } 100% { opacity: 1; transform: scale(1); } }
+        .map-banner { background: #e5e5ea; height: 160px; display: flex; justify-content: center; align-items: center; position: relative; border-bottom: 1px solid #d1d1d6; }
+        .gps-pill { background: #2c2c2e; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .gps-dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; }
 
-        .main-container { max-width: 500px; margin: -20px auto 30px auto; background: white; border-radius: 24px 24px 0 0; padding: 24px 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); position: relative; z-index: 10; min-height: 420px; box-sizing: border-box; }
+        .main-container { max-width: 500px; margin: -20px auto 30px auto; background: white; border-radius: 24px 24px 0 0; padding: 20px 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); position: relative; z-index: 10; min-height: 400px; box-sizing: border-box; }
         
         .section-title { font-size: 11px; font-weight: bold; color: #8e8e93; letter-spacing: 0.5px; margin-bottom: 8px; text-transform: uppercase; }
         
-        .route-box { border: 1px solid #c7c7cc; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; margin-bottom: 16px; background: #fff; cursor: pointer; position: relative; z-index: 12; }
+        .route-box { border: 1px solid #c7c7cc; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 500; margin-bottom: 16px; background: #fff; cursor: pointer; }
         
-        .transport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; position: relative; z-index: 12; }
-        .transport-card { border: 1.5px solid #c7c7cc; border-radius: 12px; padding: 12px 6px; text-align: center; background: white; cursor: pointer; transition: all 0.2s; position: relative; z-index: 12; }
+        .transport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .transport-card { border: 1.5px solid #c7c7cc; border-radius: 12px; padding: 10px 6px; text-align: center; background: white; cursor: pointer; }
         .transport-card.selected { border-color: #34c759; background: #f0fdf4; }
         .transport-card .title { font-size: 12px; font-weight: 600; color: #1c1c1e; margin-top: 4px; }
         .transport-card .price { font-size: 12px; font-weight: bold; color: #34c759; margin-top: 2px; }
 
-        .form-input { width: 100%; padding: 12px; border: 1px solid #c7c7cc; border-radius: 10px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; position: relative; z-index: 12; background: #fff; }
-        .form-input:focus { border-color: #34c759; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #c7c7cc; border-radius: 10px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; }
         
-        .btn-action { background: #34c759; color: #1c1c1e; font-weight: bold; border: none; width: 100%; padding: 14px; border-radius: 14px; font-size: 16px; cursor: pointer; margin-top: 10px; text-align: center; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3); position: relative; z-index: 12; }
+        .btn-action { background: #34c759; color: #1c1c1e; font-weight: bold; border: none; width: 100%; padding: 14px; border-radius: 14px; font-size: 16px; cursor: pointer; margin-top: 10px; text-align: center; }
         .btn-action:hover { background: #28a745; }
 
-        canvas#sigCanvas { border: 1px solid #c7c7cc; background: #fafafa; border-radius: 8px; width: 100%; touch-action: none; margin-bottom: 10px; cursor: crosshair; position: relative; z-index: 12; }
+        canvas#sigCanvas { border: 1px solid #c7c7cc; background: #fafafa; border-radius: 8px; width: 100%; touch-action: none; margin-bottom: 10px; cursor: crosshair; }
     </style>
 </head>
 <body>
@@ -74,13 +69,11 @@
         <button class="nav-pill">💳 Recargas</button>
     </div>
 
-    <!-- MAPA ANIMADO COM GPS -->
     <div class="map-banner">
         <div class="gps-pill">
             <div class="gps-dot"></div>
             GPS Bissau Ativo
         </div>
-        <canvas id="mapCanvas"></canvas>
     </div>
 
     <div class="main-container">
@@ -88,24 +81,24 @@
         <!-- VISTA CLIENTE -->
         <div id="vistaCliente">
             <div class="section-title">ROTA E DESTINO EM BISSAU</div>
-            <div class="route-box" onclick="alert('Ponto selecionado: Praça dos Heróis ➔ Aeroporto Osvaldo Vieira')">
+            <div class="route-box" onclick="alert('Rota ativa: Praça dos Heróis ➔ Aeroporto Osvaldo Vieira')">
                 <span>Praça dos Heróis ➔ Aeroporto Osvaldo Vieira</span>
                 <span style="color: #8e8e93;">↕</span>
             </div>
 
             <div class="section-title">ESCOLHA O TRANSPORTE</div>
             <div class="transport-grid">
-                <div class="transport-card selected" onclick="selecionarTransporte(this, 'Táxi Azul')">
+                <div class="transport-card selected" onclick="selecionarTransporte(this)">
                     <div style="font-size: 18px;">🚕</div>
                     <div class="title">Táxi Azul</div>
                     <div class="price">1.500 XOF</div>
                 </div>
-                <div class="transport-card" onclick="selecionarTransporte(this, 'Carro Privado')">
+                <div class="transport-card" onclick="selecionarTransporte(this)">
                     <div style="font-size: 18px;">🚗</div>
                     <div class="title">Carro Privado</div>
                     <div class="price">1.950 XOF</div>
                 </div>
-                <div class="transport-card" onclick="selecionarTransporte(this, 'Moto-Táxi')">
+                <div class="transport-card" onclick="selecionarTransporte(this)">
                     <div style="font-size: 18px;">🛵</div>
                     <div class="title">Moto-Táxi</div>
                     <div class="price">1.050 XOF</div>
@@ -113,12 +106,12 @@
             </div>
 
             <div class="section-title">FORMA DE PAGAMENTO DA VIAGEM</div>
-            <div class="route-box" onclick="alert('Método ativo: Dinheiro Vivo (Ao Condutor)')">
+            <div class="route-box" onclick="alert('Pagamento selecionado: Dinheiro Vivo (Ao Condutor)')">
                 <span>💵 Dinheiro Vivo (Ao Condutor)</span>
                 <span style="color: #8e8e93;">↕</span>
             </div>
 
-            <button class="btn-action" onclick="alert('A procurar motoristas próximos em Bissau...')">Pedir Viagem Agora</button>
+            <button class="btn-action" onclick="alert('Pesquisando motoristas próximos em Bissau...')">Pedir Viagem Agora</button>
         </div>
 
         <!-- VISTA MOTORISTA (REGISTO & CONTRATO) -->
@@ -160,7 +153,7 @@
                 <div style="font-size: 13px; font-weight: bold; margin: 10px 0 5px 0;">Desenhe a sua assinatura abaixo:</div>
                 <canvas id="sigCanvas" width="400" height="150"></canvas>
                 
-                <button type="button" style="background: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-bottom: 10px; position: relative; z-index: 12;" onclick="limparAssinatura()">Limpar Assinatura</button>
+                <button type="button" style="background: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-bottom: 10px;" onclick="limparAssinatura()">Limpar Assinatura</button>
                 
                 <button class="btn-action" onclick="finalizarRegistoEGerarDocumentos()">Submeter, Salvar no Supabase & Gerar Ficheiros</button>
             </div>
@@ -178,60 +171,27 @@
 
         let sigCanvas, sigCtx, hasSigned = false;
 
+        function switchRole(role) {
+            document.getElementById('btnRoleCliente').classList.remove('active');
+            document.getElementById('btnRoleMotorista').classList.remove('active');
+            document.getElementById('vistaCliente').style.display = 'none';
+            document.getElementById('vistaMotorista').style.display = 'none';
+
+            if(role === 'cliente') {
+                document.getElementById('btnRoleCliente').classList.add('active');
+                document.getElementById('vistaCliente').style.display = 'block';
+            } else {
+                document.getElementById('btnRoleMotorista').classList.add('active');
+                document.getElementById('vistaMotorista').style.display = 'block';
+            }
+        }
+
+        function selecionarTransporte(element) {
+            document.querySelectorAll('.transport-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
         window.onload = function() {
-            // Animação do Mapa GPS
-            const mapCanvas = document.getElementById('mapCanvas');
-            const mapCtx = mapCanvas.getContext('2d');
-            
-            function resizeMap() {
-                mapCanvas.width = mapCanvas.parentElement.clientWidth;
-                mapCanvas.height = mapCanvas.parentElement.clientHeight;
-            }
-            resizeMap();
-            window.addEventListener('resize', resizeMap);
-
-            let carX = 50;
-            let carY = 90;
-            let targetX = 300;
-
-            function animateMap() {
-                mapCtx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
-
-                mapCtx.strokeStyle = "#d1d1d6";
-                mapCtx.lineWidth = 6;
-                mapCtx.beginPath();
-                mapCtx.moveTo(0, 90); mapCtx.lineTo(mapCanvas.width, 90);
-                mapCtx.moveTo(150, 0); mapCtx.lineTo(150, mapCanvas.height);
-                mapCtx.moveTo(320, 0); mapCtx.lineTo(320, mapCanvas.height);
-                mapCtx.stroke();
-
-                if (Math.abs(carX - targetX) < 1) {
-                    targetX = Math.random() * (mapCanvas.width - 60) + 30;
-                }
-                carX += (targetX > carX) ? 0.8 : -0.8;
-
-                mapCtx.strokeStyle = "#34c759";
-                mapCtx.lineWidth = 4;
-                mapCtx.setLineDash([6, 6]);
-                mapCtx.beginPath();
-                mapCtx.moveTo(50, 90);
-                mapCtx.lineTo(carX, carY);
-                mapCtx.stroke();
-                mapCtx.setLineDash([]);
-
-                mapCtx.fillStyle = "#ff3b30";
-                mapCtx.beginPath();
-                mapCtx.arc(320, 90, 8, 0, Math.PI * 2);
-                mapCtx.fill();
-
-                mapCtx.font = "20px sans-serif";
-                mapCtx.fillText("🚕", carX - 12, carY + 7);
-
-                requestAnimationFrame(animateMap);
-            }
-            animateMap();
-
-            // Configurar Canvas de Assinatura
             sigCanvas = document.getElementById('sigCanvas');
             sigCtx = sigCanvas.getContext('2d');
             
@@ -257,26 +217,6 @@
                 sigCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
             }
         };
-
-        function switchRole(role) {
-            document.getElementById('btnRoleCliente').classList.remove('active');
-            document.getElementById('btnRoleMotorista').classList.remove('active');
-            document.getElementById('vistaCliente').style.display = 'none';
-            document.getElementById('vistaMotorista').style.display = 'none';
-
-            if(role === 'cliente') {
-                document.getElementById('btnRoleCliente').classList.add('active');
-                document.getElementById('vistaCliente').style.display = 'block';
-            } else {
-                document.getElementById('btnRoleMotorista').classList.add('active');
-                document.getElementById('vistaMotorista').style.display = 'block';
-            }
-        }
-
-        function selecionarTransporte(element, nomeTransporte) {
-            document.querySelectorAll('.transport-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
-        }
 
         function limparAssinatura() {
             sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
