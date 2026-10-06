@@ -46,7 +46,7 @@
         .nav-item:hover { background: #333; color: #fff; }
         .nav-item.active { background: #00e676 !important; color: #000 !important; }
 
-        /* Área do Mapa (Com animação GPS original) */
+        /* Área do Mapa */
         .map-area { height: 140px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; pointer-events: none; }
         canvas#bissauMap { width: 100%; height: 100%; display: block; }
         .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); pointer-events: none; z-index: 5; }
@@ -65,6 +65,12 @@
         .service-card.selected { border-color: #00e676; background: rgba(0,230,118,0.08); }
         .service-title { font-size: 10px; font-weight: bold; }
         .service-price { font-size: 12px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
+
+        /* Painel de Espera / Cancelamento de Viagem */
+        .waiting-card { background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; text-align: center; }
+        .waiting-title { font-size: 13px; font-weight: bold; color: #e65100; }
+        .timer-text { font-size: 22px; font-weight: 800; color: #d84315; margin: 4px 0; }
+        .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
 
         /* Listas com Scroll */
         .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 2px; }
@@ -110,7 +116,7 @@
         <div class="nav-item" id="nav-recargas" onclick="switchServiceTab('recargas')">📱 Recargas</div>
     </div>
 
-    <!-- Map Engine (Com o GPS Animado Original e Símbolo ROTA GB) -->
+    <!-- Map Engine (GPS Animado Original) -->
     <div class="map-area">
         <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
         <canvas id="bissauMap"></canvas>
@@ -155,11 +161,25 @@
                 </select>
             </div>
 
-            <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="alert('A procurar condutor ROTA GB mais próximo...')">Pedir Viagem Agora</button>
+            <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="requestRide()">Pedir Viagem Agora</button>
+        </div>
+
+        <!-- Painel de Espera & Cancelamento -->
+        <div class="waiting-card" id="waitingPanel">
+            <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
+            <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
+            <div class="timer-text" id="waitingTimer">00:00</div>
+            <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
+                Preço reservado: <strong id="reservedAmount">1.500 XOF</strong>
+            </div>
+            <div style="font-size: 11px; color: #333; margin-bottom: 6px;">
+                Pagamento via: <strong id="selectedPaymentMethod">Dinheiro Vivo</strong>
+            </div>
+            <button type="button" class="btn-cancel" onclick="cancelRide()">Cancelar Viagem & Pedir Reembolso</button>
         </div>
     </div>
 
-    <!-- Panel 2: Comida -->
+    <!-- Panel 2: Restaurantes (Lista Completa Restaurada) -->
     <div class="bottom-panel" id="panel-comida" style="display: none;">
         <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Restaurantes em Bissau</div>
         <div class="store-list">
@@ -168,19 +188,40 @@
                     <div class="store-name">Papa Loca Bissau</div>
                     <div class="store-desc">Grelhados, Hambúrgueres e Fast Food</div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado para Papa Loca!')">Pedir</button>
             </div>
             <div class="store-card">
                 <div>
                     <div class="store-name">A Padeira Africana</div>
                     <div class="store-desc">Galinha Cafriela e Comida Típica</div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado para A Padeira Africana!')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Restaurante O Coqueiro</div>
+                    <div class="store-desc">Peixe Fresco, Marisco e Cozinha Típica</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado para O Coqueiro!')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Snack-Bar Oasis</div>
+                    <div class="store-desc">Pastelaria, Sumos Naturais e Refeições Rápidas</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado para Snack-Bar Oasis!')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Chez Sapphire</div>
+                    <div class="store-desc">Cozinha Internacional e Buffet</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado para Chez Sapphire!')">Pedir</button>
             </div>
         </div>
     </div>
 
-    <!-- Panel 3: Lojas -->
+    <!-- Panel 3: Lojas (Lista Completa Restaurada) -->
     <div class="bottom-panel" id="panel-lojas" style="display: none;">
         <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Supermercados e Lojas</div>
         <div class="store-list">
@@ -189,12 +230,33 @@
                     <div class="store-name">Supermercado Hereso</div>
                     <div class="store-desc">Alimentação Geral, Bebidas e Frescos</div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Compra iniciada!')">Comprar</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Iniciando compra no Supermercado Hereso...')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Mini-Mercado Bandim</div>
+                    <div class="store-desc">Produtos de Mercearia e Higiene</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Iniciando compra no Mini-Mercado Bandim...')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Farmácia Central Bissau</div>
+                    <div class="store-desc">Medicamentos e Primeiros Socorros</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Iniciando compra na Farmácia Central...')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Boutique Guiné Moda</div>
+                    <div class="store-desc">Roupas, Calçados e Acessórios</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Iniciando compra na Boutique Guiné Moda...')">Comprar</button>
             </div>
         </div>
     </div>
 
-    <!-- Panel 4: Hotéis -->
+    <!-- Panel 4: Hotéis (Lista Completa Restaurada) -->
     <div class="bottom-panel" id="panel-hoteis" style="display: none;">
         <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Hotéis e Apartamentos em Bissau</div>
         <div class="store-list">
@@ -204,7 +266,31 @@
                     <div class="store-desc">Av. Amílcar Cabral — Quarto Duplo Executive</div>
                     <div class="price-tag">45.000 XOF / noite</div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reserva efetuada!')">Reservar</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reserva efetuada no Hotel Ledra Bissau!')">Reservar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Hotel Ceiba Bissau</div>
+                    <div class="store-desc">Av. Combatentes — Suíte de Luxo com Piscina</div>
+                    <div class="price-tag">75.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reserva efetuada no Hotel Ceiba Bissau!')">Reservar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Coimbra Hotel & Spa</div>
+                    <div class="store-desc">Praça dos Heróis Nacionais — Quarto Standard</div>
+                    <div class="price-tag">35.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reserva efetuada no Coimbra Hotel & Spa!')">Reservar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Apartamentos Sol de Bissau</div>
+                    <div class="store-desc">Bairro de Penha — T1 Equipado</div>
+                    <div class="price-tag">25.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reserva efetuada nos Apartamentos Sol de Bissau!')">Reservar</button>
             </div>
         </div>
     </div>
@@ -216,7 +302,7 @@
             <label>NÚMERO DE TELEMÓVEL (+245)</label>
             <input type="tel" placeholder="Ex: 955XXXXXX">
         </div>
-        <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="alert('Recarga efetuada!')">Pagar Recarga Agora</button>
+        <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="alert('Recarga efetuada com sucesso!')">Pagar Recarga Agora</button>
     </div>
 
     <!-- Panel Motorista -->
@@ -291,7 +377,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdWxkYXZpd2ZiY3ZvY2ZrbmF3Ixlub2xlIjoiYW5vbiIsImlhdCI6MTc5MTE0MDg0NywiZXhwIjoyMTA2NzE2ODQ3f0.uBSZQ_YChvWUS7B7TE762qGRSBaajFf-Flh18J7E0BU';
     const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ANIMAÇÃO DO MAPA E CARRINHO GPS ORIGINAL (Com ROTA GB Express)
+    // ANIMAÇÃO DO MAPA E CARRINHO GPS
     const canvas = document.getElementById('bissauMap');
     const ctx = canvas.getContext('2d');
 
@@ -338,6 +424,39 @@
         requestAnimationFrame(drawMap);
     }
     drawMap();
+
+    // CONTROLO DE VIAGEM E TEMPORIZADOR
+    let timerInterval = null;
+    let secondsElapsed = 0;
+
+    function requestRide() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        const paymentMethod = document.getElementById('paymentSelect').value;
+
+        document.getElementById('reservedAmount5').innerText = `${Math.round(basePrice).toLocaleString()} XOF`;
+        document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
+        
+        document.getElementById('rideFormControls').style.display = 'none';
+        document.getElementById('waitingPanel').style.display = 'flex';
+
+        secondsElapsed = 0;
+        document.getElementById('waitingTimer').innerText = "00:00";
+        if(timerInterval) clearInterval(timerInterval);
+
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('waitingTimer').innerText = `${mins}:${secs}`;
+        }, 1000);
+    }
+
+    function cancelRide() {
+        if(timerInterval) clearInterval(timerInterval);
+        document.getElementById('waitingPanel').style.display = 'none';
+        document.getElementById('rideFormControls').style.display = 'block';
+        alert("Viagem cancelada com sucesso. Reembolso processado.");
+    }
 
     // INTERACTION LOGIC
     function switchServiceTab(tab) {
@@ -395,7 +514,7 @@
     function selectService(element, multiplier) {
         document.querySelectorAll('.service-card').forEach(el => el.classList.remove('selected'));
         element.classList.add('selected');
-        updatePrice(multiplier);
+        updatePrice();
     }
 
     function updatePrice() {
@@ -457,7 +576,7 @@
 
             if (existente && existente.length > 0) {
                 alert(`⚠️ ATENÇÃO: A matrícula "${matricula.toUpperCase()}" já se encontra registada no sistema ROTA GB!\n\nNão é permitido cadastrar veículos duplicados.`);
-                return; // Bloqueia o avanço
+                return;
             }
         } catch (err) {
             console.error("Erro na verificação:", err);
@@ -483,7 +602,6 @@
         const conta = document.getElementById('numeroContaMotorista').value.trim();
         const dataAtual = new Date().toLocaleDateString('pt-PT');
 
-        // Submeter Registo no Supabase
         const { error } = await _supabase
             .from('motoristas')
             .insert([{ 
@@ -503,7 +621,6 @@
             return;
         }
 
-        // Gerar Contrato PDF
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.setFillColor(28, 28, 30);
