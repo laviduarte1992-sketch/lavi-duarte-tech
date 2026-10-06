@@ -3,69 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROTA GB - Registo de Motoristas</title>
+    <title>ROTA GB - Guiné-Bissau</title>
 
-    <!-- 1. Bibliotecas Obrigatórias -->
+    <!-- Bibliotecas Obrigatórias -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: #ffffff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
-        h2, h3 { color: #1a1a1a; text-align: center; margin-bottom: 10px; }
-        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; width: 100%; box-sizing: border-box; }
-        button { background-color: #00e676; color: #1a1a1a; font-weight: bold; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 5px; }
-        button:hover { background-color: #00c853; }
-        canvas { border: 1px solid #ccc; background: #fafafa; border-radius: 5px; width: 100%; touch-action: none; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; color: #333; }
+        header { background: #1a1a1a; color: #00e676; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        header h1 { margin: 0; font-size: 20px; }
+        .nav-tabs { display: flex; background: #333; padding: 10px 20px; gap: 15px; }
+        .nav-tabs button { background: none; border: none; color: white; font-size: 15px; cursor: pointer; padding: 5px 10px; border-radius: 4px; }
+        .nav-tabs button.active { background: #00e676; color: #1a1a1a; font-weight: bold; }
+        .main-container { max-width: 600px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+        label { font-weight: bold; font-size: 14px; color: #444; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; width: 100%; box-sizing: border-box; }
+        .btn-main { background-color: #00e676; color: #1a1a1a; font-weight: bold; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
+        .btn-main:hover { background-color: #00c853; }
+        canvas { border: 1px solid #ccc; background: #fafafa; border-radius: 6px; width: 100%; touch-action: none; }
     </style>
 </head>
 <body>
 
-    <!-- 1. Formulário de Cadastro do Motorista -->
-    <div class="container" id="formCadastroMotorista">
-        <h2>ROTA GB — Bissau</h2>
-        <p style="font-size: 13px; color: #666; text-align: center;">Registo Oficial de Condutores</p>
-        
-        <input type="text" id="nomeMotorista" placeholder="Nome Completo" required>
-        <input type="email" id="emailMotorista" placeholder="E-mail" required>
-        <input type="text" id="telefoneMotorista" placeholder="Telefone (ex: 9xxxxxxx)" required>
-        
-        <select id="tipoTransporte">
-            <option value="Táxi Azul/Amarelo">Táxi Azul/Amarelo</option>
-            <option value="Moto-Táxi">Moto-Táxi</option>
-            <option value="Carro Privado">Carro Privado</option>
-        </select>
+    <header>
+        <h1>🚗 ROTA GB — Bissau</h1>
+        <span style="font-size: 13px; color: #fff;">Painel do Administrador / Condutor</span>
+    </header>
 
-        <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
-        <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula (Placa)" required>
-        
-        <select id="metodoRecebimentoMotorista">
-            <option value="MTN Money">MTN Money</option>
-            <option value="Orange Money">Orange Money</option>
-            <option value="Banco">Transferência Bancária</option>
-        </select>
-
-        <input type="text" id="numeroContaMotorista" placeholder="Número da Carteira / Conta" required>
-        
-        <button type="button" onclick="avancarParaContrato()">Prosseguir para o Contrato</button>
+    <div class="nav-tabs">
+        <button id="btnTabRegisto" class="active" onclick="toggleDriverTab('registo')">Novo Registo</button>
+        <button id="btnTabPainel" onclick="toggleDriverTab('painel')">Estado da Frota</button>
     </div>
 
-    <!-- 2. Secção do Contrato e Assinatura Digital -->
-    <div class="container" id="contractStep" style="display: none;">
-        <h3>📜 Contrato de Parceria</h3>
-        <p style="font-size: 12px; color: #444;">Ao submeter, aceita a comissão de 15% e as normas operacionais do ROTA GB em Bissau.</p>
+    <div class="main-container">
         
-        <label style="font-size: 13px; font-weight: bold;">Desenhe a sua assinatura abaixo:</label>
-        <canvas id="sigCanvas" width="350" height="150"></canvas>
-        
-        <button type="button" style="background-color: #ff5252; color: white; padding: 8px;" onclick="limparAssinatura()">Limpar Assinatura</button>
-        
-        <button type="button" onclick="finalizarEGerarPDF()">Assinar & Submeter Registo</button>
+        <!-- SECÇÃO 1: FORMULÁRIO DE REGISTO -->
+        <div id="seccaoRegisto">
+            <h2>Registo Oficial de Condutores</h2>
+            <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Preencha os dados abaixo para gerar o contrato de parceria em Bissau.</p>
+            
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" id="nomeMotorista" placeholder="Ex: Mamadu Sissé" required>
+            </div>
+            
+            <div class="form-group">
+                <label>E-mail de Notificação</label>
+                <input type="email" id="emailMotorista" placeholder="exemplo@rotagb.gw" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Telemóvel (WhatsApp)</label>
+                <input type="text" id="telefoneMotorista" placeholder="9xxxxxxx" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Tipo de Serviço / Transporte</label>
+                <select id="tipoTransporte">
+                    <option value="Táxi Azul/Amarelo">Táxi Azul/Amarelo</option>
+                    <option value="Moto-Táxi">Moto-Táxi</option>
+                    <option value="Carro Privado">Carro Privado</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Marca e Modelo do Veículo</label>
+                <input type="text" id="marcaModelo" placeholder="Ex: Toyota Corolla" required>
+            </div>
+
+            <div class="form-group">
+                <label>Número de Matrícula (Placa)</label>
+                <input type="text" id="matriculaVeiculo" placeholder="Ex: A-1234-GB" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Método de Recebimento de Ganhos</label>
+                <select id="metodoRecebimentoMotorista">
+                    <option value="MTN Money">MTN Money</option>
+                    <option value="Orange Money">Orange Money</option>
+                    <option value="Banco">Transferência Bancária</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Número da Conta / Carteira Móvel</label>
+                <input type="text" id="numeroContaMotorista" placeholder="Número associado" required>
+            </div>
+            
+            <button type="button" class="btn-main" onclick="avancarParaContrato()">Prosseguir para Assinatura do Contrato</button>
+        </div>
+
+        <!-- SECÇÃO 2: CONTRATO E ASSINATURA -->
+        <div id="contractStep" style="display: none;">
+            <h2>📜 Contrato de Adesão & Parceria</h2>
+            <p style="font-size: 13px; color: #555; line-height: 1.5;">
+                Pelo presente contrato, o parceiro compromete-se com as normas da ROTA GB em Bissau. A comissão da plataforma é de 15% sobre as viagens realizadas.
+            </p>
+            
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Desenhe a sua assinatura digital abaixo:</label>
+                <canvas id="sigCanvas" width="400" height="160"></canvas>
+            </div>
+            
+            <button type="button" style="background-color: #ff5252; color: white; padding: 8px 12px; border:none; border-radius:4px; cursor:pointer; font-size:13px; margin-bottom: 15px;" onclick="limparAssinatura()">Limpar Assinatura</button>
+            
+            <button type="button" class="btn-main" onclick="finalizarEGerarPDF()">Concluir, Enviar ao Supabase & Descarregar Ficheiros</button>
+        </div>
+
+        <!-- SECÇÃO 3: PAINEL INFORMATIVO -->
+        <div id="seccaoPainel" style="display: none; text-align: center; padding: 20px;">
+            <h2>Painel ROTA GB</h2>
+            <p style="color: #666;">Todos os novos registos enviados pelos motoristas vão diretamente para a sua tabela no Supabase com o estado <b>pendente</b> para aprovação.</p>
+            <button type="button" class="btn-main" onclick="toggleDriverTab('registo')">Registar Novo Motorista</button>
+        </div>
+
     </div>
 
     <script>
         // ==========================================
-        // LIGAR AO SEU SUPABASE (CONFIGURADO)
+        // CONFIGURAÇÃO SUPABASE
         // ==========================================
         const SUPABASE_URL = 'https://ymuldaviwfbcvocfknaw.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdWxkYXZpd2ZiY3ZvY2ZrbmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExNDA4NDcsImV4cCI6MjEwNjcxNjg0N30.uBSZQ_YChvWUS7B7TE762qGRSBaajFf-Flh18J7E0BU';
@@ -101,6 +159,22 @@
             }
         };
 
+        function toggleDriverTab(tab) {
+            document.getElementById('btnTabRegisto').classList.remove('active');
+            document.getElementById('btnTabPainel').classList.remove('active');
+            document.getElementById('seccaoRegisto').style.display = 'none';
+            document.getElementById('contractStep').style.display = 'none';
+            document.getElementById('seccaoPainel').style.display = 'none';
+
+            if(tab === 'registo') {
+                document.getElementById('btnTabRegisto').classList.add('active');
+                document.getElementById('seccaoRegisto').style.display = 'block';
+            } else if(tab === 'painel') {
+                document.getElementById('btnTabPainel').classList.add('active');
+                document.getElementById('seccaoPainel').style.display = 'block';
+            }
+        }
+
         function limparAssinatura() {
             sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
             hasSigned = false;
@@ -113,19 +187,16 @@
             const matricula = document.getElementById('matriculaVeiculo').value;
 
             if(!nome || !email || !telefone || !matricula) {
-                alert("Por favor, preencha todos os campos obrigatórios antes de prosseguir.");
+                alert("Por favor, preencha todos os campos obrigatórios.");
                 return;
             }
-            document.getElementById('formCadastroMotorista').style.display = 'none';
-            document.getElementById('contractStep').style.display = 'flex';
+            document.getElementById('seccaoRegisto').style.display = 'none';
+            document.getElementById('contractStep').style.display = 'block';
         }
 
-        // ==========================================
-        // SUBMIT, SUPABASE, PDF E AUTOCOLANTE
-        // ==========================================
         async function finalizarEGerarPDF() {
             if(!hasSigned) {
-                alert("Por favor, desenhe a sua assinatura no quadro antes de concluir.");
+                alert("Por favor, desenhe a sua assinatura antes de concluir.");
                 return;
             }
 
@@ -139,8 +210,8 @@
             const conta = document.getElementById('numeroContaMotorista').value;
             const dataAtual = new Date().toLocaleDateString('pt-PT');
 
-            // 1. Enviar para o Supabase (fica pendente para aprovação na tabela 'motoristas')
-            const { data, error } = await _supabase
+            // 1. Guardar no Supabase
+            const { error } = await _supabase
                 .from('motoristas')
                 .insert([
                     { 
@@ -161,7 +232,7 @@
                 return;
             }
 
-            // 2. Gerar o Contrato PDF
+            // 2. Gerar PDF do Contrato
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
@@ -228,7 +299,7 @@
 
             doc.save(`Contrato_ROTA_GB_${nome.replace(/\s+/g, '_')}.pdf`);
 
-            // 3. Gerar Imagem do Autocolante de Porta Personalizado
+            // 3. Gerar Imagem do Autocolante de Porta
             const badgeCanvas = document.createElement('canvas');
             badgeCanvas.width = 600;
             badgeCanvas.height = 300;
@@ -276,9 +347,11 @@
             link.href = badgeCanvas.toDataURL('image/png');
             link.click();
 
-            alert(`🎉 Sucesso absoluto!\n\n• Registo enviado para o Supabase (Estado: Pendente).\n• Contrato PDF descarregado.\n• Autocolante de porta (${matricula}) gerado para a gráfica.`);
+            alert(`🎉 Registo concluído!\n\n• Os dados foram enviados para o Supabase (estado pendente).\n• O Contrato PDF e o Autocolante de Porta foram descarregados.`);
 
-            location.reload();
+            document.getElementById('seccaoRegisto').reset();
+            limparAssinatura();
+            toggleDriverTab('painel');
         }
     </script>
 </body>
