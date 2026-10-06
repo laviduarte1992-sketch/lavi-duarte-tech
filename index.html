@@ -3,193 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROTA GB - Guiné-Bissau</title>
-    <!-- Bibliotecas Obrigatórias -->
+    <title>ROTA GB - Registo de Motoristas</title>
+
+    <!-- 1. Biblioteca do Supabase (Obrigatório) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Biblioteca jsPDF para gerar o contrato em PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f2f2f7; margin: 0; padding: 0; color: #1c1c1e; }
-        header { background: #1c1c1e; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-area { display: flex; align-items: center; gap: 8px; }
-        .logo-text { color: #00e676; font-weight: bold; font-size: 22px; letter-spacing: 0.5px; }
-        .gw-badge { background: #ff3b30; color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
-        
-        .role-switcher { background: #2c2c2e; padding: 6px; border-radius: 20px; display: flex; gap: 4px; }
-        .role-btn { background: transparent; border: none; color: #8e8e93; font-weight: 600; padding: 6px 14px; border-radius: 16px; cursor: pointer; font-size: 13px; }
-        .role-btn.active { background: #00e676; color: #1c1c1e; }
-
-        .sub-nav { background: #1c1c1e; padding: 0 16px 12px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
-        .sub-nav::-webkit-scrollbar { display: none; }
-        .nav-pill { background: #2c2c2e; border: none; color: white; padding: 8px 14px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
-        .nav-pill.active { background: #00e676; color: #1c1c1e; font-weight: bold; }
-
-        .map-banner { background: #e5e5ea; height: 160px; display: flex; justify-content: center; align-items: center; position: relative; border-bottom: 1px solid #d1d1d6; }
-        .gps-pill { background: #2c2c2e; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .gps-dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; }
-
-        .main-container { max-width: 500px; margin: -20px auto 30px auto; background: white; border-radius: 24px 24px 0 0; padding: 20px 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); position: relative; z-index: 10; min-height: 400px; box-sizing: border-box; }
-        
-        .section-title { font-size: 11px; font-weight: bold; color: #8e8e93; letter-spacing: 0.5px; margin-bottom: 8px; text-transform: uppercase; }
-        
-        .route-box { border: 1px solid #c7c7cc; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 500; margin-bottom: 16px; background: #fff; }
-        
-        .transport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-        .transport-card { border: 1.5px solid #c7c7cc; border-radius: 12px; padding: 10px 6px; text-align: center; background: white; cursor: pointer; }
-        .transport-card.selected { border-color: #34c759; background: #f0fdf4; }
-        .transport-card .title { font-size: 12px; font-weight: 600; color: #1c1c1e; margin-top: 4px; }
-        .transport-card .price { font-size: 12px; font-weight: bold; color: #34c759; margin-top: 2px; }
-
-        .form-input { width: 100%; padding: 12px; border: 1px solid #c7c7cc; border-radius: 10px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; }
-        
-        .btn-action { background: #34c759; color: #1c1c1e; font-weight: bold; border: none; width: 100%; padding: 14px; border-radius: 14px; font-size: 16px; cursor: pointer; margin-top: 10px; text-align: center; }
-        .btn-action:hover { background: #28a745; }
-
-        canvas { border: 1px solid #c7c7cc; background: #fafafa; border-radius: 8px; width: 100%; touch-action: none; margin-bottom: 10px; }
-    </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-area">
-            <span class="logo-text">ROTA GB</span>
-            <span class="gw-badge">GW</span>
-        </div>
-        <div class="role-switcher">
-            <button class="role-btn active" id="btnRoleCliente" onclick="switchRole('cliente')">Cliente</button>
-            <button class="role-btn" id="btnRoleMotorista" onclick="switchRole('motorista')">Motorista</button>
-        </div>
-    </header>
+    <!-- O seu formulário de registo existente -->
+    <div id="formCadastroMotorista" style="display: flex; flex-direction: column; width: 300px; gap: 10px; margin: 20px;">
+        <h2>Registo de Motorista - ROTA GB</h2>
+        <input type="text" id="nomeMotorista" placeholder="Nome Completo" required>
+        <input type="email" id="emailMotorista" placeholder="E-mail" required>
+        <input type="text" id="telefoneMotorista" placeholder="Telefone (ex: 9xxxxxxx)" required>
+        
+        <select id="tipoTransporte">
+            <option value="Táxi Azul/Amarelo">Táxi Azul/Amarelo</option>
+            <option value="Moto-Táxi">Moto-Táxi</option>
+            <option value="Carro Privado">Carro Privado</option>
+        </select>
 
-    <div class="sub-nav">
-        <button class="nav-pill active">🚗 Transporte</button>
-        <button class="nav-pill">🍲 Comida</button>
-        <button class="nav-pill">🛒 Lojas</button>
-        <button class="nav-pill">🏨 Hotéis & Apts</button>
-        <button class="nav-pill">💳 Recargas</button>
+        <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
+        <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula (Placa)" required>
+        
+        <select id="metodoRecebimentoMotorista">
+            <option value="MTN Money">MTN Money</option>
+            <option value="Orange Money">Orange Money</option>
+            <option value="Banco">Transferência Bancária</option>
+        </select>
+
+        <input type="text" id="numeroContaMotorista" placeholder="Número da Carteira / Conta" required>
+        
+        <button type="button" onclick="avancarParaContrato()">Prosseguir para o Contrato</button>
     </div>
 
-    <div class="map-banner">
-        <div class="gps-pill">
-            <div class="gps-dot"></div>
-            GPS Bissau Ativo
-        </div>
-    </div>
-
-    <div class="main-container">
-
-        <!-- VISTA CLIENTE -->
-        <div id="vistaCliente">
-            <div class="section-title">ROTA E DESTINO EM BISSAU</div>
-            <div class="route-box">
-                <span>Praça dos Heróis ➔ Aeroporto Osvaldo Vieira</span>
-                <span style="color: #8e8e93;">↕</span>
-            </div>
-
-            <div class="section-title">ESCOLHA O TRANSPORTE</div>
-            <div class="transport-grid">
-                <div class="transport-card selected">
-                    <div style="font-size: 18px;">🚕</div>
-                    <div class="title">Táxi Azul</div>
-                    <div class="price">1.500 XOF</div>
-                </div>
-                <div class="transport-card">
-                    <div style="font-size: 18px;">🚗</div>
-                    <div class="title">Carro Privado</div>
-                    <div class="price">1.950 XOF</div>
-                </div>
-                <div class="transport-card">
-                    <div style="font-size: 18px;">🛵</div>
-                    <div class="title">Moto-Táxi</div>
-                    <div class="price">1.050 XOF</div>
-                </div>
-            </div>
-
-            <div class="section-title">FORMA DE PAGAMENTO DA VIAGEM</div>
-            <div class="route-box">
-                <span>💵 Dinheiro Vivo (Ao Condutor)</span>
-                <span style="color: #8e8e93;">↕</span>
-            </div>
-
-            <button class="btn-action" onclick="alert('Pesquisando motoristas próximos em Bissau...')">Pedir Viagem Agora</button>
-        </div>
-
-        <!-- VISTA MOTORISTA (REGISTO & CONTRATO) -->
-        <div id="vistaMotorista" style="display: none;">
-            <div id="etapaFormRegisto">
-                <div class="section-title">REGISTO OFICIAL DE CONDUTORES (BISSAU)</div>
-                
-                <input type="text" id="nomeMotorista" class="form-input" placeholder="Nome Completo do Condutor" required>
-                <input type="email" id="emailMotorista" class="form-input" placeholder="E-mail" required>
-                <input type="text" id="telefoneMotorista" class="form-input" placeholder="Telemóvel / WhatsApp (ex: 9xxxxxxx)" required>
-                
-                <select id="tipoTransporte" class="form-input">
-                    <option value="Táxi Azul/Amarelo">Táxi Azul/Amarelo</option>
-                    <option value="Moto-Táxi">Moto-Táxi</option>
-                    <option value="Carro Privado">Carro Privado</option>
-                </select>
-
-                <input type="text" id="marcaModelo" class="form-input" placeholder="Marca e Modelo do Veículo" required>
-                <input type="text" id="matriculaVeiculo" class="form-input" placeholder="Número de Matrícula (Placa)" required>
-                
-                <select id="metodoRecebimentoMotorista" class="form-input">
-                    <option value="MTN Money">MTN Money</option>
-                    <option value="Orange Money">Orange Money</option>
-                    <option value="Banco">Transferência Bancária</option>
-                </select>
-
-                <input type="text" id="numeroContaMotorista" class="form-input" placeholder="Número da Conta / Carteira" required>
-                
-                <button class="btn-action" onclick="avancarParaAssinatura()">Prosseguir para Assinatura</button>
-            </div>
-
-            <!-- ETAPA DE ASSINATURA -->
-            <div id="etapaContrato" style="display: none;">
-                <div class="section-title">📜 CONTRATO DE PARCERIA & TERMOS</div>
-                <p style="font-size: 13px; color: #555; line-height: 1.4;">
-                    Ao assinar, aceita as normas de prestação de serviços do ROTA GB em Bissau (comissão de 15%).
-                </p>
-                
-                <div style="font-size: 13px; font-weight: bold; margin: 10px 0 5px 0;">Desenhe a sua assinatura abaixo:</div>
-                <canvas id="sigCanvas" width="400" height="150"></canvas>
-                
-                <button type="button" style="background: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-bottom: 10px;" onclick="limparAssinatura()">Limpar Assinatura</button>
-                
-                <button class="btn-action" onclick="finalizarRegistoEGerarDocumentos()">Submeter, Salvar no Supabase & Gerar Ficheiros</button>
-            </div>
-        </div>
-
+    <!-- Secção do Contrato e Assinatura -->
+    <div id="contractStep" style="display: none; margin: 20px;">
+        <h3>Contrato de Adesão & Parceria ROTA GB</h3>
+        <p>Ao submeter, aceita a comissão de 15% e as normas operacionais do ROTA GB em Bissau.</p>
+        
+        <!-- Quadro de Assinatura -->
+        <p>Desenhe a sua assinatura abaixo:</p>
+        <canvas id="sigCanvas" width="300" height="150" style="border:1px solid #000; background:#f9f9f9;"></canvas>
+        <br>
+        <button type="button" onclick="limparAssinatura()">Limpar Assinatura</button>
+        <br><br>
+        <button type="button" onclick="finalizarEGerarPDF()">Assinar & Submeter Registo</button>
     </div>
 
     <script>
         // ==========================================
-        // CONFIGURAÇÃO SUPABASE
+        // 2. LIGAR AO SUPABASE (COLE OS SEUS DADOS AQUI)
         // ==========================================
-        const SUPABASE_URL = 'https://ymuldaviwfbcvocfknaw.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdWxkYXZpd2ZiY3ZvY2ZrbmF3Ixlub2xlIjoiYW5vbiIsImlhdCI6MTc5MTE0MDg0NywiZXhwIjoyMTA2NzE2ODQ3f0.uBSZQ_YChvWUS7B7TE762qGRSBaajFf-Flh18J7E0BU';
+        const SUPABASE_URL = 'https://O_SEU_PROJECT_URL_AQUI.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'COLE_AQUI_A_SUA_CHAVE_ANON_COMPLETA_QUE_COPIOU';
+
+        // Inicializar a ligação ao Supabase
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let sigCanvas, sigCtx, hasSigned = false;
-
-        function switchRole(role) {
-            document.getElementById('btnRoleCliente').classList.remove('active');
-            document.getElementById('btnRoleMotorista').classList.remove('active');
-            document.getElementById('vistaCliente').style.display = 'none';
-            document.getElementById('vistaMotorista').style.display = 'none';
-
-            if(role === 'cliente') {
-                document.getElementById('btnRoleCliente').classList.add('active');
-                document.getElementById('vistaCliente').style.display = 'block';
-            } else {
-                document.getElementById('btnRoleMotorista').classList.add('active');
-                document.getElementById('vistaMotorista').style.display = 'block';
-            }
-        }
 
         window.onload = function() {
             sigCanvas = document.getElementById('sigCanvas');
             sigCtx = sigCanvas.getContext('2d');
             
+            // Eventos para desenhar no canvas com o dedo ou rato
             let painting = false;
             sigCanvas.addEventListener('mousedown', startPos);
             sigCanvas.addEventListener('mouseup', endPos);
@@ -218,23 +99,22 @@
             hasSigned = false;
         }
 
-        function avancarParaAssinatura() {
+        function avancarParaContrato() {
             const nome = document.getElementById('nomeMotorista').value;
-            const email = document.getElementById('emailMotorista').value;
-            const tel = document.getElementById('telefoneMotorista').value;
-            const matricula = document.getElementById('matriculaVeiculo').value;
-
-            if(!nome || !email || !tel || !matricula) {
-                alert("Por favor, preencha os campos obrigatórios do registo.");
+            if(!nome) {
+                alert("Por favor, preencha pelo menos o nome.");
                 return;
             }
-            document.getElementById('etapaFormRegisto').style.display = 'none';
-            document.getElementById('etapaContrato').style.display = 'block';
+            document.getElementById('formCadastroMotorista').style.display = 'none';
+            document.getElementById('contractStep').style.display = 'block';
         }
 
-        async function finalizarRegistoEGerarDocumentos() {
+        // ==========================================
+        // 3. FUNÇÃO DE GUARDAR NO SUPABASE E GERAR PDF
+        // ==========================================
+        async function finalizarEGerarPDF() {
             if(!hasSigned) {
-                alert("Por favor, desenhe a sua assinatura antes de concluir.");
+                alert("Por favor, desenhe a sua assinatura no quadro antes de concluir.");
                 return;
             }
 
@@ -248,8 +128,8 @@
             const conta = document.getElementById('numeroContaMotorista').value;
             const dataAtual = new Date().toLocaleDateString('pt-PT');
 
-            // 1. Enviar para a tabela 'motoristas' no Supabase
-            const { error } = await _supabase
+            // Enviar para a tabela 'motoristas' no Supabase
+            const { data, error } = await _supabase
                 .from('motoristas')
                 .insert([
                     { 
@@ -270,11 +150,11 @@
                 return;
             }
 
-            // 2. Gerar Contrato PDF
+            // Gerar o Contrato PDF
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            doc.setFillColor(28, 28, 30);
+            doc.setFillColor(26, 26, 26);
             doc.rect(0, 0, 210, 30, 'F');
             doc.setTextColor(0, 230, 118);
             doc.setFontSize(22);
@@ -337,7 +217,7 @@
 
             doc.save(`Contrato_ROTA_GB_${nome.replace(/\s+/g, '_')}.pdf`);
 
-            // 3. Gerar Imagem do Autocolante de Porta
+            // Gerar Imagem do Autocolante de Porta
             const badgeCanvas = document.createElement('canvas');
             badgeCanvas.width = 600;
             badgeCanvas.height = 300;
@@ -345,11 +225,11 @@
 
             bCtx.fillStyle = "#ffffff";
             bCtx.fillRect(0, 0, 600, 300);
-            bCtx.strokeStyle = "#1c1c1e";
+            bCtx.strokeStyle = "#1a1a1a";
             bCtx.lineWidth = 10;
             bCtx.strokeRect(5, 5, 590, 290);
 
-            bCtx.fillStyle = "#1c1c1e";
+            bCtx.fillStyle = "#1a1a1a";
             bCtx.fillRect(15, 15, 570, 70);
             bCtx.fillStyle = "#00e676";
             bCtx.font = "bold 32px sans-serif";
@@ -359,24 +239,24 @@
             bCtx.font = "14px sans-serif";
             bCtx.fillText("PARCEIRO OFICIAL EM BISSAU", 230, 52);
 
-            bCtx.fillStyle = "#1c1c1e";
+            bCtx.fillStyle = "#1a1a1a";
             bCtx.font = "bold 28px sans-serif";
             bCtx.fillText("EXPRESS & TRANSPORTES", 35, 130);
 
             bCtx.fillStyle = "#666666";
             bCtx.font = "bold 16px sans-serif";
             bCtx.fillText("CONDUTOR AUTORIZADO", 35, 165);
-            bCtx.fillStyle = "#1c1c1e";
+            bCtx.fillStyle = "#1a1a1a";
             bCtx.font = "bold 20px sans-serif";
             bCtx.fillText(nome.toUpperCase(), 35, 192);
 
             bCtx.fillStyle = "#fcd116"; 
             bCtx.fillRect(35, 215, 530, 55);
-            bCtx.strokeStyle = "#1c1c1e";
+            bCtx.strokeStyle = "#1a1a1a";
             bCtx.lineWidth = 3;
             bCtx.strokeRect(35, 215, 530, 55);
 
-            bCtx.fillStyle = "#1c1c1e";
+            bCtx.fillStyle = "#1a1a1a";
             bCtx.font = "bold 26px monospace";
             bCtx.fillText(`MATRÍCULA: ${matricula.toUpperCase()}`, 65, 252);
 
@@ -385,7 +265,7 @@
             link.href = badgeCanvas.toDataURL('image/png');
             link.click();
 
-            alert(`🎉 Sucesso absoluto!\n\n• Registo enviado para o Supabase (Estado: Pendente).\n• O Contrato PDF e o Autocolante foram gerados e descarregados.`);
+            alert(`🎉 Registo enviado com sucesso para o Supabase e contrato gerado!\nO motorista ${nome} já aparece na sua base de dados com o estado "pendente".`);
 
             location.reload();
         }
