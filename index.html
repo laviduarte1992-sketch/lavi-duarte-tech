@@ -164,7 +164,7 @@
             <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="requestRide()">Pedir Viagem Agora</button>
         </div>
 
-        <!-- Painel de Espera & Cancelamento -->
+        <!-- Painel de Espera / Cancelamento -->
         <div class="waiting-card" id="waitingPanel">
             <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
             <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
@@ -295,7 +295,7 @@
         </div>
     </div>
 
-    <!-- Panel 5: Recargas (Com botões Orange e Telecel restaurados) -->
+    <!-- Panel 5: Recargas -->
     <div class="bottom-panel" id="panel-recargas" style="display: none;">
         <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Comprar Saldo de Telemóvel</div>
         
@@ -306,7 +306,7 @@
 
         <div class="form-group" style="margin-top: 6px;">
             <label>NÚMERO DE TELEMÓVEL (+245)</label>
-            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX" pattern="[0-9]{9}">
+            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX">
         </div>
 
         <div class="form-group" style="margin-top: 6px;">
@@ -337,7 +337,7 @@
             <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas...')">Aguardar Chamadas</button>
         </div>
 
-        <!-- Form Registo Motorista (Com validação de Matrícula Única) -->
+        <!-- Form Registo Motorista (Com validação de Matrícula Única e Termos + Aceitar e Assinar) -->
         <div id="driver-register" style="display: none;">
             <div id="etapaFormRegisto">
                 <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
@@ -362,14 +362,22 @@
                     </select>
                     <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira de Recebimento" required>
 
-                    <button type="submit" class="btn-primary">Prosseguir para Assinatura</button>
+                    <!-- Termos e Condições -->
+                    <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px; color: #555; line-height: 1.4;">
+                        <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="aceiteTermos" required style="margin-top: 2px; width: auto; cursor: pointer;">
+                            <span>Li e aceito os termos e condições da ROTA GB, incluindo a taxa de comissão de 15% aplicável sobre os serviços em Bissau.</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Aceitar e Assinar</button>
                 </form>
             </div>
 
             <!-- Etapa 2: Assinatura e Envio -->
             <div id="etapaContrato" style="display: none; flex-direction: column; gap: 8px;">
                 <div style="font-size: 12px; font-weight: bold;">📜 CONTRATO DE PARCERIA & TERMOS</div>
-                <p style="font-size: 11px; color: #555;">Desenhe a sua assinatura abaixo para validar o contrato ROTA GB (15% comissão).</p>
+                <p style="font-size: 11px; color: #555;">Desenhe a sua assinatura no quadro abaixo para validar o contrato ROTA GB.</p>
                 
                 <div class="signature-pad-container">
                     <canvas id="sigPad"></canvas>
@@ -593,11 +601,17 @@
         hasSigned = false;
     }
 
-    // VALIDAÇÃO DE DUPLICADO POR MATRÍCULA NO SUPABASE
+    // VALIDAÇÃO DE DUPLICADO POR MATRÍCULA NO SUPABASE & TERMOS
     async function avancarParaAssinatura(e) {
         e.preventDefault();
-        const matricula = document.getElementById('matriculaVeiculo').value.trim();
+        
+        const termosAceites = document.getElementById('aceiteTermos').checked;
+        if (!termosAceites) {
+            alert("Deve aceitar os termos e condições para prosseguir.");
+            return;
+        }
 
+        const matricula = document.getElementById('matriculaVeiculo').value.trim();
         if (!matricula) {
             alert("Por favor, insira o número de matrícula.");
             return;
