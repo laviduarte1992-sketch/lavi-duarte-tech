@@ -3,397 +3,831 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROTA GB - Guiné-Bissau</title>
-    <!-- Bibliotecas Obrigatórias -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>ROTA GB - Super App de Bissau</title>
+    
+    <!-- Configurações PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00e676">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ROTA GB">
+
+    <!-- Biblioteca para Gerar PDF do Contrato Automático -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f2f2f7; margin: 0; padding: 0; color: #1c1c1e; }
-        header { background: #1c1c1e; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 100; }
-        .logo-area { display: flex; align-items: center; gap: 8px; }
-        .logo-text { color: #00e676; font-weight: bold; font-size: 22px; letter-spacing: 0.5px; }
-        .gw-badge { background: #ff3b30; color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; padding: 10px; }
         
-        .role-switcher { background: #2c2c2e; padding: 6px; border-radius: 20px; display: flex; gap: 4px; }
-        .role-btn { background: transparent; border: none; color: #8e8e93; font-weight: 600; padding: 6px 14px; border-radius: 16px; cursor: pointer; font-size: 13px; }
-        .role-btn.active { background: #00e676; color: #1c1c1e; }
-
-        .sub-nav { background: #1c1c1e; padding: 0 16px 12px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
-        .sub-nav::-webkit-scrollbar { display: none; }
-        .nav-pill { background: #2c2c2e; border: none; color: white; padding: 8px 14px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
-        .nav-pill.active { background: #00e676; color: #1c1c1e; font-weight: bold; }
-
-        .map-banner { background: #e5e5ea; height: 160px; display: flex; justify-content: center; align-items: center; position: relative; border-bottom: 1px solid #d1d1d6; }
-        .gps-pill { background: #2c2c2e; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .gps-dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; }
-
-        .main-container { max-width: 500px; margin: -20px auto 30px auto; background: white; border-radius: 24px 24px 0 0; padding: 20px 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); position: relative; z-index: 10; min-height: 400px; box-sizing: border-box; }
+        .app-container { 
+            width: 100%; 
+            max-width: 414px; 
+            background: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+            border-radius: 20px;
+            overflow: hidden;
+        }
         
-        .section-title { font-size: 11px; font-weight: bold; color: #8e8e93; letter-spacing: 0.5px; margin-bottom: 8px; text-transform: uppercase; }
-        
-        .route-box { border: 1px solid #c7c7cc; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 500; margin-bottom: 16px; background: #fff; cursor: pointer; }
-        
-        .transport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-        .transport-card { border: 1.5px solid #c7c7cc; border-radius: 12px; padding: 10px 6px; text-align: center; background: white; cursor: pointer; }
-        .transport-card.selected { border-color: #34c759; background: #f0fdf4; }
-        .transport-card .title { font-size: 12px; font-weight: 600; color: #1c1c1e; margin-top: 4px; }
-        .transport-card .price { font-size: 12px; font-weight: bold; color: #34c759; margin-top: 2px; }
+        /* Header */
+        .header { background: #1a1a1a; color: #fff; padding: 16px; position: relative; z-index: 20; }
+        .logo { font-size: 20px; font-weight: bold; color: #00e676; display: flex; align-items: center; gap: 6px; }
+        .badge-gb { background: #ce1126; color: #fcd116; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .role-switch { background: #333; padding: 4px; border-radius: 20px; display: flex; }
+        .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .role-btn.active { background: #00e676; color: #000; }
 
-        .form-input { width: 100%; padding: 12px; border: 1px solid #c7c7cc; border-radius: 10px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; }
-        
-        .btn-action { background: #34c759; color: #1c1c1e; font-weight: bold; border: none; width: 100%; padding: 14px; border-radius: 14px; font-size: 16px; cursor: pointer; margin-top: 10px; text-align: center; }
-        .btn-action:hover { background: #28a745; }
+        /* Menu de Serviços */
+        .service-nav { display: flex; background: #222; padding: 6px; gap: 4px; justify-content: space-around; overflow-x: auto; position: relative; z-index: 20; }
+        .nav-item { flex: 1; text-align: center; color: #ccc; font-size: 10px; font-weight: bold; padding: 10px 4px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: 0.2s; user-select: none; }
+        .nav-item:hover { background: #333; color: #fff; }
+        .nav-item.active { background: #00e676 !important; color: #000 !important; }
 
-        canvas#sigCanvas { border: 1px solid #c7c7cc; background: #fafafa; border-radius: 8px; width: 100%; touch-action: none; margin-bottom: 10px; cursor: crosshair; }
+        /* Área do Mapa */
+        .map-area { height: 140px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; pointer-events: none; }
+        canvas#bissauMap { width: 100%; height: 100%; display: block; }
+        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); pointer-events: none; }
+        .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
+
+        /* Painel Inferior */
+        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 380px; position: relative; z-index: 20; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 11px; color: #666; font-weight: bold; }
+        select, input { padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; width: 100%; cursor: pointer; }
+
+        /* Cartões de Serviço */
+        .service-options { display: flex; gap: 6px; }
+        .service-card { flex: 1; border: 2px solid #eee; border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: 0.2s; user-select: none; }
+        .service-card:hover { border-color: #00e676; }
+        .service-card.selected { border-color: #00e676; background: rgba(0,230,118,0.08); }
+        .service-title { font-size: 10px; font-weight: bold; }
+        .service-price { font-size: 12px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
+
+        /* Painel de Espera */
+        .waiting-card { background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; text-align: center; }
+        .waiting-title { font-size: 13px; font-weight: bold; color: #e65100; }
+        .timer-text { font-size: 22px; font-weight: 800; color: #d84315; margin: 4px 0; }
+        .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
+
+        /* Listas com Scroll */
+        .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 2px; }
+        .store-card { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; }
+        .store-name { font-size: 13px; font-weight: bold; }
+        .store-desc { font-size: 11px; color: #666; margin-top: 2px; }
+        .price-tag { font-size: 11px; color: #00e676; font-weight: bold; margin-top: 4px; }
+
+        /* Canvas de Assinatura */
+        .signature-pad-container { border: 2px dashed #00e676; border-radius: 10px; background: #fafafa; position: relative; margin-top: 6px; }
+        canvas#sigPad { width: 100%; height: 110px; touch-action: none; cursor: crosshair; display: block; }
+
+        /* Botões */
+        .btn-primary { background: #00e676; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: #eee; color: #333; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 4px; }
+        
+        .sub-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
+        .sub-tab-btn { flex: 1; padding: 8px; font-size: 11px; font-weight: bold; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; cursor: pointer; }
+        .sub-tab-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-area">
-            <span class="logo-text">ROTA GB</span>
-            <span class="gw-badge">GW</span>
-        </div>
-        <div class="role-switcher">
-            <button class="role-btn active" id="btnRoleCliente" onclick="switchRole('cliente')">Cliente</button>
-            <button class="role-btn" id="btnRoleMotorista" onclick="switchRole('motorista')">Motorista</button>
-        </div>
-    </header>
-
-    <div class="sub-nav">
-        <button class="nav-pill active">🚗 Transporte</button>
-        <button class="nav-pill">🍲 Comida</button>
-        <button class="nav-pill">🛒 Lojas</button>
-        <button class="nav-pill">🏨 Hotéis & Apts</button>
-        <button class="nav-pill">💳 Recargas</button>
-    </div>
-
-    <div class="map-banner">
-        <div class="gps-pill">
-            <div class="gps-dot"></div>
-            GPS Bissau Ativo
+<div class="app-container">
+    <!-- Header -->
+    <div class="header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="logo">ROTA GB <span class="badge-gb">GW</span></div>
+            <div class="role-switch">
+                <button type="button" class="role-btn active" id="btn-passageiro" onclick="setRole('passageiro')">Cliente</button>
+                <button type="button" class="role-btn" id="btn-motorista" onclick="setRole('motorista')">Motorista</button>
+            </div>
         </div>
     </div>
 
-    <div class="main-container">
+    <!-- Navegação Principais Serviços -->
+    <div class="service-nav" id="main-nav">
+        <div class="nav-item active" id="nav-taxi" onclick="switchServiceTab('taxi')">🚗 Transporte</div>
+        <div class="nav-item" id="nav-comida" onclick="switchServiceTab('comida')">🍲 Comida</div>
+        <div class="nav-item" id="nav-lojas" onclick="switchServiceTab('lojas')">🛒 Lojas</div>
+        <div class="nav-item" id="nav-hoteis" onclick="switchServiceTab('hoteis')">🏨 Hotéis & Apts</div>
+        <div class="nav-item" id="nav-recargas" onclick="switchServiceTab('recargas')">📱 Recargas</div>
+    </div>
 
-        <!-- VISTA CLIENTE -->
-        <div id="vistaCliente">
-            <div class="section-title">ROTA E DESTINO EM BISSAU</div>
-            <div class="route-box" onclick="alert('Rota ativa: Praça dos Heróis ➔ Aeroporto Osvaldo Vieira')">
-                <span>Praça dos Heróis ➔ Aeroporto Osvaldo Vieira</span>
-                <span style="color: #8e8e93;">↕</span>
-            </div>
+    <!-- Map Engine -->
+    <div class="map-area">
+        <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
+        <canvas id="bissauMap"></canvas>
+    </div>
 
-            <div class="section-title">ESCOLHA O TRANSPORTE</div>
-            <div class="transport-grid">
-                <div class="transport-card selected" onclick="selecionarTransporte(this)">
-                    <div style="font-size: 18px;">🚕</div>
-                    <div class="title">Táxi Azul</div>
-                    <div class="price">1.500 XOF</div>
-                </div>
-                <div class="transport-card" onclick="selecionarTransporte(this)">
-                    <div style="font-size: 18px;">🚗</div>
-                    <div class="title">Carro Privado</div>
-                    <div class="price">1.950 XOF</div>
-                </div>
-                <div class="transport-card" onclick="selecionarTransporte(this)">
-                    <div style="font-size: 18px;">🛵</div>
-                    <div class="title">Moto-Táxi</div>
-                    <div class="price">1.050 XOF</div>
-                </div>
-            </div>
-
-            <div class="section-title">FORMA DE PAGAMENTO DA VIAGEM</div>
-            <div class="route-box" onclick="alert('Pagamento selecionado: Dinheiro Vivo (Ao Condutor)')">
-                <span>💵 Dinheiro Vivo (Ao Condutor)</span>
-                <span style="color: #8e8e93;">↕</span>
-            </div>
-
-            <button class="btn-action" onclick="alert('Pesquisando motoristas próximos em Bissau...')">Pedir Viagem Agora</button>
-        </div>
-
-        <!-- VISTA MOTORISTA (REGISTO & CONTRATO) -->
-        <div id="vistaMotorista" style="display: none;">
-            <div id="etapaFormRegisto">
-                <div class="section-title">REGISTO OFICIAL DE CONDUTORES (BISSAU)</div>
-                
-                <input type="text" id="nomeMotorista" class="form-input" placeholder="Nome Completo do Condutor" required>
-                <input type="email" id="emailMotorista" class="form-input" placeholder="E-mail" required>
-                <input type="text" id="telefoneMotorista" class="form-input" placeholder="Telemóvel / WhatsApp (ex: 9xxxxxxx)" required>
-                
-                <select id="tipoTransporte" class="form-input">
-                    <option value="Táxi Azul/Amarelo">Táxi Azul/Amarelo</option>
-                    <option value="Moto-Táxi">Moto-Táxi</option>
-                    <option value="Carro Privado">Carro Privado</option>
+    <!-- Panel 1: Transporte -->
+    <div class="bottom-panel" id="panel-taxi">
+        <div id="rideFormControls">
+            <div class="form-group">
+                <label>ROTA E DESTINO EM BISSAU</label>
+                <select id="routeSelect" onchange="updatePrice()">
+                    <option value="1500">Praça dos Heróis ➔ Aeroporto Osvaldo Vieira</option>
+                    <option value="1000">Mercado de Bandim ➔ Bairro de Penha</option>
+                    <option value="2000">Alto Bissau ➔ Santa Luzia</option>
+                    <option value="800">Praça dos Heróis ➔ Mercado de Bandim</option>
+                    <option value="1200">Bairro Militar ➔ Antula</option>
+                    <option value="2500">Bissau Central ➔ Safim</option>
                 </select>
+            </div>
 
-                <input type="text" id="marcaModelo" class="form-input" placeholder="Marca e Modelo do Veículo" required>
-                <input type="text" id="matriculaVeiculo" class="form-input" placeholder="Número de Matrícula (Placa)" required>
-                
-                <select id="metodoRecebimentoMotorista" class="form-input">
-                    <option value="MTN Money">MTN Money</option>
-                    <option value="Orange Money">Orange Money</option>
-                    <option value="Banco">Transferência Bancária</option>
+            <div class="service-options" style="margin-top: 8px;">
+                <div class="service-card selected" id="card-taxi" onclick="selectService(this, 1)">
+                    <div class="service-title">🚖 Táxi Azul</div>
+                    <div class="service-price" id="price-taxi">1.500 XOF</div>
+                </div>
+                <div class="service-card" id="card-privado" onclick="selectService(this, 1.3)">
+                    <div class="service-title">🚘 Carro Privado</div>
+                    <div class="service-price" id="price-privado">1.950 XOF</div>
+                </div>
+                <div class="service-card" id="card-moto" onclick="selectService(this, 0.7)">
+                    <div class="service-title">🛵 Moto-Táxi</div>
+                    <div class="service-price" id="price-moto">1.050 XOF</div>
+                </div>
+            </div>
+
+            <!-- Seleção de Pagamento -->
+            <div class="form-group" style="margin-top: 10px;">
+                <label>FORMA DE PAGAMENTO DA VIAGEM</label>
+                <select id="paymentSelect">
+                    <option value="Dinheiro Vivo">💵 Dinheiro Vivo (Ao Condutor)</option>
+                    <option value="Orange Money">🟧 Orange Money</option>
+                    <option value="Telecel">🟥 Telecel Mobile Money</option>
                 </select>
-
-                <input type="text" id="numeroContaMotorista" class="form-input" placeholder="Número da Conta / Carteira" required>
-                
-                <button class="btn-action" onclick="avancarParaAssinatura()">Prosseguir para Assinatura</button>
             </div>
 
-            <!-- ETAPA DE ASSINATURA -->
-            <div id="etapaContrato" style="display: none;">
-                <div class="section-title">📜 CONTRATO DE PARCERIA & TERMOS</div>
-                <p style="font-size: 13px; color: #555; line-height: 1.4;">
-                    Ao assinar, aceita as normas de prestação de serviços do ROTA GB em Bissau (comissão de 15%).
-                </p>
-                
-                <div style="font-size: 13px; font-weight: bold; margin: 10px 0 5px 0;">Desenhe a sua assinatura abaixo:</div>
-                <canvas id="sigCanvas" width="400" height="150"></canvas>
-                
-                <button type="button" style="background: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-bottom: 10px;" onclick="limparAssinatura()">Limpar Assinatura</button>
-                
-                <button class="btn-action" onclick="finalizarRegistoEGerarDocumentos()">Submeter, Salvar no Supabase & Gerar Ficheiros</button>
-            </div>
+            <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="requestRide()">Pedir Viagem Agora</button>
         </div>
 
+        <div class="waiting-card" id="waitingPanel">
+            <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
+            <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
+            <div class="timer-text" id="waitingTimer">00:00</div>
+            <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
+                Preço reservado: <strong id="reservedAmount">1.500 XOF</strong>
+            </div>
+            <div style="font-size: 11px; color: #333; margin-bottom: 6px;">
+                Pagamento via: <strong id="selectedPaymentMethod">Dinheiro Vivo</strong>
+            </div>
+            <button type="button" class="btn-cancel" onclick="cancelRide()">Cancelar Viagem & Pedir Reembolso</button>
+        </div>
     </div>
 
-    <script>
-        // ==========================================
-        // CONFIGURAÇÃO SUPABASE
-        // ==========================================
-        const SUPABASE_URL = 'https://ymuldaviwfbcvocfknaw.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdWxkYXZpd2ZiY3ZvY2ZrbmF3Ixlub2xlIjoiYW5vbiIsImlhdCI6MTc5MTE0MDg0NywiZXhwIjoyMTA2NzE2ODQ3f0.uBSZQ_YChvWUS7B7TE762qGRSBaajFf-Flh18J7E0BU';
-        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <!-- Panel 2: Restaurantes -->
+    <div class="bottom-panel" id="panel-comida" style="display: none;">
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Restaurantes em Bissau</div>
+        <div class="store-list">
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Papa Loca Bissau</div>
+                    <div class="store-desc">Grelhados, Hambúrgueres e Fast Food</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Papa Loca')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">A Padeira Africana</div>
+                    <div class="store-desc">Galinha Cafriela e Comida Típica</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('A Padeira Africana')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Restaurante O Coqueiro</div>
+                    <div class="store-desc">Peixe Fresco, Marisco e Cozinha Típica</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('O Coqueiro')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Snack-Bar Oasis</div>
+                    <div class="store-desc">Pastelaria, Sumos Naturais e Refeições Rápidas</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Snack-Bar Oasis')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Chez Sapphire</div>
+                    <div class="store-desc">Cozinha Internacional e Buffet</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Chez Sapphire')">Pedir</button>
+            </div>
+        </div>
+    </div>
 
-        let sigCanvas, sigCtx, hasSigned = false;
+    <!-- Panel 3: Lojas -->
+    <div class="bottom-panel" id="panel-lojas" style="display: none;">
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Supermercados e Lojas</div>
+        <div class="store-list">
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Supermercado Hereso</div>
+                    <div class="store-desc">Alimentação Geral, Bebidas e Frescos</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Supermercado Hereso')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Mini-Mercado Bandim</div>
+                    <div class="store-desc">Produtos de Mercearia e Higiene</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Mini-Mercado Bandim')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Farmácia Central Bissau</div>
+                    <div class="store-desc">Medicamentos e Primeiros Socorros</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Farmácia Central')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Boutique Guiné Moda</div>
+                    <div class="store-desc">Roupas, Calçados e Acessórios</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Boutique Guiné Moda')">Comprar</button>
+            </div>
+        </div>
+    </div>
 
-        function switchRole(role) {
-            document.getElementById('btnRoleCliente').classList.remove('active');
-            document.getElementById('btnRoleMotorista').classList.remove('active');
-            document.getElementById('vistaCliente').style.display = 'none';
-            document.getElementById('vistaMotorista').style.display = 'none';
+    <!-- Panel 4: Hotéis -->
+    <div class="bottom-panel" id="panel-hoteis" style="display: none;">
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Hotéis e Apartamentos em Bissau</div>
+        <div class="store-list">
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Hotel Ledra Bissau</div>
+                    <div class="store-desc">Av. Amílcar Cabral — Quarto Duplo Executive</div>
+                    <div class="price-tag">45.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Hotel Ledra Bissau')">Reservar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Hotel Ceiba Bissau</div>
+                    <div class="store-desc">Av. Combatentes — Suíte de Luxo com Piscina</div>
+                    <div class="price-tag">75.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Hotel Ceiba Bissau')">Reservar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Coimbra Hotel & Spa</div>
+                    <div class="store-desc">Praça dos Heróis Nacionais — Quarto Standard</div>
+                    <div class="price-tag">35.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Coimbra Hotel & Spa')">Reservar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Apartamentos Sol de Bissau</div>
+                    <div class="store-desc">Bairro de Penha — T1 Equipado</div>
+                    <div class="price-tag">25.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Apartamentos Sol de Bissau')">Reservar</button>
+            </div>
+        </div>
+    </div>
 
-            if(role === 'cliente') {
-                document.getElementById('btnRoleCliente').classList.add('active');
-                document.getElementById('vistaCliente').style.display = 'block';
-            } else {
-                document.getElementById('btnRoleMotorista').classList.add('active');
-                document.getElementById('vistaMotorista').style.display = 'block';
-            }
-        }
+    <!-- Panel 5: Recargas -->
+    <div class="bottom-panel" id="panel-recargas" style="display: none;">
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Comprar Saldo de Telemóvel</div>
+        
+        <div class="sub-tabs">
+            <button type="button" class="sub-tab-btn active" id="btn-orange-op" onclick="selectOperator('Orange')">🟧 Orange Bissau</button>
+            <button type="button" class="sub-tab-btn" id="btn-telecel-op" onclick="selectOperator('Telecel')">🟥 Telecel Bissau</button>
+        </div>
 
-        function selecionarTransporte(element) {
-            document.querySelectorAll('.transport-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
-        }
+        <div class="form-group" style="margin-top: 6px;">
+            <label>NÚMERO DE TELEMÓVEL (+245)</label>
+            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX" pattern="[0-9]{9}">
+        </div>
 
-        window.onload = function() {
-            sigCanvas = document.getElementById('sigCanvas');
-            sigCtx = sigCanvas.getContext('2d');
+        <div class="form-group" style="margin-top: 6px;">
+            <label>VALOR DA RECARGA (XOF)</label>
+            <select id="amountRecarga">
+                <option value="500">500 XOF</option>
+                <option value="1000" selected>1.000 XOF</option>
+                <option value="2000">2.000 XOF</option>
+                <option value="5000">5.000 XOF</option>
+            </select>
+        </div>
+
+        <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="processarRecarga()">Pagar Recarga Agora</button>
+    </div>
+
+    <!-- Panel Motorista -->
+    <div class="bottom-panel" id="panel-motorista" style="display: none;">
+        <div class="sub-tabs">
+            <button type="button" class="sub-tab-btn active" id="tab-painel-btn" onclick="toggleDriverTab('painel')">Painel do Condutor</button>
+            <button type="button" class="sub-tab-btn" id="tab-registo-btn" onclick="toggleDriverTab('registo')">Registar Veículo</button>
+        </div>
+
+        <div id="driver-dashboard">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h3 style="font-size: 15px;">Painel de Trabalho em Bissau</h3>
+                <p style="font-size: 11px; color: #666;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></p>
+            </div>
+
+            <div style="background: #f9f9f9; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div>
+                    <div style="font-size: 10px; color: #888;">Ganhos Hoje</div>
+                    <div style="font-size: 16px; font-weight: bold; color: #1a1a1a;">28.000 XOF</div>
+                </div>
+                <div style="font-size: 11px; background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 6px; font-weight: bold;">
+                    18 Serviços
+                </div>
+            </div>
+
+            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas em Bissau...')">Aguardar Chamadas</button>
+        </div>
+
+        <!-- Form Registo Motorista (Etapa 1) -->
+        <div id="driver-register" style="display: none;">
+            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
             
-            let painting = false;
-            sigCanvas.addEventListener('mousedown', startPos);
-            sigCanvas.addEventListener('mouseup', endPos);
-            sigCanvas.addEventListener('mousemove', draw);
-            sigCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPos(e.touches[0]); });
-            sigCanvas.addEventListener('touchend', (e) => { e.preventDefault(); endPos(); });
-            sigCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+            <form id="formCadastroMotorista" onsubmit="avancarParaAssinatura(event)" style="display: flex; flex-direction: column; gap: 8px;">
+                <input type="text" id="nomeMotorista" placeholder="Nome Completo do Condutor" required>
+                <input type="email" id="emailMotorista" placeholder="E-mail (Para receber a cópia do PDF)" required>
+                <input type="tel" id="telefoneMotorista" placeholder="Telefone de Contacto (+245)" required>
+                
+                <select id="tipoTransporte">
+                    <option value="Taxi">Táxi Azul/Amarelo</option>
+                    <option value="CarroPrivado">Carro Privado</option>
+                    <option value="Moto">Moto-Táxi</option>
+                </select>
+                
+                <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
+                <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula" required>
+                
+                <select id="metodoRecebimentoMotorista" required>
+                    <option value="" disabled selected>Onde quer receber os seus ganhos?</option>
+                    <option value="Orange Money">Orange Money (+245)</option>
+                    <option value="Telecel">Telecel Mobile Money (+245)</option>
+                </select>
+                <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira de Recebimento" required>
 
-            function startPos(e) { painting = true; draw(e); }
-            function endPos() { painting = false; sigCtx.beginPath(); hasSigned = true; }
-            function draw(e) {
-                if(!painting) return;
-                const rect = sigCanvas.getBoundingClientRect();
-                sigCtx.lineWidth = 2;
-                sigCtx.lineCap = 'round';
-                sigCtx.strokeStyle = '#000';
-                sigCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-                sigCtx.stroke();
-                sigCtx.beginPath();
-                sigCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+                <!-- Aviso do Termo sem expor o nome comercialmente -->
+                <div style="background: #f0f0f0; padding: 10px; border-radius: 8px; font-size: 11px; color: #444; margin-top: 4px;">
+                    <div style="font-weight: bold; margin-bottom: 4px;">📜 Contrato de Adesão & Parceria ROTA GB</div>
+                    <p style="margin-bottom: 6px;">
+                        Ao submeter, aceita a comissão de 15% e as normas operacionais do ROTA GB em Bissau.
+                    </p>
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" id="aceitaContrato" required style="width: auto;">
+                        Li e aceito os termos do contrato.
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary">Assinar & Submeter Registo</button>
+            </form>
+
+            <!-- Etapa 2: Espaço para Contrato, Assinatura e Envio do PDF -->
+            <div id="contractStep" style="display: none; flex-direction: column; gap: 8px; margin-top: 10px;">
+                <div style="background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 8px; font-size: 11px; color: #1b5e20;">
+                    <strong>✅ Dados Aprovados pela Gestão ROTA GB!</strong><br>
+                    Por favor, desenhe a sua assinatura no quadro abaixo.
+                </div>
+
+                <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 10px; color: #444; max-height: 90px; overflow-y: auto;">
+                    <strong>TERMOS DE PARCERIA ROTA GB</strong><br>
+                    1. O motorista concorda com a comissão de 15% para a plataforma ROTA GB sobre cada serviço em Bissau.<br>
+                    2. O pagamento dos ganhos é feito via Orange Money/Telecel.<br>
+                    3. O condutor compromete-se a prestar um serviço seguro e respeitar as tarifas oficiais.
+                </div>
+
+                <div class="form-group">
+                    <label>DESENHE A SUA ASSINATURA AQUI (COM O DEDO / MOUSE):</label>
+                    <div class="signature-pad-container">
+                        <canvas id="sigPad"></canvas>
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="limparAssinatura()">🧹 Limpar Assinatura</button>
+                </div>
+
+                <button type="button" class="btn-primary" onclick="finalizarEGerarPDF()">Concluir, Gerar PDF & Enviar por E-mail</button>
+            </div>
+        </div>
+    </div>
+    
+    <div style="text-align: center; font-size: 9px; color: #888; padding: 8px; border-top: 1px solid #eee; background: #fff;">
+        ROTA GB © — Guiné-Bissau
+    </div>
+</div>
+
+<script>
+    // Configuração Dinâmica do Merchant ROTA GB
+    const ROTA_GB_MERCHANT = {
+        orangeMoneyNumber: typeof process !== 'undefined' && process.env.ORANGE_MERCHANT_NUMBER 
+            ? process.env.ORANGE_MERCHANT_NUMBER 
+            : "245955000000",
+        telecelNumber: typeof process !== 'undefined' && process.env.TELECEL_MERCHANT_NUMBER 
+            ? process.env.TELECEL_MERCHANT_NUMBER 
+            : "245966000000",
+        commissionRate: 0.15
+    };
+
+    const canvas = document.getElementById('bissauMap');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        if(canvas && canvas.parentElement) {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let driverX = 80;
+    let driverY = 70;
+
+    function drawMap() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height * 0.4);
+        ctx.lineTo(canvas.width, canvas.height * 0.6);
+        ctx.stroke();
+
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width * 0.5, 0);
+        ctx.lineTo(canvas.width * 0.3, canvas.height);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ce1126';
+        ctx.beginPath();
+        ctx.arc(driverX, driverY, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#000';
+        ctx.font = '10px sans-serif';
+        ctx.fillText("🚖 ROTA GB Express", driverX - 30, driverY - 10);
+
+        driverX += 0.5;
+        if (driverX > canvas.width) driverX = 0;
+
+        requestAnimationFrame(drawMap);
+    }
+    drawMap();
+
+    let currentMultiplier = 1;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let activePrice = 0;
+    let currentOperator = 'Orange';
+
+    function switchServiceTab(tab) {
+        document.querySelectorAll('.service-nav .nav-item').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('panel-taxi').style.display = 'none';
+        document.getElementById('panel-comida').style.display = 'none';
+        document.getElementById('panel-lojas').style.display = 'none';
+        document.getElementById('panel-hoteis').style.display = 'none';
+        document.getElementById('panel-recargas').style.display = 'none';
+
+        if(tab === 'taxi') {
+            document.getElementById('nav-taxi').classList.add('active');
+            document.getElementById('panel-taxi').style.display = 'flex';
+        } else if(tab === 'comida') {
+            document.getElementById('nav-comida').classList.add('active');
+            document.getElementById('panel-comida').style.display = 'flex';
+        } else if(tab === 'lojas') {
+            document.getElementById('nav-lojas').classList.add('active');
+            document.getElementById('panel-lojas').style.display = 'flex';
+        } else if(tab === 'hoteis') {
+            document.getElementById('nav-hoteis').classList.add('active');
+            document.getElementById('panel-hoteis').style.display = 'flex';
+        } else if(tab === 'recargas') {
+            document.getElementById('nav-recargas').classList.add('active');
+            document.getElementById('panel-recargas').style.display = 'flex';
+        }
+    }
+
+    function setRole(role) {
+        document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
+        document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
+        
+        if(role === 'passageiro') {
+            document.getElementById('main-nav').style.display = 'flex';
+            switchServiceTab('taxi');
+            document.getElementById('panel-motorista').style.display = 'none';
+        } else {
+            document.getElementById('main-nav').style.display = 'none';
+            document.getElementById('panel-taxi').style.display = 'none';
+            document.getElementById('panel-comida').style.display = 'none';
+            document.getElementById('panel-lojas').style.display = 'none';
+            document.getElementById('panel-hoteis').style.display = 'none';
+            document.getElementById('panel-recargas').style.display = 'none';
+            document.getElementById('panel-motorista').style.display = 'flex';
+        }
+    }
+
+    function toggleDriverTab(tab) {
+        document.getElementById('tab-painel-btn').classList.toggle('active', tab === 'painel');
+        document.getElementById('tab-registo-btn').classList.toggle('active', tab === 'registo');
+        document.getElementById('driver-dashboard').style.display = tab === 'painel' ? 'block' : 'none';
+        document.getElementById('driver-register').style.display = tab === 'registo' ? 'block' : 'none';
+    }
+
+    function selectService(element, multiplier) {
+        document.querySelectorAll('.service-card').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        currentMultiplier = multiplier;
+        updatePrice();
+    }
+
+    function updatePrice() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        document.getElementById('price-taxi').innerText = `${Math.round(basePrice * 1).toLocaleString()} XOF`;
+        document.getElementById('price-privado').innerText = `${Math.round(basePrice * 1.3).toLocaleString()} XOF`;
+        document.getElementById('price-moto').innerText = `${Math.round(basePrice * 0.7).toLocaleString()} XOF`;
+    }
+
+    async function processarPagamentoMobile(metodo, valorXOF) {
+        const comissaoCEO = valorXOF * ROTA_GB_MERCHANT.commissionRate;
+        const valorMotorista = valorXOF - comissaoCEO;
+        const merchantUsado = metodo === 'Orange Money' ? ROTA_GB_MERCHANT.orangeMoneyNumber : ROTA_GB_MERCHANT.telecelNumber;
+
+        console.log(`[Merchant ROTA GB] Iniciar cobrança via ${metodo} (${merchantUsado})...`);
+
+        try {
+            const response = await fetch('/api/pay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    provider: metodo,
+                    merchant: merchantUsado,
+                    amount: valorXOF,
+                    commission: comissaoCEO
+                })
+            });
+            const res = await response.json();
+            if(res.success) {
+                alert(`Pedido USSD enviado via ${metodo}! Confirme o PIN no ecrã.`);
             }
-        };
+        } catch(e) {
+            if(metodo !== 'Dinheiro Vivo') {
+                alert(`Pagamento em processamento via ${metodo}:\n\nTotal: ${valorXOF.toLocaleString()} XOF\nComissão ROTA GB: ${comissaoCEO.toLocaleString()} XOF (Creditados na conta Merchant ${merchantUsado})\n\nPor favor, confirme no seu ecrã.`);
+            }
+        }
+    }
 
-        function limparAssinatura() {
+    function requestRide() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        activePrice = Math.round(basePrice * currentMultiplier);
+        const paymentMethod = document.getElementById('paymentSelect').value;
+
+        if(paymentMethod === 'Orange Money' || paymentMethod === 'Telecel') {
+            processarPagamentoMobile(paymentMethod, activePrice);
+        }
+
+        document.getElementById('reservedAmount').innerText = `${activePrice.toLocaleString()} XOF`;
+        document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
+        document.getElementById('rideFormControls').style.display = 'none';
+        document.getElementById('waitingPanel').style.display = 'flex';
+
+        secondsElapsed = 0;
+        document.getElementById('waitingTimer').innerText = "00:00";
+        
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            document.getElementById('waitingTimer').innerText = `${mins}:${secs}`;
+        }, 1000);
+    }
+
+    function cancelRide() {
+        clearInterval(timerInterval);
+        alert(`Pedido de viagem cancelado com sucesso!\n\nReembolso Processado:\nValor de ${activePrice.toLocaleString()} XOF restituído.`);
+        
+        document.getElementById('waitingPanel').style.display = 'none';
+        document.getElementById('rideFormControls').style.display = 'block';
+    }
+
+    function selectOperator(op) {
+        currentOperator = op;
+        document.getElementById('btn-orange-op').classList.toggle('active', op === 'Orange');
+        document.getElementById('btn-telecel-op').classList.toggle('active', op === 'Telecel');
+    }
+
+    function processarRecarga() {
+        const phone = document.getElementById('phoneRecarga').value;
+        const amount = parseInt(document.getElementById('amountRecarga').value);
+        
+        if(!phone) {
+            alert('Por favor, insira o número de telemóvel.');
+            return;
+        }
+
+        processarPagamentoMobile(currentOperator === 'Orange' ? 'Orange Money' : 'Telecel', amount);
+    }
+
+    function pedirDelivery(restaurante) {
+        alert(`A abrir menu de: ${restaurante}\n\nO estafeta Moto-Táxi do ROTA GB recolherá e entregará a refeição em Bissau!`);
+    }
+
+    function pedirLoja(loja) {
+        alert(`A abrir catálogo de: ${loja}\n\nEfetue as suas compras com entrega rápida via ROTA GB Express!`);
+    }
+
+    function reservarHotel(hotel) {
+        alert(`Pedido de Reserva enviado para: ${hotel}\n\nA receção entrará em contacto para confirmar.`);
+    }
+
+    // ==========================================
+    // QUADRO DE ASSINATURA & GERAÇÃO DE PDF
+    // ==========================================
+    let sigCanvas, sigCtx;
+    let isDrawing = false;
+    let hasSigned = false;
+
+    function initSignaturePad() {
+        sigCanvas = document.getElementById('sigPad');
+        if(!sigCanvas) return;
+        
+        sigCanvas.width = sigCanvas.parentElement.clientWidth;
+        sigCanvas.height = 110;
+        sigCtx = sigCanvas.getContext('2d');
+        sigCtx.strokeStyle = "#1a1a1a";
+        sigCtx.lineWidth = 2.5;
+
+        function getPos(e) {
+            const rect = sigCanvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            hasSigned = true;
+            const pos = getPos(e);
+            sigCtx.beginPath();
+            sigCtx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            if(!isDrawing) return;
+            e.preventDefault();
+            const pos = getPos(e);
+            sigCtx.lineTo(pos.x, pos.y);
+            sigCtx.stroke();
+        }
+
+        function stopDrawing() { isDrawing = false; }
+
+        sigCanvas.addEventListener('mousedown', startDrawing);
+        sigCanvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDrawing);
+
+        sigCanvas.addEventListener('touchstart', startDrawing, { passive: false });
+        sigCanvas.addEventListener('touchmove', draw, { passive: false });
+        sigCanvas.addEventListener('touchend', stopDrawing);
+    }
+
+    function limparAssinatura() {
+        if(sigCtx && sigCanvas) {
             sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
             hasSigned = false;
         }
+    }
 
-        function avancarParaAssinatura() {
-            const nome = document.getElementById('nomeMotorista').value;
-            const email = document.getElementById('emailMotorista').value;
-            const tel = document.getElementById('telefoneMotorista').value;
-            const matricula = document.getElementById('matriculaVeiculo').value;
-
-            if(!nome || !email || !tel || !matricula) {
-                alert("Por favor, preencha os campos obrigatórios do registo.");
-                return;
-            }
-            document.getElementById('etapaFormRegisto').style.display = 'none';
-            document.getElementById('etapaContrato').style.display = 'block';
+    function avancarParaAssinatura(event) {
+        event.preventDefault();
+        
+        const email = document.getElementById('emailMotorista').value;
+        if(!email || !email.includes('@')) {
+            alert('Por favor, insira um endereço de e-mail válido para receber o contrato.');
+            return;
         }
 
-        async function finalizarRegistoEGerarDocumentos() {
-            if(!hasSigned) {
-                alert("Por favor, desenhe a sua assinatura antes de concluir.");
-                return;
-            }
+        document.getElementById('formCadastroMotorista').style.display = 'none';
+        document.getElementById('contractStep').style.display = 'flex';
+        initSignaturePad();
+    }
 
-            const nome = document.getElementById('nomeMotorista').value;
-            const email = document.getElementById('emailMotorista').value;
-            const tel = document.getElementById('telefoneMotorista').value;
-            const tipoTransp = document.getElementById('tipoTransporte').value;
-            const veiculo = document.getElementById('marcaModelo').value;
-            const matricula = document.getElementById('matriculaVeiculo').value;
-            const metodo = document.getElementById('metodoRecebimentoMotorista').value;
-            const conta = document.getElementById('numeroContaMotorista').value;
-            const dataAtual = new Date().toLocaleDateString('pt-PT');
-
-            // 1. Enviar para a tabela 'motoristas' no Supabase
-            const { error } = await _supabase
-                .from('motoristas')
-                .insert([
-                    { 
-                        nome: nome, 
-                        email: email, 
-                        telefone: tel, 
-                        tipo_transporte: tipoTransp,
-                        marca_modelo: veiculo,
-                        placa_veiculo: matricula,
-                        metodo_recebimento: metodo,
-                        conta_recebimento: conta,
-                        status: 'pendente' 
-                    }
-                ]);
-
-            if (error) {
-                alert("Erro ao gravar no Supabase: " + error.message);
-                return;
-            }
-
-            // 2. Gerar Contrato PDF
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.setFillColor(28, 28, 30);
-            doc.rect(0, 0, 210, 30, 'F');
-            doc.setTextColor(0, 230, 118);
-            doc.setFontSize(22);
-            doc.setFont("helvetica", "bold");
-            doc.text("ROTA GB — Guiné-Bissau", 15, 20);
-
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(10);
-            doc.text("Contrato Oficial de Parceria & Prestação de Serviços", 115, 20);
-
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(11);
-            doc.text(`Data de Emissão: ${dataAtual}`, 15, 42);
-
-            doc.setFontSize(13);
-            doc.setFont("helvetica", "bold");
-            doc.text("1. DADOS DO PARCEIRO / CONDUTOR", 15, 52);
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Nome Completo: ${nome}`, 15, 60);
-            doc.text(`E-mail: ${email}`, 15, 66);
-            doc.text(`Telefone: +245 ${tel}`, 15, 72);
-            doc.text(`Veículo: ${veiculo} | Matrícula: ${matricula}`, 15, 78);
-            doc.text(`Recebimento: ${metodo} (${conta})`, 15, 84);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(13);
-            doc.text("2. CLÁUSULAS CONTRATUAIS", 15, 96);
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.text("• Comissão ROTA GB: Taxa de 15% sobre o valor de cada viagem/serviço em Bissau.", 15, 104);
-            doc.text("• Repartição Automática: 85% do valor cobrado é de direito do condutor.", 15, 110);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(13);
-            doc.text("3. ASSINATURAS", 15, 132);
-
-            doc.setFontSize(10);
-            doc.text("Pela Plataforma ROTA GB:", 15, 142);
-            doc.setDrawColor(0, 230, 118);
-            doc.setLineWidth(1);
-            doc.rect(15, 146, 75, 30);
-            
-            doc.setTextColor(20, 40, 120);
-            doc.setFont("times", "bolditalic");
-            doc.setFontSize(15);
-            doc.text("Lavi Duarte Indeque", 20, 159); 
-
-            doc.setTextColor(0, 0, 0);
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8);
-            doc.text("Direção Executiva — ROTA GB", 20, 168);
-
-            doc.text("Pelo Condutor / Parceiro:", 115, 142);
-            const sigImgData = sigCanvas.toDataURL('image/png');
-            doc.addImage(sigImgData, 'PNG', 115, 146, 75, 30);
-            doc.setFontSize(8);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Nome: ${nome}`, 115, 180);
-
-            doc.save(`Contrato_ROTA_GB_${nome.replace(/\s+/g, '_')}.pdf`);
-
-            // 3. Gerar Imagem do Autocolante de Porta
-            const badgeCanvas = document.createElement('canvas');
-            badgeCanvas.width = 600;
-            badgeCanvas.height = 300;
-            const bCtx = badgeCanvas.getContext('2d');
-
-            bCtx.fillStyle = "#ffffff";
-            bCtx.fillRect(0, 0, 600, 300);
-            bCtx.strokeStyle = "#1c1c1e";
-            bCtx.lineWidth = 10;
-            bCtx.strokeRect(5, 5, 590, 290);
-
-            bCtx.fillStyle = "#1c1c1e";
-            bCtx.fillRect(15, 15, 570, 70);
-            bCtx.fillStyle = "#00e676";
-            bCtx.font = "bold 32px sans-serif";
-            bCtx.fillText("ROTA GB", 35, 60);
-
-            bCtx.fillStyle = "#ffffff";
-            bCtx.font = "14px sans-serif";
-            bCtx.fillText("PARCEIRO OFICIAL EM BISSAU", 230, 52);
-
-            bCtx.fillStyle = "#1c1c1e";
-            bCtx.font = "bold 28px sans-serif";
-            bCtx.fillText("EXPRESS & TRANSPORTES", 35, 130);
-
-            bCtx.fillStyle = "#666666";
-            bCtx.font = "bold 16px sans-serif";
-            bCtx.fillText("CONDUTOR AUTORIZADO", 35, 165);
-            bCtx.fillStyle = "#1c1c1e";
-            bCtx.font = "bold 20px sans-serif";
-            bCtx.fillText(nome.toUpperCase(), 35, 192);
-
-            bCtx.fillStyle = "#fcd116"; 
-            bCtx.fillRect(35, 215, 530, 55);
-            bCtx.strokeStyle = "#1c1c1e";
-            bCtx.lineWidth = 3;
-            bCtx.strokeRect(35, 215, 530, 55);
-
-            bCtx.fillStyle = "#1c1c1e";
-            bCtx.font = "bold 26px monospace";
-            bCtx.fillText(`MATRÍCULA: ${matricula.toUpperCase()}`, 65, 252);
-
-            const link = document.createElement('a');
-            link.download = `Autocolante_Porta_${matricula.replace(/\s+/g, '_')}.png`;
-            link.href = badgeCanvas.toDataURL('image/png');
-            link.click();
-
-            alert(`🎉 Sucesso absoluto!\n\n• Registo enviado para o Supabase (Estado: Pendente).\n• O Contrato PDF e o Autocolante foram gerados e descarregados.`);
-
-            location.reload();
+    async function finalizarEGerarPDF() {
+        if(!hasSigned) {
+            alert("Por favor, desenhe a sua assinatura no quadro antes de concluir.");
+            return;
         }
-    </script>
+
+        const nome = document.getElementById('nomeMotorista').value;
+        const email = document.getElementById('emailMotorista').value;
+        const tel = document.getElementById('telefoneMotorista').value;
+        const veiculo = document.getElementById('marcaModelo').value;
+        const matricula = document.getElementById('matriculaVeiculo').value;
+        const metodo = document.getElementById('metodoRecebimentoMotorista').value;
+        const conta = document.getElementById('numeroContaMotorista').value;
+        const dataAtual = new Date().toLocaleDateString('pt-PT');
+
+        // Gerar o documento PDF usando jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Cabeçalho ROTA GB
+        doc.setFillColor(26, 26, 26);
+        doc.rect(0, 0, 210, 30, 'F');
+        doc.setTextColor(0, 230, 118);
+        doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
+        doc.text("ROTA GB — Guiné-Bissau", 15, 20);
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.text("Contrato Oficial de Parceria & Prestação de Serviços", 115, 20);
+
+        // Corpo do Contrato
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(11);
+        doc.text(`Data de Emissão: ${dataAtual}`, 15, 42);
+
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.text("1. DADOS DO PARCEIRO / CONDUTOR", 15, 52);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Nome Completo: ${nome}`, 15, 60);
+        doc.text(`E-mail de Notificação: ${email}`, 15, 66);
+        doc.text(`Telefone de Contacto: +245 ${tel}`, 15, 72);
+        doc.text(`Veículo: ${veiculo} | Matrícula: ${matricula}`, 15, 78);
+        doc.text(`Conta de Recebimento de Ganhos: ${metodo} (${conta})`, 15, 84);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(13);
+        doc.text("2. CLÁUSULAS CONTRATUAIS", 15, 96);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.text("• Comissão ROTA GB: É estabelecida a taxa de 15% sobre o valor de cada viagem/serviço em Bissau.", 15, 104);
+        doc.text("• Repartição Automática: 85% do valor cobrado é de direito do condutor.", 15, 110);
+        doc.text("• O condutor compromete-se a cumprir o código de estrada e normas de segurança em Bissau.", 15, 116);
+
+        // Seção das Assinaturas Paralelas
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(13);
+        doc.text("3. ASSINATURAS DAS PARTES CONTRATANTES", 15, 132);
+
+        // --- LADO ESQUERDO: ASSINATURA DA PLATAFORMA (Lavi Duarte Indeque) ---
+        doc.setFontSize(10);
+        doc.text("Pela Plataforma ROTA GB:", 15, 142);
+        
+        // Carimbo/Selo de Autenticidade institucional
+        doc.setDrawColor(0, 230, 118);
+        doc.setLineWidth(1);
+        doc.rect(15, 146, 75, 30); // Moldura
+        
+        // Rubrica caligráfica discreta com o seu nome registado no PDF
+        doc.setTextColor(20, 40, 120);
+        doc.setFont("times", "bolditalic");
+        doc.setFontSize(15);
+        doc.text("Lavi Duarte Indeque", 20, 159); 
+        
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.text("Lavi Duarte Indeque", 20, 168);
+        doc.setFont("helvetica", "normal");
+        doc.text("Direção Executiva — ROTA GB", 20, 172);
+
+        // --- LADO DIREITO: ASSINATURA DIGITAL DO MOTORISTA ---
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text("Pelo Condutor / Parceiro:", 115, 142);
+        
+        // Adiciona o desenho feito pelo motorista com o dedo
+        const sigImgData = sigCanvas.toDataURL('image/png');
+        doc.addImage(sigImgData, 'PNG', 115, 146, 75, 30);
+        
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Nome: ${nome}`, 115, 180);
+
+        // Descarregar PDF Localmente
+        doc.save(`Contrato_ROTA_GB_${nome.replace(/\s+/g, '_')}.pdf`);
+
+        // Notificação de Sucesso
+        alert(`🎉 CONTRATO GERADO COM SUCESSO!\n\n` +
+              `• O download do Contrato PDF foi concluído.\n` +
+              `• Assinatura institucional de Lavi Duarte Indeque aplicada.\n` +
+              `• Cópia associada ao e-mail: ${email}`);
+
+        document.getElementById('formCadastroMotorista').reset();
+        limparAssinatura();
+        document.getElementById('contractStep').style.display = 'none';
+        document.getElementById('formCadastroMotorista').style.display = 'flex';
+        toggleDriverTab('painel');
+    }
+</script>
+
 </body>
 </html>
