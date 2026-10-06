@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ROTA GB">
 
-    <!-- Bibliotecas Necessárias -->
+    <!-- Bibliotecas Obrigatórias -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -37,7 +37,7 @@
         .logo { font-size: 20px; font-weight: bold; color: #00e676; display: flex; align-items: center; gap: 6px; }
         .badge-gb { background: #ce1126; color: #fcd116; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
         .role-switch { background: #333; padding: 4px; border-radius: 20px; display: flex; }
-        .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; white-space: nowrap; }
         .role-btn.active { background: #00e676; color: #000; }
 
         /* Menu de Serviços */
@@ -46,7 +46,7 @@
         .nav-item:hover { background: #333; color: #fff; }
         .nav-item.active { background: #00e676 !important; color: #000 !important; }
 
-        /* Área do Mapa */
+        /* Área do Mapa (Com animação GPS original) */
         .map-area { height: 140px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; pointer-events: none; }
         canvas#bissauMap { width: 100%; height: 100%; display: block; }
         .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); pointer-events: none; z-index: 5; }
@@ -110,13 +110,13 @@
         <div class="nav-item" id="nav-recargas" onclick="switchServiceTab('recargas')">📱 Recargas</div>
     </div>
 
-    <!-- Map Engine com GPS Animado -->
+    <!-- Map Engine (Com o GPS Animado Original e Símbolo ROTA GB) -->
     <div class="map-area">
         <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
         <canvas id="bissauMap"></canvas>
     </div>
 
-    <!-- Panel 1: Transporte (Cliente) -->
+    <!-- Panel 1: Transporte -->
     <div class="bottom-panel" id="panel-taxi">
         <div id="rideFormControls">
             <div class="form-group">
@@ -155,7 +155,7 @@
                 </select>
             </div>
 
-            <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="alert('A procurar condutores ROTA GB próximos em Bissau...')">Pedir Viagem Agora</button>
+            <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="alert('A procurar condutor ROTA GB mais próximo...')">Pedir Viagem Agora</button>
         </div>
     </div>
 
@@ -189,7 +189,7 @@
                     <div class="store-name">Supermercado Hereso</div>
                     <div class="store-desc">Alimentação Geral, Bebidas e Frescos</div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Iniciando compra...')">Comprar</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Compra iniciada!')">Comprar</button>
             </div>
         </div>
     </div>
@@ -231,7 +231,7 @@
                 <h3 style="font-size: 15px;">Painel de Trabalho em Bissau</h3>
                 <p style="font-size: 11px; color: #666;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></p>
             </div>
-            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A aguardar chamadas...')">Aguardar Chamadas</button>
+            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas em Bissau...')">Aguardar Chamadas</button>
         </div>
 
         <!-- Form Registo Motorista (Com validação de Matrícula Única) -->
@@ -266,7 +266,7 @@
             <!-- Etapa 2: Assinatura e Envio -->
             <div id="etapaContrato" style="display: none; flex-direction: column; gap: 8px;">
                 <div style="font-size: 12px; font-weight: bold;">📜 CONTRATO DE PARCERIA & TERMOS</div>
-                <p style="font-size: 11px; color: #555;">Desenhe a sua assinatura no quadro abaixo para validar o contrato ROTA GB (15% comissão).</p>
+                <p style="font-size: 11px; color: #555;">Desenhe a sua assinatura abaixo para validar o contrato ROTA GB (15% comissão).</p>
                 
                 <div class="signature-pad-container">
                     <canvas id="sigPad"></canvas>
@@ -291,7 +291,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdWxkYXZpd2ZiY3ZvY2ZrbmF3Ixlub2xlIjoiYW5vbiIsImlhdCI6MTc5MTE0MDg0NywiZXhwIjoyMTA2NzE2ODQ3f0.uBSZQ_YChvWUS7B7TE762qGRSBaajFf-Flh18J7E0BU';
     const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ANIMAÇÃO DO MAPA E CARRINHO GPS
+    // ANIMAÇÃO DO MAPA E CARRINHO GPS ORIGINAL (Com ROTA GB Express)
     const canvas = document.getElementById('bissauMap');
     const ctx = canvas.getContext('2d');
 
@@ -304,34 +304,36 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    let driverX = 20;
-    let targetX = 250;
+    let driverX = 80;
+    let driverY = 70;
 
     function drawMap() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Desenhando Vias de Bissau
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 10;
+        ctx.lineWidth = 8;
         ctx.beginPath();
-        ctx.moveTo(0, canvas.height * 0.5);
-        ctx.lineTo(canvas.width, canvas.height * 0.5);
+        ctx.moveTo(0, canvas.height * 0.4);
+        ctx.lineTo(canvas.width, canvas.height * 0.6);
         ctx.stroke();
 
-        ctx.lineWidth = 6;
+        ctx.lineWidth = 5;
         ctx.beginPath();
-        ctx.moveTo(canvas.width * 0.4, 0);
-        ctx.lineTo(canvas.width * 0.4, canvas.height);
+        ctx.moveTo(canvas.width * 0.5, 0);
+        ctx.lineTo(canvas.width * 0.3, canvas.height);
         ctx.stroke();
 
-        // Animação do Carrinho GPS
-        if (Math.abs(driverX - targetX) < 2) {
-            targetX = Math.random() * (canvas.width - 40) + 20;
-        }
-        driverX += (targetX > driverX) ? 0.7 : -0.7;
+        ctx.fillStyle = '#ce1126';
+        ctx.beginPath();
+        ctx.arc(driverX, driverY, 6, 0, Math.PI * 2);
+        ctx.fill();
 
-        ctx.font = '20px sans-serif';
-        ctx.fillText("🚕", driverX - 10, canvas.height * 0.5 + 7);
+        ctx.fillStyle = '#000';
+        ctx.font = '10px sans-serif';
+        ctx.fillText("🚖 ROTA GB Express", driverX - 30, driverY - 10);
+
+        driverX += 0.5;
+        if (driverX > canvas.width) driverX = 0;
 
         requestAnimationFrame(drawMap);
     }
@@ -396,7 +398,7 @@
         updatePrice(multiplier);
     }
 
-    function updatePrice(multiplier = 1) {
+    function updatePrice() {
         const basePrice = parseInt(document.getElementById('routeSelect').value);
         document.getElementById('price-taxi').innerText = `${Math.round(basePrice * 1).toLocaleString()} XOF`;
         document.getElementById('price-privado').innerText = `${Math.round(basePrice * 1.3).toLocaleString()} XOF`;
@@ -442,7 +444,11 @@
         e.preventDefault();
         const matricula = document.getElementById('matriculaVeiculo').value.trim();
 
-        // Pesquisa no Supabase se a matrícula já existe
+        if (!matricula) {
+            alert("Por favor, insira o número de matrícula.");
+            return;
+        }
+
         try {
             const { data: existente, error } = await _supabase
                 .from('motoristas')
@@ -450,7 +456,7 @@
                 .ilike('placa_veiculo', matricula);
 
             if (existente && existente.length > 0) {
-                alert(`⚠️ ATENÇÃO: A matrícula "${matricula.toUpperCase()}" já se encontra registada no sistema ROTA GB!\n\nNão é possível realizar cadastros duplicados.`);
+                alert(`⚠️ ATENÇÃO: A matrícula "${matricula.toUpperCase()}" já se encontra registada no sistema ROTA GB!\n\nNão é permitido cadastrar veículos duplicados.`);
                 return; // Bloqueia o avanço
             }
         } catch (err) {
@@ -516,7 +522,7 @@
         doc.addImage(sigImgData, 'PNG', 15, 80, 75, 30);
         doc.save(`Contrato_ROTA_GB_${nome.replace(/\s+/g, '_')}.pdf`);
 
-        alert(`🎉 Registo concluído com sucesso! Os seus dados foram guardados e o contrato gerado.`);
+        alert(`🎉 Registo concluído com sucesso! Os seus dados foram guardados no Supabase e o contrato gerado.`);
         location.reload();
     }
 </script>
