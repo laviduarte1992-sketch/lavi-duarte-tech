@@ -1,25 +1,30 @@
 {
-  "id": "/",
-  "name": "ROTA GB",
-  "short_name": "ROTA GB",
-  "description": "Super App de Mobilidade e Serviços na Guiné-Bissau",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#1a1a1a",
-  "theme_color": "#00e676",
-  "icons": [
-    {
-      "src": "https://i.imgur.com/8Q9Z5b3.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://i.imgur.com/8Q9Z5b3.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+  "name": "rotagb-api",
+  "version": "1.0.0",
+  "description": "API Backend da Plataforma ROTA GB para Bissau",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "rotagb",
+    "api",
+    "bissau",
+    "node"
+  ],
+  "author": "Lavi Duarte Indeque",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
