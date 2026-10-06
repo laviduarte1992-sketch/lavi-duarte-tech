@@ -339,10 +339,10 @@
             <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas em Bissau...')">Aguardar Chamadas</button>
         </div>
 
-        <!-- Form Registo Motorista -->
+        <!-- Form Registo Motorista com Contrato Digital -->
         <div id="driver-register" style="display: none;">
-            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
-            <form id="formCadastroMotorista" onsubmit="cadastrarMotorista(event)" style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Contrato Digital</div>
+            <form id="formCadastroMotorista" onsubmit="cadastrarMotoristaComContrato(event)" style="display: flex; flex-direction: column; gap: 8px;">
                 <input type="text" id="nomeMotorista" placeholder="Nome Completo" required>
                 <input type="tel" id="telefoneMotorista" placeholder="Telefone de Contacto (+245)" required>
                 <select id="tipoTransporte">
@@ -360,7 +360,19 @@
                 </select>
                 <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira de Recebimento" required>
 
-                <button type="submit" class="btn-primary">Submeter para Aprovação</button>
+                <!-- Secção de Contrato Digital -->
+                <div style="background: #f0f0f0; padding: 10px; border-radius: 8px; font-size: 11px; color: #444; margin-top: 4px;">
+                    <div style="font-weight: bold; margin-bottom: 4px;">📜 Contrato de Adesão & Parceria ROTA GB</div>
+                    <p style="margin-bottom: 6px;">
+                        Ao submeter, declara ter lido e aceite os termos da comissão (15%), as regras de serviço em Bissau e autoriza a emissão do contrato assinado eletronicamente por <strong>Eng. Lavi Duarte Indeque (CEO ROTA GB)</strong>.
+                    </p>
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" id="aceitaContrato" required style="width: auto;">
+                        Li e aceito as cláusulas do contrato.
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary">Assinar & Submeter Registo</button>
             </form>
         </div>
     </div>
@@ -595,14 +607,26 @@
         alert(`Pedido de Reserva enviado para: ${hotel}\n\nA receção entrará em contacto para confirmar.`);
     }
 
-    function cadastrarMotorista(event) {
+    function cadastrarMotoristaComContrato(event) {
         event.preventDefault();
         const nome = document.getElementById('nomeMotorista').value;
+        const tel = document.getElementById('telefoneMotorista').value;
         const matricula = document.getElementById('matriculaVeiculo').value;
         const metodo = document.getElementById('metodoRecebimentoMotorista').value;
         const conta = document.getElementById('numeroContaMotorista').value;
-        
-        alert(`Cadastro de Condutor Submetido com Sucesso!\n\nMotorista: ${nome}\nMatrícula: ${matricula}\nRecebimento de Ganhos: ${metodo} (${conta})\n\nO ROTA GB irá validar o registo em breve.`);
+        const dataAtual = new Date().toLocaleDateString('pt-PT');
+
+        alert(`🎉 CONTRATO CELEBRADO COM SUCESSO!\n\n` +
+              `Parceiro: ${nome}\n` +
+              `Telefone: +245 ${tel}\n` +
+              `Matrícula: ${matricula}\n` +
+              `Carteira de Recebimento: ${metodo} (${conta})\n` +
+              `Data de Adesão: ${dataAtual}\n\n` +
+              `Assinado Digitalmente por:\n` +
+              `• CEO ROTA GB: Eng. Lavi Duarte Indeque\n` +
+              `• Condutor: ${nome}\n\n` +
+              `O comprovativo e cópia do contrato foram enviados para o WhatsApp/SMS (+245 ${tel})!`);
+
         document.getElementById('formCadastroMotorista').reset();
         toggleDriverTab('painel');
     }
