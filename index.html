@@ -337,7 +337,7 @@
             <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas...')">Aguardar Chamadas</button>
         </div>
 
-        <!-- Form Registo Motorista (Com validação de Matrícula Única e Termos + Aceitar e Assinar) -->
+        <!-- Form Registo Motorista (Com validação de Matrícula Única, Termos, Cartão de Débito e Aceitar e Assinar) -->
         <div id="driver-register" style="display: none;">
             <div id="etapaFormRegisto">
                 <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
@@ -359,8 +359,9 @@
                         <option value="" disabled selected>Onde quer receber os seus ganhos?</option>
                         <option value="Orange Money">Orange Money (+245)</option>
                         <option value="Telecel">Telecel Mobile Money (+245)</option>
+                        <option value="Cartao Debito">Cartão de Débito / Bancário</option>
                     </select>
-                    <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira de Recebimento" required>
+                    <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira ou Conta Bancária" required>
 
                     <!-- Termos e Condições -->
                     <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px; color: #555; line-height: 1.4;">
