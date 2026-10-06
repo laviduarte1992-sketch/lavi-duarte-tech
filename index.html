@@ -143,7 +143,7 @@
                 </div>
             </div>
 
-            <!-- Seleção Fácil da Forma de Pagamento para o Cliente -->
+            <!-- Seleção de Pagamento -->
             <div class="form-group" style="margin-top: 10px;">
                 <label>FORMA DE PAGAMENTO DA VIAGEM</label>
                 <select id="paymentSelect">
@@ -274,7 +274,7 @@
             <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas em Bissau...')">Aguardar Chamadas</button>
         </div>
 
-        <!-- Formulário de Registo de Motorista com Configuração de Pagamento -->
+        <!-- Form Registo Motorista -->
         <div id="driver-register" style="display: none;">
             <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
             <form id="formCadastroMotorista" onsubmit="cadastrarMotorista(event)" style="display: flex; flex-direction: column; gap: 8px;">
@@ -288,7 +288,6 @@
                 <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
                 <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula" required>
                 
-                <!-- Dados para o motorista receber da plataforma ROTA GB -->
                 <select id="metodoRecebimentoMotorista" required>
                     <option value="" disabled selected>Onde quer receber os seus ganhos?</option>
                     <option value="Orange Money">Orange Money (+245)</option>
@@ -308,6 +307,15 @@
 </div>
 
 <script>
+    // ==========================================
+    // CONFIGURAÇÃO PASSO 2: CONTA MERCHANT DO CEO
+    // ==========================================
+    const ROTA_GB_MERCHANT = {
+        orangeMoneyNumber: "245955XXXXX", // Substituir pelo seu número Orange Merchant
+        telecelNumber: "245966XXXXX",     // Substituir pelo seu número Telecel Merchant
+        commissionRate: 0.15              // 15% de comissão direta para o ROTA GB
+    };
+
     const canvas = document.getElementById('bissauMap');
     const ctx = canvas.getContext('2d');
 
@@ -428,10 +436,49 @@
         document.getElementById('price-moto').innerText = `${Math.round(basePrice * 0.7).toLocaleString()} XOF`;
     }
 
+    // ==========================================
+    // PROCESSAMENTO DE PAGAMENTO COM MERCHANT API
+    // ==========================================
+    async function processarPagamentoMobile(metodo, valorXOF) {
+        const comissaoCEO = valorXOF * ROTA_GB_MERCHANT.commissionRate;
+        const valorMotorista = valorXOF - comissaoCEO;
+        const merchantUsado = metodo === 'Orange Money' ? ROTA_GB_MERCHANT.orangeMoneyNumber : ROTA_GB_MERCHANT.telecelNumber;
+
+        console.log(`[Merchant ROTA GB] Iniciar cobrança via ${metodo} (${merchantUsado})...`);
+        console.log(`[Merchant ROTA GB] Comissão CEO (${ROTA_GB_MERCHANT.commissionRate * 100}%): ${comissaoCEO} XOF | Repartição Motorista: ${valorMotorista} XOF`);
+
+        try {
+            const response = await fetch('/api/pay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    provider: metodo,
+                    merchant: merchantUsado,
+                    amount: valorXOF,
+                    commission: comissaoCEO
+                })
+            });
+            const res = await response.json();
+            if(res.success) {
+                alert(`Pedido USSD enviado via ${metodo}! Confirme o PIN no ecrã.`);
+            }
+        } catch(e) {
+            // Notificação em ambiente de simulação/pré-ativação contratual
+            if(metodo !== 'Dinheiro Vivo') {
+                alert(`Pagamento em processamento via ${metodo}:\n\nTotal: ${valorXOF.toLocaleString()} XOF\nComissão ROTA GB: ${comissaoCEO.toLocaleString()} XOF (Creditados na conta Merchant ${merchantUsado})\n\nPor favor, confirme no seu ecrã.`);
+            }
+        }
+    }
+
     function requestRide() {
         const basePrice = parseInt(document.getElementById('routeSelect').value);
         activePrice = Math.round(basePrice * currentMultiplier);
         const paymentMethod = document.getElementById('paymentSelect').value;
+
+        // Dispara o fluxo do Passo 2 para pagamentos móveis
+        if(paymentMethod === 'Orange Money' || paymentMethod === 'Telecel') {
+            processarPagamentoMobile(paymentMethod, activePrice);
+        }
 
         document.getElementById('reservedAmount').innerText = `${activePrice.toLocaleString()} XOF`;
         document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
@@ -466,14 +513,14 @@
 
     function processarRecarga() {
         const phone = document.getElementById('phoneRecarga').value;
-        const amount = document.getElementById('amountRecarga').value;
+        const amount = parseInt(document.getElementById('amountRecarga').value);
         
         if(!phone) {
             alert('Por favor, insira o número de telemóvel.');
             return;
         }
-        
-        alert(`A processar recarga de ${parseInt(amount).toLocaleString()} XOF para o número +245 ${phone} via ${currentOperator}...\n\nConfirme o código PIN no seu ecrã!`);
+
+        processarPagamentoMobile(currentOperator === 'Orange' ? 'Orange Money' : 'Telecel', amount);
     }
 
     function pedirDelivery(restaurante) {
