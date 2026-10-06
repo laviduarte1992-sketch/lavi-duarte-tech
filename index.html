@@ -36,7 +36,7 @@
         .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
         .role-btn.active { background: #00e676; color: #000; }
 
-        /* Menu de Serviços Correto e Clicável */
+        /* Menu de Serviços */
         .service-nav { display: flex; background: #222; padding: 6px; gap: 4px; justify-content: space-around; overflow-x: auto; position: relative; z-index: 10; }
         .nav-item { flex: 1; text-align: center; color: #ccc; font-size: 10px; font-weight: bold; padding: 10px 4px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: 0.2s; user-select: none; }
         .nav-item:hover { background: #333; color: #fff; }
@@ -78,8 +78,6 @@
         /* Botões */
         .btn-primary { background: #00e676; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
         .btn-primary:active { transform: scale(0.98); }
-        .payment-methods { display: flex; gap: 6px; font-size: 10px; color: #777; justify-content: center; margin-top: 6px; }
-        .pay-tag { background: #eee; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
         
         .sub-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
         .sub-tab-btn { flex: 1; padding: 8px; font-size: 11px; font-weight: bold; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; cursor: pointer; }
@@ -130,7 +128,7 @@
                 </select>
             </div>
 
-            <div class="service-options" style="margin-top: 10px;">
+            <div class="service-options" style="margin-top: 8px;">
                 <div class="service-card selected" id="card-taxi" onclick="selectService(this, 1)">
                     <div class="service-title">🚖 Táxi Azul</div>
                     <div class="service-price" id="price-taxi">1.500 XOF</div>
@@ -145,21 +143,31 @@
                 </div>
             </div>
 
-            <button type="button" class="btn-primary" style="margin-top: 14px;" onclick="requestRide()">Pedir Viagem Agora</button>
+            <!-- Seleção Fácil da Forma de Pagamento para o Cliente -->
+            <div class="form-group" style="margin-top: 10px;">
+                <label>FORMA DE PAGAMENTO DA VIAGEM</label>
+                <select id="paymentSelect">
+                    <option value="Dinheiro Vivo">💵 Dinheiro Vivo (Ao Condutor)</option>
+                    <option value="Orange Money">🟧 Orange Money</option>
+                    <option value="Telecel">🟥 Telecel Mobile Money</option>
+                    <option value="Cartão de Débito">💳 Cartão de Débito</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="requestRide()">Pedir Viagem Agora</button>
         </div>
 
         <div class="waiting-card" id="waitingPanel">
             <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
             <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
             <div class="timer-text" id="waitingTimer">00:00</div>
-            <div style="font-size: 11px; color: #555; margin-bottom: 6px;">
+            <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
                 Preço reservado: <strong id="reservedAmount">1.500 XOF</strong>
             </div>
+            <div style="font-size: 11px; color: #333; margin-bottom: 6px;">
+                Pagamento via: <strong id="selectedPaymentMethod">Dinheiro Vivo</strong>
+            </div>
             <button type="button" class="btn-cancel" onclick="cancelRide()">Cancelar Viagem & Pedir Reembolso</button>
-        </div>
-
-        <div class="payment-methods">
-            Pagamento: <span class="pay-tag">💵 Dinheiro</span> <span class="pay-tag">🟧 Orange Money</span> <span class="pay-tag">🟥 Telecel</span>
         </div>
     </div>
 
@@ -181,13 +189,6 @@
                 </div>
                 <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('A Padeira Africana')">Pedir</button>
             </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Restaurante Kalliste</div>
-                    <div class="store-desc">Praça Che Guevara — Pizzas e Variedades</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Restaurante Kalliste')">Pedir</button>
-            </div>
         </div>
     </div>
 
@@ -201,13 +202,6 @@
                     <div class="store-desc">Alimentação Geral e Produtos Frescos</div>
                 </div>
                 <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Supermercado Hereso')">Comprar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Spar Bissau</div>
-                    <div class="store-desc">Mercearia e Conveniência</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Spar Bissau')">Comprar</button>
             </div>
         </div>
     </div>
@@ -223,14 +217,6 @@
                     <div class="price-tag">45.000 XOF / noite</div>
                 </div>
                 <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Hotel Ledra Bissau')">Reservar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Coqueiros Hotel & Apts</div>
-                    <div class="store-desc">Bairro de Penha — Quarto com Piscina</div>
-                    <div class="price-tag">35.000 XOF / noite</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Coqueiros Hotel')">Reservar</button>
             </div>
         </div>
     </div>
@@ -288,18 +274,29 @@
             <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas em Bissau...')">Aguardar Chamadas</button>
         </div>
 
+        <!-- Formulário de Registo de Motorista com Configuração de Pagamento -->
         <div id="driver-register" style="display: none;">
-            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo</div>
+            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
             <form id="formCadastroMotorista" onsubmit="cadastrarMotorista(event)" style="display: flex; flex-direction: column; gap: 8px;">
                 <input type="text" id="nomeMotorista" placeholder="Nome Completo" required>
-                <input type="tel" id="telefoneMotorista" placeholder="Telefone (Orange / Telecel)" required>
+                <input type="tel" id="telefoneMotorista" placeholder="Telefone de Contacto (+245)" required>
                 <select id="tipoTransporte">
                     <option value="Taxi">Táxi Azul/Amarelo</option>
                     <option value="CarroPrivado">Carro Privado</option>
                     <option value="Moto">Moto-Táxi</option>
                 </select>
-                <input type="text" id="marcaModelo" placeholder="Marca e Modelo" required>
+                <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
                 <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula" required>
+                
+                <!-- Dados para o motorista receber da plataforma ROTA GB -->
+                <select id="metodoRecebimentoMotorista" required>
+                    <option value="" disabled selected>Onde quer receber os seus ganhos?</option>
+                    <option value="Orange Money">Orange Money (+245)</option>
+                    <option value="Telecel">Telecel Mobile Money (+245)</option>
+                    <option value="Conta Bancaria">Conta Bancária / Débito</option>
+                </select>
+                <input type="tel" id="numeroContaMotorista" placeholder="Número da Conta / Carteira de Recebimento" required>
+
                 <button type="submit" class="btn-primary">Submeter para Aprovação</button>
             </form>
         </div>
@@ -311,7 +308,6 @@
 </div>
 
 <script>
-    // Configuração do Canvas do Mapa
     const canvas = document.getElementById('bissauMap');
     const ctx = canvas.getContext('2d');
 
@@ -359,14 +355,12 @@
     }
     drawMap();
 
-    // Variáveis Globais
     let currentMultiplier = 1;
     let timerInterval = null;
     let secondsElapsed = 0;
     let activePrice = 0;
     let currentOperator = 'Orange';
 
-    // Troca de Módulos (Menu Superior)
     function switchServiceTab(tab) {
         document.querySelectorAll('.service-nav .nav-item').forEach(el => el.classList.remove('active'));
         
@@ -394,7 +388,6 @@
         }
     }
 
-    // Troca Cliente / Motorista
     function setRole(role) {
         document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
         document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
@@ -421,7 +414,6 @@
         document.getElementById('driver-register').style.display = tab === 'registo' ? 'block' : 'none';
     }
 
-    // Seleção de Tipo de Transporte (Táxi, Carro, Moto)
     function selectService(element, multiplier) {
         document.querySelectorAll('.service-card').forEach(el => el.classList.remove('selected'));
         element.classList.add('selected');
@@ -436,12 +428,13 @@
         document.getElementById('price-moto').innerText = `${Math.round(basePrice * 0.7).toLocaleString()} XOF`;
     }
 
-    // Pedido de Viagem
     function requestRide() {
         const basePrice = parseInt(document.getElementById('routeSelect').value);
         activePrice = Math.round(basePrice * currentMultiplier);
+        const paymentMethod = document.getElementById('paymentSelect').value;
 
         document.getElementById('reservedAmount').innerText = `${activePrice.toLocaleString()} XOF`;
+        document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
         document.getElementById('rideFormControls').style.display = 'none';
         document.getElementById('waitingPanel').style.display = 'flex';
 
@@ -459,7 +452,7 @@
 
     function cancelRide() {
         clearInterval(timerInterval);
-        alert(`Pedido de viagem cancelado com sucesso!\n\nReembolso Processado:\nValor retido de ${activePrice.toLocaleString()} XOF foi reembolsado na sua conta/carteira ROTA GB.`);
+        alert(`Pedido de viagem cancelado com sucesso!\n\nReembolso Processado:\nValor de ${activePrice.toLocaleString()} XOF restituído.`);
         
         document.getElementById('waitingPanel').style.display = 'none';
         document.getElementById('rideFormControls').style.display = 'block';
@@ -492,14 +485,17 @@
     }
 
     function reservarHotel(hotel) {
-        alert(`Pedido de Reserva enviado para: ${hotel}\n\nA receção entrará em contacto para confirmar. Pretende agendar também um Táxi ROTA GB para o Aeroporto?`);
+        alert(`Pedido de Reserva enviado para: ${hotel}\n\nA receção entrará em contacto para confirmar.`);
     }
 
     function cadastrarMotorista(event) {
         event.preventDefault();
         const nome = document.getElementById('nomeMotorista').value;
         const matricula = document.getElementById('matriculaVeiculo').value;
-        alert(`Cadastro submetido com sucesso!\n\nMotorista: ${nome}\nMatrícula: ${matricula}\n\nAguarda aprovação da administração.`);
+        const metodo = document.getElementById('metodoRecebimentoMotorista').value;
+        const conta = document.getElementById('numeroContaMotorista').value;
+        
+        alert(`Cadastro de Condutor Submetido com Sucesso!\n\nMotorista: ${nome}\nMatrícula: ${matricula}\nRecebimento de Ganhos: ${metodo} (${conta})\n\nO ROTA GB irá validar o registo em breve.`);
         document.getElementById('formCadastroMotorista').reset();
         toggleDriverTab('painel');
     }
