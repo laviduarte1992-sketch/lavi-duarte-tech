@@ -413,3 +413,390 @@
             <label>NÚMERO DE TELEMÓVEL (+245)</label>
             <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX">
         </div>
+
+        <div class="form-group" style="margin-top: 6px;">
+            <label>VALOR DA RECARGA (XOF)</label>
+            <select id="amountRecarga">
+                <option value="500">500 XOF</option>
+                <option value="1000" selected>1.000 XOF</option>
+                <option value="2000">2.000 XOF</option>
+                <option value="5000">5.000 XOF</option>
+            </select>
+        </div>
+
+        <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="processarRecarga()">Pagar Recarga Agora</button>
+    </div>
+
+    <!-- Panel Motorista -->
+    <div class="bottom-panel" id="panel-motorista" style="display: none;">
+        <div class="sub-tabs">
+            <button type="button" class="sub-tab-btn active" id="tab-painel-btn" onclick="toggleDriverTab('painel')">Painel do Condutor</button>
+            <button type="button" class="sub-tab-btn" id="tab-registo-btn" onclick="toggleDriverTab('registo')">Registar Veículo</button>
+        </div>
+
+        <div id="driver-dashboard">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h3 style="font-size: 15px;">Painel de Trabalho em Bissau</h3>
+                <p style="font-size: 11px; color: #666;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></p>
+            </div>
+            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas...')">Aguardar Chamadas</button>
+        </div>
+
+        <!-- Form Registo Motorista -->
+        <div id="driver-register" style="display: none;">
+            <div id="etapaFormRegisto">
+                <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
+                <form id="formCadastroMotorista" onsubmit="avancarParaAssinatura(event)" style="display: flex; flex-direction: column; gap: 8px;">
+                    <input type="text" id="nomeMotorista" placeholder="Nome Completo do Condutor" required>
+                    <input type="email" id="emailMotorista" placeholder="E-mail" required>
+                    <input type="tel" id="telefoneMotorista" placeholder="Telefone de Contacto (+245)" required>
+                    
+                    <select id="tipoTransporte">
+                        <option value="Táxi Azul/Amarelo">Táxi Azul/Amarelo</option>
+                        <option value="Carro Privado">Carro Privado</option>
+                        <option value="Moto-Táxi">Moto-Táxi</option>
+                    </select>
+                    
+                    <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
+                    <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula (Placa)" required>
+                    
+                    <select id="metodoRecebimentoMotorista" required>
+                        <option value="" disabled selected>Onde quer receber os seus ganhos?</option>
+                        <option value="Orange Money">Orange Money (+245)</option>
+                        <option value="Telecel">Telecel Mobile Money (+245)</option>
+                        <option value="Cartao Debito">Cartão de Débito / Bancário</option>
+                    </select>
+                    <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira ou Conta Bancária" required>
+
+                    <!-- Termos e Condições -->
+                    <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px; color: #555; line-height: 1.4;">
+                        <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="aceiteTermos" required style="margin-top: 2px; width: auto; cursor: pointer;">
+                            <span>Li e aceito os termos e condições da ROTA GB, incluindo a taxa de comissão de 15% aplicável sobre os serviços em Bissau.</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Aceitar e Assinar</button>
+                </form>
+            </div>
+
+            <!-- Etapa 2: Assinatura e Envio -->
+            <div id="etapaContrato" style="display: none; flex-direction: column; gap: 8px;">
+                <div style="font-size: 12px; font-weight: bold;">📜 CONTRATO DE PARCERIA & TERMOS</div>
+                <p style="font-size: 11px; color: #555;">Desenhe a sua assinatura no quadro abaixo para validar o contrato ROTA GB.</p>
+                
+                <div class="signature-pad-container">
+                    <canvas id="sigPad"></canvas>
+                </div>
+                <button type="button" class="btn-secondary" onclick="limparAssinatura()">🧹 Limpar Assinatura</button>
+                
+                <button type="button" class="btn-primary" onclick="finalizarRegistoEGerarDocumentos()">Submeter & Gerar Documentos</button>
+            </div>
+        </div>
+    </div>
+    
+    <div style="text-align: center; font-size: 9px; color: #888; padding: 8px; border-top: 1px solid #eee; background: #fff;">
+        ROTA GB © — Guiné-Bissau
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // CONFIGURAÇÃO SUPABASE
+    // ==========================================
+    const SUPABASE_URL = 'https://ymuldaviwfbcvocfknaw.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdWxkYXZpd2ZiY3ZvY2ZrbmF3Ixlub2xlIjoiYW5vbiIsImlhdCI6MTc5MTE0MDg0NywiZXhwIjoyMTA2NzE2ODQ3f0.uBSZQ_YChvWUS7B7TE762qGRSBaajFf-Flh18J7E0BU';
+    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ANIMAÇÃO DO MAPA E CARRINHO GPS
+    const canvas = document.getElementById('bissauMap');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        if(canvas && canvas.parentElement) {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let driverX = 80;
+    let driverY = 70;
+
+    function drawMap() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height * 0.4);
+        ctx.lineTo(canvas.width, canvas.height * 0.6);
+        ctx.stroke();
+
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width * 0.5, 0);
+        ctx.lineTo(canvas.width * 0.3, canvas.height);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ce1126';
+        ctx.beginPath();
+        ctx.arc(driverX, driverY, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#000';
+        ctx.font = '10px sans-serif';
+        ctx.fillText("🚖 ROTA GB Express", driverX - 30, driverY - 10);
+
+        driverX += 0.5;
+        if (driverX > canvas.width) driverX = 0;
+
+        requestAnimationFrame(drawMap);
+    }
+    drawMap();
+
+    // CONTROLO DE VIAGEM E TEMPORIZADOR
+    let timerInterval = null;
+    let secondsElapsed = 0;
+
+    function requestRide() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        const paymentMethod = document.getElementById('paymentSelect').value;
+
+        document.getElementById('reservedAmount').innerText = `${Math.round(basePrice).toLocaleString()} XOF`;
+        document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
+        
+        document.getElementById('rideFormControls').style.display = 'none';
+        document.getElementById('waitingPanel').style.display = 'flex';
+
+        secondsElapsed = 0;
+        document.getElementById('waitingTimer').innerText = "00:00";
+        if(timerInterval) clearInterval(timerInterval);
+
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('waitingTimer').innerText = `${mins}:${secs}`;
+        }, 1000);
+    }
+
+    function cancelRide() {
+        if(timerInterval) clearInterval(timerInterval);
+        document.getElementById('waitingPanel').style.display = 'none';
+        document.getElementById('rideFormControls').style.display = 'block';
+        alert("Viagem cancelada com sucesso. Reembolso processado.");
+    }
+
+    // SELEÇÃO DE OPERADORA DE RECARGA
+    let currentOperator = 'Orange';
+    function selectOperator(op) {
+        currentOperator = op;
+        document.getElementById('btn-orange-op').classList.toggle('active', op === 'Orange');
+        document.getElementById('btn-telecel-op').classList.toggle('active', op === 'Telecel');
+    }
+
+    function processarRecarga() {
+        const telefone = document.getElementById('phoneRecarga').value.trim();
+        const valor = document.getElementById('amountRecarga').value;
+        if(!telefone || telefone.length < 9) {
+            alert("Por favor, introduza um número de telemóvel válido em Bissau.");
+            return;
+        }
+        alert(`✅ Recarga de ${valor} XOF via ${currentOperator} para o número +245 ${telefone} efetuada com sucesso!`);
+    }
+
+    // INTERACTION LOGIC
+    function switchServiceTab(tab) {
+        document.querySelectorAll('.service-nav .nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('panel-taxi').style.display = 'none';
+        document.getElementById('panel-comida').style.display = 'none';
+        document.getElementById('panel-lojas').style.display = 'none';
+        document.getElementById('panel-hoteis').style.display = 'none';
+        document.getElementById('panel-recargas').style.display = 'none';
+
+        if(tab === 'taxi') {
+            document.getElementById('nav-taxi').classList.add('active');
+            document.getElementById('panel-taxi').style.display = 'flex';
+        } else if(tab === 'comida') {
+            document.getElementById('nav-comida').classList.add('active');
+            document.getElementById('panel-comida').style.display = 'flex';
+        } else if(tab === 'lojas') {
+            document.getElementById('nav-lojas').classList.add('active');
+            document.getElementById('panel-lojas').style.display = 'flex';
+        } else if(tab === 'hoteis') {
+            document.getElementById('nav-hoteis').classList.add('active');
+            document.getElementById('panel-hoteis').style.display = 'flex';
+        } else if(tab === 'recargas') {
+            document.getElementById('nav-recargas').classList.add('active');
+            document.getElementById('panel-recargas').style.display = 'flex';
+        }
+    }
+
+    function setRole(role) {
+        document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
+        document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
+        
+        if(role === 'passageiro') {
+            document.getElementById('main-nav').style.display = 'flex';
+            switchServiceTab('taxi');
+            document.getElementById('panel-motorista').style.display = 'none';
+        } else {
+            document.getElementById('main-nav').style.display = 'none';
+            document.getElementById('panel-taxi').style.display = 'none';
+            document.getElementById('panel-comida').style.display = 'none';
+            document.getElementById('panel-lojas').style.display = 'none';
+            document.getElementById('panel-hoteis').style.display = 'none';
+            document.getElementById('panel-recargas').style.display = 'none';
+            document.getElementById('panel-motorista').style.display = 'flex';
+        }
+    }
+
+    function toggleDriverTab(tab) {
+        document.getElementById('tab-painel-btn').classList.toggle('active', tab === 'painel');
+        document.getElementById('tab-registo-btn').classList.toggle('active', tab === 'registo');
+        document.getElementById('driver-dashboard').style.display = tab === 'painel' ? 'block' : 'none';
+        document.getElementById('driver-register').style.display = tab === 'registo' ? 'block' : 'none';
+    }
+
+    function selectService(element, multiplier) {
+        document.querySelectorAll('.service-card').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        updatePrice();
+    }
+
+    function updatePrice() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        document.getElementById('price-taxi').innerText = `${Math.round(basePrice * 1).toLocaleString()} XOF`;
+        document.getElementById('price-privado').innerText = `${Math.round(basePrice * 1.3).toLocaleString()} XOF`;
+        document.getElementById('price-moto').innerText = `${Math.round(basePrice * 0.7).toLocaleString()} XOF`;
+    }
+
+    // CANVAS DE ASSINATURA
+    let sigPad, sigCtx, hasSigned = false;
+    window.onload = function() {
+        sigPad = document.getElementById('sigPad');
+        sigCtx = sigPad.getContext('2d');
+        
+        let painting = false;
+        sigPad.addEventListener('mousedown', startPos);
+        sigPad.addEventListener('mouseup', endPos);
+        sigPad.addEventListener('mousemove', draw);
+        sigPad.addEventListener('touchstart', (e) => { e.preventDefault(); startPos(e.touches[0]); });
+        sigPad.addEventListener('touchend', (e) => { e.preventDefault(); endPos(); });
+        sigPad.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+
+        function startPos(e) { painting = true; draw(e); }
+        function endPos() { painting = false; sigCtx.beginPath(); hasSigned = true; }
+        function draw(e) {
+            if(!painting) return;
+            const rect = sigPad.getBoundingClientRect();
+            sigCtx.lineWidth = 2;
+            sigCtx.lineCap = 'round';
+            sigCtx.strokeStyle = '#000';
+            sigCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            sigCtx.stroke();
+            sigCtx.beginPath();
+            sigCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+    };
+
+    function limparAssinatura() {
+        sigCtx.clearRect(0, 0, sigPad.width, sigPad.height);
+        hasSigned = false;
+    }
+
+    // VALIDAÇÃO DE DUPLICADO POR MATRÍCULA NO SUPABASE & TERMOS
+    async function avancarParaAssinatura(e) {
+        e.preventDefault();
+        
+        const termosAceites = document.getElementById('aceiteTermos').checked;
+        if (!termosAceites) {
+            alert("Deve aceitar os termos e condições para prosseguir.");
+            return;
+        }
+
+        const matricula = document.getElementById('matriculaVeiculo').value.trim();
+        if (!matricula) {
+            alert("Por favor, insira o número de matrícula.");
+            return;
+        }
+
+        try {
+            const { data: existente, error } = await _supabase
+                .from('motoristas')
+                .select('placa_veiculo')
+                .ilike('placa_veiculo', matricula);
+
+            if (existente && existente.length > 0) {
+                alert(`⚠️ ATENÇÃO: A matrícula "${matricula.toUpperCase()}" já se encontra registada no sistema ROTA GB!\n\nNão é permitido cadastrar veículos duplicados.`);
+                return;
+            }
+        } catch (err) {
+            console.error("Erro na verificação:", err);
+        }
+
+        document.getElementById('etapaFormRegisto').style.display = 'none';
+        document.getElementById('etapaContrato').style.display = 'flex';
+    }
+
+    async function finalizarRegistoEGerarDocumentos() {
+        if(!hasSigned) {
+            alert("Por favor, desenhe a sua assinatura antes de concluir.");
+            return;
+        }
+
+        const nome = document.getElementById('nomeMotorista').value.trim();
+        const email = document.getElementById('emailMotorista').value.trim();
+        const tel = document.getElementById('telefoneMotorista').value.trim();
+        const tipoTransp = document.getElementById('tipoTransporte').value;
+        const veiculo = document.getElementById('marcaModelo').value.trim();
+        const matricula = document.getElementById('matriculaVeiculo').value.trim();
+        const metodo = document.getElementById('metodoRecebimentoMotorista').value;
+        const conta = document.getElementById('numeroContaMotorista').value.trim();
+        const dataAtual = new Date().toLocaleDateString('pt-PT');
+
+        const { error } = await _supabase
+            .from('motoristas')
+            .insert([{ 
+                nome: nome, 
+                email: email, 
+                telefone: tel, 
+                tipo_transporte: tipoTransp,
+                marca_modelo: veiculo,
+                placa_veiculo: matricula,
+                metodo_recebimento: metodo,
+                conta_recebimento: conta,
+                status: 'pendente' 
+            }]);
+
+        if (error) {
+            alert("Erro ao gravar no Supabase: " + error.message);
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFillColor(28, 28, 30);
+        doc.rect(0, 0, 210, 30, 'F');
+        doc.setTextColor(0, 230, 118);
+        doc.setFontSize(22);
+        doc.text("ROTA GB — Guiné-Bissau", 15, 20);
+
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(11);
+        doc.text(`Data: ${dataAtual}`, 15, 42);
+        doc.text(`Condutor: ${nome}`, 15, 52);
+        doc.text(`Veículo: ${veiculo} | Matrícula: ${matricula}`, 15, 60);
+
+        const sigImgData = sigPad.toDataURL('image/png');
+        doc.addImage(sigImgData, 'PNG', 15, 80, 75, 30);
+        doc.save(`Contrato_ROTA_GB_${nome.replace(/\s+/g, '_')}.pdf`);
+
+        alert(`🎉 Registo concluído com sucesso! Os seus dados foram guardados no Supabase e o contrato gerado.`);
+        location.reload();
+    }
+</script>
+</body>
+</html>
