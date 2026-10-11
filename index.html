@@ -2,611 +2,162 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROTA GB - Super App de Bissau</title>
-    
-    <!-- Configurações PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#00e676">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ROTA GB">
-
-    <!-- Bibliotecas Obrigatórias -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+    <title>ROTA GB - Painel de Tarifas</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; padding: 10px; }
-        
-        .app-container { 
-            width: 100%; 
-            max-width: 414px; 
-            background: #fff; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        
-        /* Header */
-        .header { background: #1a1a1a; color: #fff; padding: 16px; position: relative; z-index: 20; }
-        .logo { font-size: 20px; font-weight: bold; color: #00e676; display: flex; align-items: center; gap: 6px; }
-        .badge-gb { background: #ce1126; color: #fcd116; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-        .role-switch { background: #333; padding: 4px; border-radius: 20px; display: flex; }
-        .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; white-space: nowrap; }
-        .role-btn.active { background: #00e676; color: #000; }
-
-        /* Menu de Serviços */
-        .service-nav { display: flex; background: #222; padding: 6px; gap: 4px; justify-content: space-around; overflow-x: auto; position: relative; z-index: 20; }
-        .nav-item { flex: 1; text-align: center; color: #ccc; font-size: 10px; font-weight: bold; padding: 10px 4px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: 0.2s; user-select: none; }
-        .nav-item:hover { background: #333; color: #fff; }
-        .nav-item.active { background: #00e676 !important; color: #000 !important; }
-
-        /* Área do Mapa */
-        .map-area { height: 140px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; pointer-events: none; }
-        canvas#bissauMap { width: 100%; height: 100%; display: block; }
-        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); pointer-events: none; z-index: 5; }
-        .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
-
-        /* Painel Inferior */
-        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 380px; position: relative; z-index: 20; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        label { font-size: 11px; color: #666; font-weight: bold; }
-        select, input { padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; width: 100%; cursor: pointer; }
-
-        /* Cartões de Serviço */
-        .service-options { display: flex; gap: 6px; }
-        .service-card { flex: 1; border: 2px solid #eee; border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: 0.2s; user-select: none; }
-        .service-card:hover { border-color: #00e676; }
-        .service-card.selected { border-color: #00e676; background: rgba(0,230,118,0.08); }
-        .service-title { font-size: 10px; font-weight: bold; }
-        .service-price { font-size: 12px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
-
-        /* Painel de Espera / Cancelamento */
-        .waiting-card { background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; text-align: center; }
-        .waiting-title { font-size: 13px; font-weight: bold; color: #e65100; }
-        .timer-text { font-size: 22px; font-weight: 800; color: #d84315; margin: 4px 0; }
-        .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
-
-        /* Listas com Scroll */
-        .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 2px; }
-        .store-card { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; }
-        .store-name { font-size: 13px; font-weight: bold; }
-        .store-desc { font-size: 11px; color: #666; margin-top: 2px; }
-        .price-tag { font-size: 11px; color: #00e676; font-weight: bold; margin-top: 4px; }
-
-        /* Canvas de Assinatura */
-        .signature-pad-container { border: 2px dashed #00e676; border-radius: 10px; background: #fafafa; position: relative; margin-top: 6px; }
-        canvas#sigPad { width: 100%; height: 110px; touch-action: none; cursor: crosshair; display: block; }
-
-        /* Botões */
-        .btn-primary { background: #00e676; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-secondary { background: #eee; color: #333; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 4px; }
-        
-        .sub-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
-        .sub-tab-btn { flex: 1; padding: 8px; font-size: 11px; font-weight: bold; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; cursor: pointer; }
-        .sub-tab-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+        body { font-family: Arial, sans-serif; background: #f4f4f9; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { color: #1a5276; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #27ae60; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; }
+        button:hover { background: #219150; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <!-- Header -->
-    <div class="header">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="logo">ROTA GB <span class="badge-gb">GW</span></div>
-            <div class="role-switch">
-                <button type="button" class="role-btn active" id="btn-passageiro" onclick="setRole('passageiro')">Cliente</button>
-                <button type="button" class="role-btn" id="btn-motorista" onclick="setRole('motorista')">Motorista</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navegação Principais Serviços -->
-    <div class="service-nav" id="main-nav">
-        <div class="nav-item active" id="nav-taxi" onclick="switchServiceTab('taxi')">🚗 Transporte</div>
-        <div class="nav-item" id="nav-comida" onclick="switchServiceTab('comida')">🍲 Comida</div>
-        <div class="nav-item" id="nav-lojas" onclick="switchServiceTab('lojas')">🛒 Lojas</div>
-        <div class="nav-item" id="nav-hoteis" onclick="switchServiceTab('hoteis')">🏨 Hotéis & Apts</div>
-        <div class="nav-item" id="nav-recargas" onclick="switchServiceTab('recargas')">📱 Recargas</div>
-    </div>
-
-    <!-- Map Engine -->
-    <div class="map-area">
-        <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
-        <canvas id="bissauMap"></canvas>
-    </div>
-
-    <!-- Panel 1: Transporte (Rotas DGVTT completas) -->
-    <div class="bottom-panel" id="panel-taxi">
-        <div id="rideFormControls">
-            <div class="form-group">
-                <label>ROTA OFICIAL DGVTT - BISSAU</label>
-                <select id="routeSelect" onchange="updatePrice()">
-                    <option value="1500">Praça dos Heróis ➔ Aeroporto Osvaldo Vieira (1.500 XOF)</option>
-                    <option value="600">Cidade ➔ Mercado de Bandim (600 XOF)</option>
-                    <option value="250">Cidade ➔ Santa Luzia (Igreja Católica) (250 XOF)</option>
-                    <option value="250">Cidade ➔ Chapa de Bissau (250 XOF)</option>
-                    <option value="275">Cidade ➔ São Vicente Paulo (275 XOF)</option>
-                    <option value="325">Cidade ➔ Belém/Missira (325 XOF)</option>
-                    <option value="350">Cidade ➔ Bairro d'Ajuda 1º e 2ª fase (350 XOF)</option>
-                    <option value="375">Cidade ➔ Hospital 3 de Agosto (375 XOF)</option>
-                    <option value="425">Cidade ➔ Bairro Internacional (425 XOF)</option>
-                    <option value="200">Cidade ➔ Hotel Emb. América (200 XOF)</option>
-                    <option value="450">Cidade ➔ Bairro Militar / Prédio Nino (450 XOF)</option>
-                    <option value="525">Cidade ➔ B. Militar / Terminal TUB (525 XOF)</option>
-                    <option value="550">Cidade ➔ Brá / Seminário (550 XOF)</option>
-                    <option value="700">Cidade ➔ Aeroporto (700 XOF)</option>
-                    <option value="950">Aeroporto ➔ Centro da Cidade (950 XOF)</option>
-                </select>
-            </div>
-
-            <div class="service-options" style="margin-top: 8px;">
-                <div class="service-card selected" id="card-taxi" onclick="selectService(this, 1)">
-                    <div class="service-title">🚖 Táxi Oficial</div>
-                    <div class="service-price" id="price-taxi">1.500 XOF</div>
-                </div>
-                <div class="service-card" id="card-privado" onclick="selectService(this, 1.3)">
-                    <div class="service-title">🚘 Carro Privado</div>
-                    <div class="service-price" id="price-privado">1.950 XOF</div>
-                </div>
-                <div class="service-card" id="card-moto" onclick="selectService(this, 0.7)">
-                    <div class="service-title">🛵 Moto-Táxi</div>
-                    <div class="service-price" id="price-moto">1.050 XOF</div>
-                </div>
-            </div>
-
-            <div class="form-group" style="margin-top: 10px;">
-                <label>FORMA DE PAGAMENTO DA VIAGEM</label>
-                <select id="paymentSelect">
-                    <option value="Dinheiro Vivo">💵 Dinheiro Vivo (Ao Condutor)</option>
-                    <option value="Orange Money">🟧 Orange Money</option>
-                    <option value="Telecel">🟥 Telecel Mobile Money</option>
-                    <option value="Cartao Debito">💳 Cartão de Débito / Bancário</option>
-                </select>
-            </div>
-
-            <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="requestRide()">Pedir Viagem Agora</button>
+<div class="card">
+    <h2>⚙️ Gestão de Preços — ROTA GB</h2>
+    <form id="tarifasForm">
+        <div class="form-group">
+            <label for="moto">🏍️ ROTA Moto (Preço Base em XOF):</label>
+            <input type="number" id="moto" value="500" required>
         </div>
 
-        <!-- Painel de Espera / Cancelamento -->
-        <div class="waiting-card" id="waitingPanel">
-            <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
-            <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
-            <div class="timer-text" id="waitingTimer">00:00</div>
-            <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
-                Preço reservado: <strong id="reservedAmount">1.500 XOF</strong>
-            </div>
-            <div style="font-size: 11px; color: #333; margin-bottom: 6px;">
-                Pagamento via: <strong id="selectedPaymentMethod">Dinheiro Vivo</strong>
-            </div>
-            <button type="button" class="btn-cancel" onclick="cancelRide()">Cancelar Viagem & Pedir Reembolso</button>
-        </div>
-    </div>
-
-    <!-- Panel 2: Restaurantes (Lista Completa) -->
-    <div class="bottom-panel" id="panel-comida" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Restaurantes em Bissau</div>
-        <div class="store-list">
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Papa Loca Bissau</div>
-                    <div class="store-desc">Grelhados, Hambúrgueres e Fast Food</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">A Padeira Africana</div>
-                    <div class="store-desc">Galinha Cafriela e Comida Típica</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Restaurante O Coqueiro</div>
-                    <div class="store-desc">Peixe Fresco, Marisco e Cozinha Típica</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Snack-Bar Oasis</div>
-                    <div class="store-desc">Pastelaria, Sumos Naturais e Refeições Rápidas</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Chez Sapphire</div>
-                    <div class="store-desc">Cozinha Internacional e Buffet</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Panel 3: Lojas (Lista Completa) -->
-    <div class="bottom-panel" id="panel-lojas" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Supermercados e Lojas</div>
-        <div class="store-list">
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Supermercado Hereso</div>
-                    <div class="store-desc">Alimentação Geral, Bebidas e Frescos</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Mini-Mercado Bandim</div>
-                    <div class="store-desc">Produtos de Mercearia e Higiene</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Farmácia Central Bissau</div>
-                    <div class="store-desc">Medicamentos e Primeiros Socorros</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Boutique Guiné Moda</div>
-                    <div class="store-desc">Roupas, Calçados e Acessórios</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Panel 4: Hotéis (Lista Completa) -->
-    <div class="bottom-panel" id="panel-hoteis" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Hotéis e Apartamentos em Bissau</div>
-        <div class="store-list">
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Hotel Ledra Bissau</div>
-                    <div class="store-desc">Av. Amílcar Cabral — Quarto Duplo Executive</div>
-                    <div class="price-tag">45.000 XOF / noite</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reservado!')">Reservar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Hotel Ceiba Bissau</div>
-                    <div class="store-desc">Av. Combatentes — Suíte de Luxo com Piscina</div>
-                    <div class="price-tag">75.000 XOF / noite</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reservado!')">Reservar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Coimbra Hotel & Spa</div>
-                    <div class="store-desc">Praça dos Heróis Nacionais — Quarto Standard</div>
-                    <div class="price-tag">35.000 XOF / noite</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reservado!')">Reservar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Apartamentos Sol de Bissau</div>
-                    <div class="store-desc">Bairro de Penha — T1 Equipado</div>
-                    <div class="price-tag">25.000 XOF / noite</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reservado!')">Reservar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Panel 5: Recargas -->
-    <div class="bottom-panel" id="panel-recargas" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Comprar Saldo de Telemóvel</div>
-        
-        <div class="sub-tabs">
-            <button type="button" class="sub-tab-btn active" id="btn-orange-op" onclick="selectOperator('Orange')">🟧 Orange Bissau</button>
-            <button type="button" class="sub-tab-btn" id="btn-telecel-op" onclick="selectOperator('Telecel')">🟥 Telecel Bissau</button>
+        <div class="form-group">
+            <label for="taxi">🚕 ROTA Táxi (Preço Base em XOF):</label>
+            <input type="number" id="taxi" value="1000" required>
         </div>
 
-        <div class="form-group" style="margin-top: 6px;">
-            <label>NÚMERO DE TELEMÓVEL (+245)</label>
-            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX">
+        <div class="form-group">
+            <label for="privado">🚗 ROTA Privado (Preço Base em XOF):</label>
+            <input type="number" id="privado" value="1500" required>
         </div>
 
-        <div class="form-group" style="margin-top: 6px;">
-            <label>VALOR DA RECARGA (XOF)</label>
-            <select id="amountRecarga">
-                <option value="500">500 XOF</option>
-                <option value="1000" selected>1.000 XOF</option>
-                <option value="2000">2.000 XOF</option>
-                <option value="5000">5.000 XOF</option>
-            </select>
-        </div>
-
-        <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="processarRecarga()">Pagar Recarga Agora</button>
-    </div>
-
-    <!-- Panel Motorista -->
-    <div class="bottom-panel" id="panel-motorista" style="display: none;">
-        <div class="sub-tabs">
-            <button type="button" class="sub-tab-btn active" id="tab-painel-btn" onclick="toggleDriverTab('painel')">Painel do Condutor</button>
-            <button type="button" class="sub-tab-btn" id="tab-registo-btn" onclick="toggleDriverTab('registo')">Registar Veículo</button>
-        </div>
-
-        <div id="driver-dashboard">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <h3 style="font-size: 15px;">Painel de Trabalho em Bissau</h3>
-                <p style="font-size: 11px; color: #666;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></p>
-            </div>
-            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas...')">Aguardar Chamadas</button>
-        </div>
-
-        <!-- Form Registo Motorista -->
-        <div id="driver-register" style="display: none;">
-            <div id="etapaFormRegisto">
-                <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
-                <form id="formCadastroMotorista" onsubmit="avancarParaAssinatura(event)" style="display: flex; flex-direction: column; gap: 8px;">
-                    <input type="text" id="nomeMotorista" placeholder="Nome Completo do Condutor" required>
-                    <input type="email" id="emailMotorista" placeholder="E-mail" required>
-                    <input type="tel" id="telefoneMotorista" placeholder="Telefone de Contacto (+245)" required>
-                    
-                    <select id="tipoTransporte">
-                        <option value="Táxi Azul/Amarelo">Táxi Azul/Amarelo</option>
-                        <option value="Carro Privado">Carro Privado</option>
-                        <option value="Moto-Táxi">Moto-Táxi</option>
-                    </select>
-                    
-                    <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
-                    <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula (Placa)" required>
-                    
-                    <select id="metodoRecebimentoMotorista" required>
-                        <option value="" disabled selected>Onde quer receber os seus ganhos?</option>
-                        <option value="Orange Money">Orange Money (+245)</option>
-                        <option value="Telecel">Telecel Mobile Money (+245)</option>
-                        <option value="Cartao Debito">Cartão de Débito / Bancário</option>
-                    </select>
-                    <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira ou Conta Bancária" required>
-
-                    <!-- Termos e Condições -->
-                    <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px; color: #555; line-height: 1.4;">
-                        <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" id="aceiteTermos" required style="margin-top: 2px;">
-                            <span>Li e aceito os termos de parceria, a retenção de comissão e as normas de segurança para operadores na Guiné-Bissau.</span>
-                        </label>
-                    </div>
-
-                    <!-- Assinatura Digital -->
-                    <div class="form-group" style="margin-top: 4px;">
-                        <label>ASSINATURA DIGITAL DO CONDUTOR</label>
-                        <div class="signature-pad-container">
-                            <canvas id="sigPad"></canvas>
-                        </div>
-                        <button type="button" class="btn-secondary" onclick="limparAssinatura()">Limpar Assinatura</button>
-                    </div>
-
-                    <button type="submit" class="btn-primary" style="margin-top: 10px;">Submeter Registo & Contrato</button>
-                </form>
-            </div>
-
-            <!-- Etapa de Sucesso do Registo -->
-            <div id="sucessoRegisto" style="display: none; text-align: center; padding: 20px;">
-                <div style="font-size: 36px; margin-bottom: 10px;">🎉</div>
-                <h3 style="font-size: 16px; margin-bottom: 8px;">Registo Submetido com Sucesso!</h3>
-                <p style="font-size: 12px; color: #666; line-height: 1.4; margin-bottom: 15px;">
-                    Os seus dados e o contrato assinado foram guardados. A nossa equipa irá validar as informações para o lançamento em Bissau.
-                </p>
-                <button type="button" class="btn-primary" onclick="reiniciarRegisto()">Registar Outro Veículo</button>
-            </div>
-        </div>
-    </div>
-
+        <button type="button" onclick="atualizarPrecos()">💾 Salvar Alterações na App</button>
+    </form>
 </div>
 
-<!-- Scripts da Aplicação -->
 <script>
-    function setRole(role) {
-        document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
-        document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
-        
-        document.getElementById('panel-taxi').style.display = (role === 'passageiro') ? 'flex' : 'none';
-        document.getElementById('panel-motorista').style.display = (role === 'motorista') ? 'flex' : 'none';
-        document.getElementById('main-nav').style.display = (role === 'passageiro') ? 'flex' : 'none';
+async function atualizarPrecos() {
+    const dados = {
+        moto: document.getElementById('moto').value,
+        taxi: document.getElementById('taxi').value,
+        privado: document.getElementById('privado').value
+    };
+
+    // Envia os dados atualizados para a API da ROTA GB
+    const resposta = await fetch('https://api.rotagb.com/admin/atualizar-tarifas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+    });
+
+    if (resposta.ok) {
+        alert('✅ Preços atualizados com sucesso! A App já está a usar as novas tarifas.');
+    } else {
+        alert('❌ Erro ao atualizar os preços. Verifique a conexão.');
     }
-
-    function switchServiceTab(service) {
-        ['taxi', 'comida', 'lojas', 'hoteis', 'recargas'].forEach(s => {
-            document.getElementById('nav-' + s).classList.remove('active');
-            document.getElementById('panel-' + s).style.display = 'none';
-        });
-        document.getElementById('nav-' + service).classList.add('active');
-        document.getElementById('panel-' + service).style.display = 'flex';
-    }
-
-    function updatePrice() {
-        const select = document.getElementById('routeSelect');
-        const basePrice = parseInt(select.value) || 1500;
-        document.getElementById('price-taxi').innerText = basePrice + ' XOF';
-        document.getElementById('price-privado').innerText = Math.round(basePrice * 1.3) + ' XOF';
-        document.getElementById('price-moto').innerText = Math.round(basePrice * 0.7) + ' XOF';
-    }
-
-    function selectService(card, multiplier) {
-        document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-    }
-
-    function toggleDriverTab(tab) {
-        document.getElementById('tab-painel-btn').classList.toggle('active', tab === 'painel');
-        document.getElementById('tab-registo-btn').classList.toggle('active', tab === 'registo');
-        document.getElementById('driver-dashboard').style.display = (tab === 'painel') ? 'block' : 'none';
-        document.getElementById('driver-register').style.display = (tab === 'registo') ? 'block' : 'none';
-    }
-
-    function requestRide() {
-        const routeSelect = document.getElementById('routeSelect');
-        const paymentSelect = document.getElementById('paymentSelect');
-        
-        document.getElementById('reservedAmount').innerText = routeSelect.options[routeSelect.selectedIndex].text.match(/\d+[\d\.]* XOF/)[0];
-        document.getElementById('selectedPaymentMethod').innerText = paymentSelect.value;
-        
-        document.getElementById('rideFormControls').style.display = 'none';
-        document.getElementById('waitingPanel').style.display = 'flex';
-    }
-
-    function cancelRide() {
-        document.getElementById('waitingPanel').style.display = 'none';
-        document.getElementById('rideFormControls').style.display = 'block';
-    }
-
-    function selectOperator(op) {
-        document.getElementById('btn-orange-op').classList.toggle('active', op === 'Orange');
-        document.getElementById('btn-telecel-op').classList.toggle('active', op === 'Telecel');
-    }
-
-    function processarRecarga() {
-        const phone = document.getElementById('phoneRecarga').value;
-        const amount = document.getElementById('amountRecarga').value;
-        if(!phone || phone.length < 7) {
-            alert('Por favor, insira um número de telemóvel válido para a recarga.');
-            return;
-        }
-        alert('Processo de recarga de ' + amount + ' XOF iniciado para o número +245 ' + phone);
-    }
-
-    // Assinatura Digital (Canvas simples)
-    const canvas = document.getElementById('sigPad');
-    let ctx = null;
-    let desenhando = false;
-
-    if (canvas) {
-        ctx = canvas.getContext('2d');
-    }
-
-    function ajustarCanvas() {
-        if(canvas && ctx) {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-        }
-    }
-    window.addEventListener('load', ajustarCanvas);
-
-    if(canvas && ctx) {
-        canvas.addEventListener('mousedown', () => desenhando = true);
-        canvas.addEventListener('mouseup', () => { desenhando = false; ctx.beginPath(); });
-        canvas.addEventListener('mousemove', desenhar);
-
-        canvas.addEventListener('touchstart', (e) => { desenhando = true; e.preventDefault(); });
-        canvas.addEventListener('touchend', () => { desenhando = false; ctx.beginPath(); });
-        canvas.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            desenharComCoordenadas(touch.clientX - rect.left, touch.clientY - rect.top);
-            e.preventDefault();
-        });
-    }
-
-    function desenhar(e) {
-        if (!desenhando || !ctx) return;
-        const rect = canvas.getBoundingClientRect();
-        desenharComCoordenadas(e.clientX - rect.left, e.clientY - rect.top);
-    }
-
-    function desenharComCoordenadas(x, y) {
-        if (!ctx) return;
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = '#000';
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-
-    function limparAssinatura() {
-        if (!ctx || !canvas) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-    }
-
-    function avancarParaAssinatura(event) {
-        event.preventDefault();
-        document.getElementById('etapaFormRegisto').style.display = 'none';
-        document.getElementById('sucessoRegisto').style.display = 'block';
-    }
-
-    function reiniciarRegisto() {
-        document.getElementById('formCadastroMotorista').reset();
-        limparAssinatura();
-        document.getElementById('sucessoRegisto').style.display = 'none';
-        document.getElementById('etapaFormRegisto').style.display = 'block';
-    }
-
-    // Motor do Mapa Simulado de Bissau (Com Ruas Brancas, Ponto Vermelho e 'ROTA GB Express' Animado)
-    const mapCanvas = document.getElementById('bissauMap');
-    if (mapCanvas) {
-        const mapCtx = mapCanvas.getContext('2d');
-        let moveStep = 0;
-
-        function desenharMapaBissau() {
-            const w = mapCanvas.offsetWidth || 380;
-            const h = mapCanvas.offsetHeight || 140;
-
-            if (mapCanvas.width !== w || mapCanvas.height !== h) {
-                mapCanvas.width = w;
-                mapCanvas.height = h;
-            }
-
-            // Fundo do Mapa (Bissau)
-            mapCtx.fillStyle = '#e5e3df';
-            mapCtx.fillRect(0, 0, w, h);
-
-            // Avenidas Brancas
-            mapCtx.strokeStyle = '#ffffff';
-            mapCtx.lineWidth = 14;
-
-            // Rua Diagonal Superior
-            mapCtx.beginPath();
-            mapCtx.moveTo(0, h * 0.25);
-            mapCtx.lineTo(w, h * 0.45);
-            mapCtx.stroke();
-
-            // Rua Transversal Diagonal
-            mapCtx.beginPath();
-            mapCtx.moveTo(w * 0.65, 0);
-            mapCtx.lineTo(w * 0.2, h);
-            mapCtx.stroke();
-
-            // Posição calculada do Veículo em movimento suave
-            moveStep = (moveStep + 0.3) % w;
-            const startX = moveStep;
-            const startY = h * 0.25 + (moveStep * 0.2);
-
-            // Marcador Ponto Vermelho (Veículo)
-            mapCtx.fillStyle = '#ce1126';
-            mapCtx.beginPath();
-            mapCtx.arc(startX, startY, 6, 0, Math.PI * 2);
-            mapCtx.fill();
-            mapCtx.strokeStyle = '#ffffff';
-            mapCtx.lineWidth = 2;
-            mapCtx.stroke();
-
-            // Texto Marcador '🚖 ROTA GB Express'
-            mapCtx.font = 'bold 11px sans-serif';
-            mapCtx.fillStyle = '#222222';
-            mapCtx.fillText('🚖 ROTA GB Express', startX - 45, startY - 10);
-
-            requestAnimationFrame(desenharMapaBissau);
-        }
-
-        requestAnimationFrame(desenharMapaBissau);
-    }
+}
 </script>
 
 </body>
 </html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROTA GB — Mobilidade Urbana em Bissau</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { color: #333; background-color: #f8f9fa; line-height: 1.6; }
+        
+        /* Header & Navegação */
+        header { background: #004d40; color: #fff; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #ffca28; }
+        nav a { color: #fff; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        
+        /* Hero Section */
+        .hero { background: linear-gradient(rgba(0, 77, 64, 0.85), rgba(0, 77, 64, 0.85)), url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1200&q=80') center/cover; color: white; padding: 80px 5%; text-align: center; }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 15px; color: #ffca28; }
+        .hero p { font-size: 1.2rem; max-width: 700px; margin: 0 auto 30px; }
+        .btn { background: #ffca28; color: #004d40; padding: 12px 25px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block; margin: 5px; transition: 0.3s; }
+        .btn:hover { background: #ffb300; }
+        
+        /* Categorias */
+        .features { padding: 60px 5%; text-align: center; }
+        .features h2 { color: #004d40; margin-bottom: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .card h3 { color: #004d40; margin-bottom: 10px; }
+        
+        /* Quem Somos / CEO */
+        .about { background: #e0f2f1; padding: 60px 5%; text-align: center; }
+        .about-content { max-width: 800px; margin: 0 auto; }
+        .ceo-badge { background: #004d40; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; display: inline-block; margin-top: 15px; }
+
+        /* Rodapé */
+        footer { background: #111; color: #aaa; text-align: center; padding: 20px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🚕 ROTA GB</div>
+        <nav>
+            <a href="#servicos">Serviços</a>
+            <a href="#motoristas">Seja Motorista</a>
+            <a href="#sobre">Quem Somos</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>O Seu Transporte Rápido e Seguro em Bissau</h1>
+        <p>Peça Mototáxi, Táxi Tradicional ou Carro Privado com Ar-Condicionado na palma da sua mão. Pagamento facilitado em Dinheiro ou Orange Money.</p>
+        <a href="#" class="btn">📱 Baixar App Passageiro</a>
+        <a href="#motoristas" class="btn" style="background: white; color: #004d40;">🚗 Cadastrar Veículo</a>
+    </section>
+
+    <section class="features" id="servicos">
+        <h2>Nossas Categorias</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>🏍️ ROTA Moto</h3>
+                <p>A solução mais rápida para escapar ao trânsito e chegar rápido ao seu destino.</p>
+            </div>
+            <div class="card">
+                <h3>🚕 ROTA Táxi</h3>
+                <p>Os tradicionais táxis urbanos licenciados de Bissau com tarifa justa e transparente.</p>
+            </div>
+            <div class="card">
+                <h3>🚗 ROTA Privado</h3>
+                <p>Veículos confortáveis, limpos e climatizados para viagens executivas ou aeroporto.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="sobre">
+        <div class="about-content">
+            <h2>Sobre a ROTA GB</h2>
+            <p>A ROTA GB é uma plataforma de mobilidade tecnológica criada para modernizar, organizar e trazer total segurança ao transporte urbano na Guiné-Bissau.</p>
+            <div class="ceo-badge">Liderança Executiva: Direção & CEO ROTA GB</div>
+        </div>
+    </section>
+
+    <footer id="contato">
+        <p>&copy; 2026 ROTA GB Mobility Technologies. Todos os direitos reservados.</p>
+        <p>Bissau, Guiné-Bissau | Contato: suporte@rotagb.com</p>
+    </footer>
+
+</body>
+</html>
+[1. Tenta GPS do Telemóvel] 
+         ↓ (Se o sinal estiver fraco ou falhar)
+[2. Usa o Ponto de Referência Selecionado pelo Cliente] (Ex: Perto da Paragem)
+         ↓ (Se a internet do motorista cair)
+[3.Envia Notificação por SMS / Permite Ligação Telefónica Direta]
