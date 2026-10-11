@@ -107,7 +107,7 @@
         </div>
     </div>
 
-    <!-- Navegação Principais Serviços (Apenas Visível no modo Cliente) -->
+    <!-- Navegação Principais Serviços -->
     <div class="service-nav" id="main-nav">
         <div class="nav-item active" id="nav-taxi" onclick="switchServiceTab('taxi')">🚗 Transporte</div>
         <div class="nav-item" id="nav-comida" onclick="switchServiceTab('comida')">🍲 Comida</div>
@@ -333,14 +333,13 @@
         <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="processarRecarga()">Pagar Recarga Agora</button>
     </div>
 
-    <!-- Panel Motorista (Aba Completa do Condutor) -->
+    <!-- Panel Motorista -->
     <div class="bottom-panel" id="panel-motorista" style="display: none;">
         <div class="sub-tabs">
             <button type="button" class="sub-tab-btn" id="tab-painel-btn" onclick="toggleDriverTab('painel')">Painel do Condutor</button>
             <button type="button" class="sub-tab-btn active" id="tab-registo-btn" onclick="toggleDriverTab('registo')">Registar Veículo</button>
         </div>
 
-        <!-- Painel de Trabalho do Motorista -->
         <div id="driver-dashboard" style="display: none;">
             <div style="text-align: center; margin-bottom: 10px;">
                 <h3 style="font-size: 15px;">Painel de Trabalho em Bissau</h3>
@@ -349,7 +348,6 @@
             <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas...')">Aguardar Chamadas</button>
         </div>
 
-        <!-- Form Registo Motorista (EXATAMENTE COMO NA PRIMEIRA IMAGEM) -->
         <div id="driver-register" style="display: block;">
             <div id="etapaFormRegisto">
                 <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
@@ -374,7 +372,6 @@
                     </select>
                     <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira ou Conta Bancária" required>
 
-                    <!-- Termos e Condições com comissão de 15% -->
                     <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px; color: #555; line-height: 1.4;">
                         <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
                             <input type="checkbox" id="aceiteTermos" required style="margin-top: 2px;">
@@ -382,7 +379,6 @@
                         </label>
                     </div>
 
-                    <!-- Assinatura Digital do Condutor -->
                     <div class="form-group" style="margin-top: 4px;">
                         <label>ASSINATURA DIGITAL DO CONDUTOR</label>
                         <div class="signature-pad-container">
@@ -395,7 +391,6 @@
                 </form>
             </div>
 
-            <!-- Etapa de Sucesso do Registo -->
             <div id="sucessoRegisto" style="display: none; text-align: center; padding: 20px;">
                 <div style="font-size: 36px; margin-bottom: 10px;">🎉</div>
                 <h3 style="font-size: 16px; margin-bottom: 8px;">Registo Submetido com Sucesso!</h3>
@@ -411,12 +406,10 @@
 
 <!-- Scripts da Aplicação -->
 <script>
-    // Alterna entre o modo Cliente e Motorista
     function setRole(role) {
         document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
         document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
         
-        // Oculta todos os painéis de clientes se escolher motorista
         if (role === 'passageiro') {
             document.getElementById('main-nav').style.display = 'flex';
             document.getElementById('panel-motorista').style.display = 'none';
@@ -427,7 +420,7 @@
                 document.getElementById(p).style.display = 'none';
             });
             document.getElementById('panel-motorista').style.display = 'flex';
-            toggleDriverTab('registo'); // Abre diretamente no formulário de registo
+            toggleDriverTab('registo');
         }
     }
 
@@ -440,7 +433,6 @@
         document.getElementById('panel-' + service).style.display = 'flex';
     }
 
-    // Cobrança Dupla para Táxis Exclusivos
     function updatePrice() {
         const select = document.getElementById('routeSelect');
         const basePriceDGVTT = parseInt(select.value) || 375;
@@ -466,6 +458,10 @@
         }
     }
 
+    // Variáveis para gerir o cronômetro de espera
+    let timerInterval = null;
+    let segundosEspera = 0;
+
     function requestRide() {
         const routeSelect = document.getElementById('routeSelect');
         const paymentSelect = document.getElementById('paymentSelect');
@@ -476,9 +472,28 @@
         
         document.getElementById('rideFormControls').style.display = 'none';
         document.getElementById('waitingPanel').style.display = 'flex';
+
+        // Iniciar Contagem de Minutos e Segundos
+        segundosEspera = 0;
+        document.getElementById('waitingTimer').innerText = "00:00";
+        
+        if (timerInterval) clearInterval(timerInterval);
+        
+        timerInterval = setInterval(() => {
+            segundosEspera++;
+            const mins = Math.floor(segundosEspera / 60);
+            const secs = segundosEspera % 60;
+            const formatoMins = mins < 10 ? '0' + mins : mins;
+            const formatoSecs = secs < 10 ? '0' + secs : secs;
+            document.getElementById('waitingTimer').innerText = `${formatoMins}:${formatoSecs}`;
+        }, 1000);
     }
 
     function cancelRide() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
         document.getElementById('waitingPanel').style.display = 'none';
         document.getElementById('rideFormControls').style.display = 'block';
     }
@@ -566,7 +581,7 @@
         document.getElementById('etapaFormRegisto').style.display = 'block';
     }
 
-    // Motor do Mapa Simulado de Bissau (Com Ruas Brancas, Ponto Vermelho e 'ROTA GB Express' Animado)
+    // Motor do Mapa Simulado de Bissau
     const mapCanvas = document.getElementById('bissauMap');
     if (mapCanvas) {
         const mapCtx = mapCanvas.getContext('2d');
@@ -581,32 +596,26 @@
                 mapCanvas.height = h;
             }
 
-            // Fundo do Mapa (Bissau)
             mapCtx.fillStyle = '#e5e3df';
             mapCtx.fillRect(0, 0, w, h);
 
-            // Avenidas Brancas
             mapCtx.strokeStyle = '#ffffff';
             mapCtx.lineWidth = 14;
 
-            // Rua Diagonal Superior
             mapCtx.beginPath();
             mapCtx.moveTo(0, h * 0.25);
             mapCtx.lineTo(w, h * 0.45);
             mapCtx.stroke();
 
-            // Rua Transversal Diagonal
             mapCtx.beginPath();
             mapCtx.moveTo(w * 0.65, 0);
             mapCtx.lineTo(w * 0.2, h);
             mapCtx.stroke();
 
-            // Posição calculada do Veículo em movimento suave
             moveStep = (moveStep + 0.3) % w;
             const startX = moveStep;
             const startY = h * 0.25 + (moveStep * 0.2);
 
-            // Marcador Ponto Vermelho (Veículo)
             mapCtx.fillStyle = '#ce1126';
             mapCtx.beginPath();
             mapCtx.arc(startX, startY, 6, 0, Math.PI * 2);
@@ -615,7 +624,6 @@
             mapCtx.lineWidth = 2;
             mapCtx.stroke();
 
-            // Texto Marcador '🚖 ROTA GB Express'
             mapCtx.font = 'bold 11px sans-serif';
             mapCtx.fillStyle = '#222222';
             mapCtx.fillText('🚖 ROTA GB Express', startX - 45, startY - 10);
