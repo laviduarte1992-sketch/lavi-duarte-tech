@@ -587,4 +587,26 @@
             const startX = moveStep;
             const startY = h * 0.25 + (moveStep * 0.2);
 
-            // Marcador Ponto Vermelho (Veículo
+            // Marcador Ponto Vermelho (Veículo)
+            mapCtx.fillStyle = '#ce1126';
+            mapCtx.beginPath();
+            mapCtx.arc(startX, startY, 6, 0, Math.PI * 2);
+            mapCtx.fill();
+            mapCtx.strokeStyle = '#ffffff';
+            mapCtx.lineWidth = 2;
+            mapCtx.stroke();
+
+            // Texto Marcador '🚖 ROTA GB Express'
+            mapCtx.font = 'bold 11px sans-serif';
+            mapCtx.fillStyle = '#222222';
+            mapCtx.fillText('🚖 ROTA GB Express', startX - 45, startY - 10);
+
+            requestAnimationFrame(desenharMapaBissau);
+        }
+
+        requestAnimationFrame(desenharMapaBissau);
+    }
+</script>
+
+</body>
+</html>
