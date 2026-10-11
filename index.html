@@ -126,132 +126,39 @@
     <div class="bottom-panel" id="panel-taxi">
         <div id="rideFormControls">
             <div class="form-group">
-                <label>ROTA OFICIAL DGVTT - BISSAU</label>
+                <label>ROTA OFICIAL DGVTT - BISSAU (CORRIDA EXCLUSIVA)</label>
                 <select id="routeSelect" onchange="updatePrice()">
-                    <!-- Rotas Oficiais DGVTT -->
-                    <option value="1500">Praça dos Heróis ➔ Aeroporto Osvaldo Vieira (1.500 XOF)</option>
-                    <option value="600">Cidade ➔ Mercado de Bandim (600 XOF)</option>
-                    <option value="250">Cidade ➔ Santa Luzia (Igreja Católica) (250 XOF)</option>
-                    <option value="250">Cidade ➔ Chapa de Bissau (250 XOF)</option>
-                    <option value="275">Cidade ➔ São Vicente Paulo (275 XOF)</option>
-                    <option value="325">Cidade ➔ Belém/Missira (325 XOF)</option>
-                    <option value="350">Cidade ➔ Bairro d'Ajuda 1º e 2ª fase (350 XOF)</option>
-                    <option value="375">Cidade ➔ Hospital 3 de Agosto (375 XOF)</option>
-                    <option value="425">Cidade ➔ Bairro Internacional (425 XOF)</option>
-                    <option value="200">Cidade ➔ Hotel Emb. América (200 XOF)</option>
-                    <option value="450">Cidade ➔ Bairro Militar / Prédio Nino (450 XOF)</option>
-                    <option value="450">Cidade ➔ Bairro Militar Feira (450 XOF)</option>
-                    <option value="475">Cidade ➔ Bairro Militar Somec (475 XOF)</option>
-                    <option value="525">Cidade ➔ B. Militar / Terminal TUB (525 XOF)</option>
-                    <option value="550">Cidade ➔ Brá / Seminário (550 XOF)</option>
-                    <option value="475">Cidade ➔ Paragem Central (475 XOF)</option>
-                    <option value="525">Cidade ➔ Guimetal (525 XOF)</option>
-                    <option value="550">Cidade ➔ São Paulo (550 XOF)</option>
-                    <option value="575">Cidade ➔ Háfia (575 XOF)</option>
-                    <option value="575">Cidade ➔ Háfia / Cruzamento (575 XOF)</option>
-                    <option value="650">Cidade ➔ Paragem Manjaco (650 XOF)</option>
-                    <option value="675">Cidade ➔ Rotunda de Aeroporto (675 XOF)</option>
-                    <option value="700">Cidade ➔ Aeroporto (700 XOF)</option>
-                    <option value="750">Cidade ➔ Base Aérea / PRAKLAS (750 XOF)</option>
-                    <option value="800">Cidade ➔ Bissalanca Poilão (800 XOF)</option>
-                    <option value="950">Cidade ➔ STENACKS (950 XOF)</option>
-                    <option value="650">Cidade ➔ Enterramento (650 XOF)</option>
-                    <option value="575">Cidade ➔ Ena (CENFA) (575 XOF)</option>
-                    <option value="700">Cidade ➔ Bairro Cupul (700 XOF)</option>
-                    <option value="775">Cidade ➔ Av. Brazil (775 XOF)</option>
-                    <option value="175">Cidade ➔ Paulo Barros (175 XOF)</option>
-                    <option value="250">Cidade ➔ Caracol (250 XOF)</option>
-                    <option value="275">Cidade ➔ Padaria Nhonho (275 XOF)</option>
-                    <option value="325">Cidade ➔ Zona 7 (325 XOF)</option>
-                    <option value="375">Cidade ➔ Bairro Plano (375 XOF)</option>
-                    <option value="375">Cidade ➔ Bairro Ministro (375 XOF)</option>
-                    <option value="425">Cidade ➔ Cuntum Madina (425 XOF)</option>
-                    <option value="450">Cidade ➔ SHEL Quelele (450 XOF)</option>
-                    <option value="475">Cidade ➔ G. Visão (Entroncamento) (475 XOF)</option>
-                    <option value="500">Cidade ➔ Sobrade (500 XOF)</option>
-                    <option value="525">Cidade ➔ Quelele (Entroncamento) (525 XOF)</option>
-                    <option value="550">Cidade ➔ Ponta Neto (550 XOF)</option>
-                    <option value="575">Cidade ➔ Bôr / Terminal TUB (575 XOF)</option>
-                    <option value="600">Cidade ➔ Aldeia SOS (600 XOF)</option>
-                    <option value="275">Cidade ➔ Cemitério de N'hala (275 XOF)</option>
-                    <option value="325">Cidade ➔ Bairro Bissack (Ponte Cibe) (325 XOF)</option>
-                    <option value="375">Cidade ➔ Bissack / Terminal TUB (375 XOF)</option>
-                    <option value="600">Cidade ➔ C. de Coqueiro / Tchada (600 XOF)</option>
-                    <option value="200">Cidade ➔ Cruzamento Santa Luzia (200 XOF)</option>
-                    <option value="275">Cidade ➔ Entrada de Djaal (275 XOF)</option>
-                    <option value="275">Cidade ➔ Estado Major / QG (275 XOF)</option>
-                    <option value="375">Cidade ➔ Discoteca Beleza (375 XOF)</option>
-                    <option value="375">Cidade ➔ Bairro Luanda (375 XOF)</option>
-                    <option value="425">Cidade ➔ Feira de QG (425 XOF)</option>
-                    <option value="425">Cidade ➔ Bairro Mpantcha (425 XOF)</option>
-                    <option value="450">Cidade ➔ Igreja Católica de Antula (450 XOF)</option>
-                    <option value="550">Cidade ➔ Antula Mercado (550 XOF)</option>
-                    <option value="350">Mercado Bandim ➔ Sobrade (350 XOF)</option>
-                    <option value="375">Mercado Bandim ➔ Quelele (Entroncamento) (375 XOF)</option>
-                    <option value="225">Mercado Bandim ➔ C. Madina / Term. TUB (225 XOF)</option>
-                    <option value="250">Mercado Bandim ➔ SHEL / Palmeiras (250 XOF)</option>
-                    <option value="325">Mercado Bandim ➔ Chapa de Bissau (325 XOF)</option>
-                    <option value="275">Mercado Bandim ➔ Belém Missira (275 XOF)</option>
-                    <option value="200">Mercado Bandim ➔ B. d'Ajuda 1ª e 2ª Fase (200 XOF)</option>
-                    <option value="275">Mercado Bandim ➔ Hospital 3 de Agosto (275 XOF)</option>
-                    <option value="375">Mercado Bandim ➔ Bairro Internacional (375 XOF)</option>
-                    <option value="175">Mercado Bandim ➔ Embaixada América (175 XOF)</option>
-                    <option value="225">Mercado Bandim ➔ B. Militar Prédio Nino (225 XOF)</option>
-                    <option value="275">Mercado Bandim ➔ B. Militar / Mercado (275 XOF)</option>
-                    <option value="275">Mercado Bandim ➔ B. Militar / Somec (275 XOF)</option>
-                    <option value="325">Mercado Bandim ➔ B. Militar / Terminal TUB (325 XOF)</option>
-                    <option value="350">Mercado Bandim ➔ Paragem Central (350 XOF)</option>
-                    <option value="350">Mercado Bandim ➔ Enterramento (350 XOF)</option>
-                    <option value="375">Mercado Bandim ➔ Seminário (375 XOF)</option>
-                    <option value="425">Mercado Bandim ➔ Lala Quema (425 XOF)</option>
-                    <option value="450">Mercado Bandim ➔ Cruzamento Háfia (450 XOF)</option>
-                    <option value="375">Mercado Bandim ➔ Paragem Manjaco (375 XOF)</option>
-                    <option value="450">Mercado Bandim ➔ Aeroporto (450 XOF)</option>
-                    <option value="400">Mercado Bandim ➔ Base Aérea / PRAKLAS (400 XOF)</option>
-                    <option value="350">Mercado Bandim ➔ STENAKS (350 XOF)</option>
-                    <option value="300">Mercado Bandim ➔ Av. Brazil (300 XOF)</option>
-                    <option value="525">Mercado Bandim ➔ Caracol (525 XOF)</option>
-                    <option value="550">Mercado Bandim ➔ Zona 7 (550 XOF)</option>
-                    <option value="275">Santa Luzia ➔ 2ª Esquadra (275 XOF)</option>
-                    <option value="275">Santa Luzia ➔ Chapa de Bissau (275 XOF)</option>
-                    <option value="200">Santa Luzia ➔ Cristo Redentor (200 XOF)</option>
-                    <option value="200">Santa Luzia ➔ Belém/Missira (200 XOF)</option>
-                    <option value="225">Santa Luzia ➔ Bº d'Ajuda 1ª e 2ª Fase (225 XOF)</option>
-                    <option value="200">Santa Luzia ➔ Entrada de Caju (200 XOF)</option>
-                    <option value="225">Santa Luzia ➔ Hoti Hotel / Embaixada (225 XOF)</option>
-                    <option value="250">Santa Luzia ➔ Bº Militar / Mercado (250 XOF)</option>
-                    <option value="225">Santa Luzia ➔ Bº Militar / SOMEC (225 XOF)</option>
-                    <option value="250">Santa Luzia ➔ Paragem Central (250 XOF)</option>
-                    <option value="275">Santa Luzia ➔ Brá / Seminário (275 XOF)</option>
-                    <option value="325">Santa Luzia ➔ Guimetal (325 XOF)</option>
-                    <option value="275">Santa Luzia ➔ Cruzamento Háfia (275 XOF)</option>
-                    <option value="375">Santa Luzia ➔ Aeroporto (375 XOF)</option>
-                    <option value="375">Santa Luzia ➔ Av. Brazil / Matadouro (375 XOF)</option>
-                    <option value="425">Santa Luzia ➔ Paulo Barros (425 XOF)</option>
-                    <option value="475">Santa Luzia ➔ Caracol (475 XOF)</option>
-                    <option value="450">Santa Luzia ➔ Zona 7 (450 XOF)</option>
-                    <option value="550">Santa Luzia ➔ Bº Plano (550 XOF)</option>
-                    <option value="525">Santa Luzia ➔ Bº Ministros (525 XOF)</option>
-                    <option value="250">Q.G ➔ Missira (250 XOF)</option>
-                    <option value="450">Q.G ➔ Bairro Militar (450 XOF)</option>
-                    <option value="200">Rotunda de Antula ➔ Entrada Djolo (200 XOF)</option>
-                    <option value="950">Aeroporto ➔ Centro da Cidade (950 XOF)</option>
-                    <option value="550">Safim ➔ Mercado Bandim (550 XOF)</option>
+                    <option value="1500">Praça dos Heróis ➔ Aeroporto Osvaldo Vieira (Tabela: 1.500 XOF)</option>
+                    <option value="600">Cidade ➔ Mercado de Bandim (Tabela: 600 XOF)</option>
+                    <option value="375" selected>Santa Luzia ➔ Aeroporto (Tabela: 375 XOF)</option>
+                    <option value="250">Cidade ➔ Santa Luzia (Igreja Católica) (Tabela: 250 XOF)</option>
+                    <option value="250">Cidade ➔ Chapa de Bissau (Tabela: 250 XOF)</option>
+                    <option value="275">Cidade ➔ São Vicente Paulo (Tabela: 275 XOF)</option>
+                    <option value="325">Cidade ➔ Belém/Missira (Tabela: 325 XOF)</option>
+                    <option value="350">Cidade ➔ Bairro d'Ajuda 1º e 2ª fase (Tabela: 350 XOF)</option>
+                    <option value="375">Cidade ➔ Hospital 3 de Agosto (Tabela: 375 XOF)</option>
+                    <option value="425">Cidade ➔ Bairro Internacional (Tabela: 425 XOF)</option>
+                    <option value="200">Cidade ➔ Hotel Emb. América (Tabela: 200 XOF)</option>
+                    <option value="450">Cidade ➔ Bairro Militar / Prédio Nino (Tabela: 450 XOF)</option>
+                    <option value="525">Cidade ➔ B. Militar / Terminal TUB (Tabela: 525 XOF)</option>
+                    <option value="550">Cidade ➔ Brá / Seminário (Tabela: 550 XOF)</option>
+                    <option value="700">Cidade ➔ Aeroporto (Tabela: 700 XOF)</option>
+                    <option value="950">Aeroporto ➔ Centro da Cidade (Tabela: 950 XOF)</option>
                 </select>
             </div>
 
             <div class="service-options" style="margin-top: 8px;">
                 <div class="service-card selected" id="card-taxi" onclick="selectService(this, 1)">
                     <div class="service-title">🚖 Táxi Oficial</div>
-                    <div class="service-price" id="price-taxi">950 XOF</div>
+                    <div class="service-price" id="price-taxi">750 XOF</div>
                 </div>
                 <div class="service-card" id="card-privado" onclick="selectService(this, 1.3)">
                     <div class="service-title">🚘 Carro Privado</div>
-                    <div class="service-price" id="price-privado">1.235 XOF</div>
+                    <div class="service-price" id="price-privado">975 XOF</div>
                 </div>
                 <div class="service-card" id="card-moto" onclick="selectService(this, 0.7)">
                     <div class="service-title">🛵 Moto-Táxi</div>
-                    <div class="service-price" id="price-moto">665 XOF</div>
+                    <div class="service-price" id="price-moto">525 XOF</div>
                 </div>
             </div>
 
@@ -274,7 +181,7 @@
             <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
             <div class="timer-text" id="waitingTimer">00:00</div>
             <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
-                Preço reservado: <strong id="reservedAmount">950 XOF</strong>
+                Preço reservado: <strong id="reservedAmount">750 XOF</strong>
             </div>
             <div style="font-size: 11px; color: #333; margin-bottom: 6px;">
                 Pagamento via: <strong id="selectedPaymentMethod">Dinheiro Vivo</strong>
@@ -470,332 +377,244 @@
                     <!-- Termos e Condições -->
                     <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px; color: #555; line-height: 1.4;">
                         <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" id="aceiteTermos" required style="margin-top: 2px; width: auto; cursor: pointer;">
-                            <span>Li e aceito os termos e condições da ROTA GB, incluindo a taxa de comissão de 15% aplicável sobre os serviços em Bissau.</span>
+                            <input type="checkbox" id="aceiteTermos" required style="margin-top: 2px;">
+                            <span>Li e aceito os termos de parceria, a retenção de comissão e as normas de segurança para operadores na Guiné-Bissau.</span>
                         </label>
                     </div>
 
-                    <button type="submit" class="btn-primary">Aceitar e Assinar</button>
+                    <!-- Assinatura Digital -->
+                    <div class="form-group" style="margin-top: 4px;">
+                        <label>ASSINATURA DIGITAL DO CONDUTOR</label>
+                        <div class="signature-pad-container">
+                            <canvas id="sigPad"></canvas>
+                        </div>
+                        <button type="button" class="btn-secondary" onclick="limparAssinatura()">Limpar Assinatura</button>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 10px;">Submeter Registo & Contrato</button>
                 </form>
             </div>
 
-            <!-- Etapa 2: Assinatura e Envio -->
-            <div id="etapaContrato" style="display: none; flex-direction: column; gap: 8px;">
-                <div style="font-size: 12px; font-weight: bold;">📜 CONTRATO DE PARCERIA & TERMOS</div>
-                <p style="font-size: 11px; color: #555;">Desenhe a sua assinatura no quadro abaixo para validar o contrato ROTA GB.</p>
-                
-                <div class="signature-pad-container">
-                    <canvas id="sigPad"></canvas>
-                </div>
-                <button type="button" class="btn-secondary" onclick="limparAssinatura()">🧹 Limpar Assinatura</button>
-                
-                <button type="button" class="btn-primary" onclick="finalizarRegistoEGerarDocumentos()">Submeter & Gerar Documentos</button>
+            <!-- Etapa de Sucesso do Registo -->
+            <div id="sucessoRegisto" style="display: none; text-align: center; padding: 20px;">
+                <div style="font-size: 36px; margin-bottom: 10px;">🎉</div>
+                <h3 style="font-size: 16px; margin-bottom: 8px;">Registo Submetido com Sucesso!</h3>
+                <p style="font-size: 12px; color: #666; line-height: 1.4; margin-bottom: 15px;">
+                    Os seus dados e o contrato assinado foram guardados. A nossa equipa irá validar as informações para o lançamento em Bissau.
+                </p>
+                <button type="button" class="btn-primary" onclick="reiniciarRegisto()">Registar Outro Veículo</button>
             </div>
         </div>
     </div>
-    
-    <div style="text-align: center; font-size: 9px; color: #888; padding: 8px; border-top: 1px solid #eee; background: #fff;">
-        ROTA GB © — Guiné-Bissau
-    </div>
+
 </div>
 
+<!-- Scripts da Aplicação -->
 <script>
-    // ==========================================
-    // CONFIGURAÇÃO SUPABASE
-    // ==========================================
-    const SUPABASE_URL = 'https://ymuldaviwfbcvocfknaw.supabase.co'; 
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdWxkYXZpd2ZiY3ZvY2ZrbmF3Ixlub2xlIjoiYW5vbiIsImlhdCI6MTc5MTE0MDg0NywiZXhwIjoyMTA2NzE2ODQ3f0.uBSZQ_YChvWUS7B7TE762qGRSBaajFf-Flh18J7E0BU';
-    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // ANIMAÇÃO DO MAPA E CARRINHO GPS
-    const canvas = document.getElementById('bissauMap');
-    const ctx = canvas.getContext('2d');
-
-    function resizeCanvas() {
-        if(canvas && canvas.parentElement) {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-        }
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    let driverX = 80;
-    let driverY = 70;
-
-    function drawMap() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function setRole(role) {
+        document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
+        document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
         
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 8;
-        ctx.beginPath();
-        ctx.moveTo(0, canvas.height * 0.4);
-        ctx.lineTo(canvas.width, canvas.height * 0.6);
-        ctx.stroke();
-
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(canvas.width * 0.5, 0);
-        ctx.lineTo(canvas.width * 0.3, canvas.height);
-        ctx.stroke();
-
-        ctx.fillStyle = '#ce1126';
-        ctx.beginPath();
-        ctx.arc(driverX, driverY, 6, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#000';
-        ctx.font = '10px sans-serif';
-        ctx.fillText("🚖 ROTA GB Express", driverX - 30, driverY - 10);
-
-        driverX += 0.5;
-        if (driverX > canvas.width) driverX = 0;
-
-        requestAnimationFrame(drawMap);
+        document.getElementById('panel-taxi').style.display = (role === 'passageiro') ? 'flex' : 'none';
+        document.getElementById('panel-motorista').style.display = (role === 'motorista') ? 'flex' : 'none';
+        document.getElementById('main-nav').style.display = (role === 'passageiro') ? 'flex' : 'none';
     }
-    drawMap();
 
-    // CONTROLO DE VIAGEM E TEMPORIZADOR
-    let timerInterval = null;
-    let secondsElapsed = 0;
+    function switchServiceTab(service) {
+        ['taxi', 'comida', 'lojas', 'hoteis', 'recargas'].forEach(s => {
+            document.getElementById('nav-' + s).classList.remove('active');
+            document.getElementById('panel-' + s).style.display = 'none';
+        });
+        document.getElementById('nav-' + service).classList.add('active');
+        document.getElementById('panel-' + service).style.display = 'flex';
+    }
+
+    // LÓGICA ATUALIZADA: Multiplica por 2 a tarifa oficial da DGVTT para cobrir a deslocação exclusiva
+    function updatePrice() {
+        const select = document.getElementById('routeSelect');
+        const basePriceDGVTT = parseInt(select.value) || 375;
+        const basePrice = basePriceDGVTT * 2; // Cobrança Dupla Exclusiva
+
+        document.getElementById('price-taxi').innerText = basePrice.toLocaleString('pt-PT') + ' XOF';
+        document.getElementById('price-privado').innerText = Math.round(basePrice * 1.3).toLocaleString('pt-PT') + ' XOF';
+        document.getElementById('price-moto').innerText = Math.round(basePrice * 0.7).toLocaleString('pt-PT') + ' XOF';
+    }
+
+    function selectService(card, multiplier) {
+        document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+    }
+
+    function toggleDriverTab(tab) {
+        document.getElementById('tab-painel-btn').classList.toggle('active', tab === 'painel');
+        document.getElementById('tab-registo-btn').classList.toggle('active', tab === 'registo');
+        document.getElementById('driver-dashboard').style.display = (tab === 'painel') ? 'block' : 'none';
+        document.getElementById('driver-register').style.display = (tab === 'registo') ? 'block' : 'none';
+    }
 
     function requestRide() {
-        const basePrice = parseInt(document.getElementById('routeSelect').value);
-        const paymentMethod = document.getElementById('paymentSelect').value;
-
-        document.getElementById('reservedAmount').innerText = `${Math.round(basePrice).toLocaleString()} XOF`;
-        document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
+        const routeSelect = document.getElementById('routeSelect');
+        const paymentSelect = document.getElementById('paymentSelect');
+        const selectedTaxiPrice = document.getElementById('price-taxi').innerText;
+        
+        document.getElementById('reservedAmount').innerText = selectedTaxiPrice;
+        document.getElementById('selectedPaymentMethod').innerText = paymentSelect.value;
         
         document.getElementById('rideFormControls').style.display = 'none';
         document.getElementById('waitingPanel').style.display = 'flex';
-
-        secondsElapsed = 0;
-        document.getElementById('waitingTimer').innerText = "00:00";
-        if(timerInterval) clearInterval(timerInterval);
-
-        timerInterval = setInterval(() => {
-            secondsElapsed++;
-            const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-            const secs = (secondsElapsed % 60).toString().padStart(2, '0');
-            document.getElementById('waitingTimer').innerText = `${mins}:${secs}`;
-        }, 1000);
     }
 
     function cancelRide() {
-        if(timerInterval) clearInterval(timerInterval);
         document.getElementById('waitingPanel').style.display = 'none';
         document.getElementById('rideFormControls').style.display = 'block';
-        alert("Viagem cancelada com sucesso. Reembolso processado.");
     }
 
-    // SELEÇÃO DE OPERADORA DE RECARGA
-    let currentOperator = 'Orange';
     function selectOperator(op) {
-        currentOperator = op;
         document.getElementById('btn-orange-op').classList.toggle('active', op === 'Orange');
         document.getElementById('btn-telecel-op').classList.toggle('active', op === 'Telecel');
     }
 
     function processarRecarga() {
-        const telefone = document.getElementById('phoneRecarga').value.trim();
-        const valor = document.getElementById('amountRecarga').value;
-        if(!telefone || telefone.length < 9) {
-            alert("Por favor, introduza um número de telemóvel válido em Bissau.");
+        const phone = document.getElementById('phoneRecarga').value;
+        const amount = document.getElementById('amountRecarga').value;
+        if(!phone || phone.length < 7) {
+            alert('Por favor, insira um número de telemóvel válido para a recarga.');
             return;
         }
-        alert(`✅ Recarga de ${valor} XOF via ${currentOperator} para o número +245 ${telefone} efetuada com sucesso!`);
+        alert('Processo de recarga de ' + amount + ' XOF iniciado para o número +245 ' + phone);
     }
 
-    // INTERACTION LOGIC
-    function switchServiceTab(tab) {
-        document.querySelectorAll('.service-nav .nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('panel-taxi').style.display = 'none';
-        document.getElementById('panel-comida').style.display = 'none';
-        document.getElementById('panel-lojas').style.display = 'none';
-        document.getElementById('panel-hoteis').style.display = 'none';
-        document.getElementById('panel-recargas').style.display = 'none';
+    // Assinatura Digital (Canvas)
+    const canvas = document.getElementById('sigPad');
+    let ctx = null;
+    let desenhando = false;
 
-        if(tab === 'taxi') {
-            document.getElementById('nav-taxi').classList.add('active');
-            document.getElementById('panel-taxi').style.display = 'flex';
-        } else if(tab === 'comida') {
-            document.getElementById('nav-comida').classList.add('active');
-            document.getElementById('panel-comida').style.display = 'flex';
-        } else if(tab === 'lojas') {
-            document.getElementById('nav-lojas').classList.add('active');
-            document.getElementById('panel-lojas').style.display = 'flex';
-        } else if(tab === 'hoteis') {
-            document.getElementById('nav-hoteis').classList.add('active');
-            document.getElementById('panel-hoteis').style.display = 'flex';
-        } else if(tab === 'recargas') {
-            document.getElementById('nav-recargas').classList.add('active');
-            document.getElementById('panel-recargas').style.display = 'flex';
+    if (canvas) {
+        ctx = canvas.getContext('2d');
+    }
+
+    function ajustarCanvas() {
+        if(canvas && ctx) {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
         }
     }
+    window.addEventListener('load', ajustarCanvas);
 
-    function setRole(role) {
-        document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
-        document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
-        
-        if(role === 'passageiro') {
-            document.getElementById('main-nav').style.display = 'flex';
-            switchServiceTab('taxi');
-            document.getElementById('panel-motorista').style.display = 'none';
-        } else {
-            document.getElementById('main-nav').style.display = 'none';
-            document.getElementById('panel-taxi').style.display = 'none';
-            document.getElementById('panel-comida').style.display = 'none';
-            document.getElementById('panel-lojas').style.display = 'none';
-            document.getElementById('panel-hoteis').style.display = 'none';
-            document.getElementById('panel-recargas').style.display = 'none';
-            document.getElementById('panel-motorista').style.display = 'flex';
-        }
+    if(canvas && ctx) {
+        canvas.addEventListener('mousedown', () => desenhando = true);
+        canvas.addEventListener('mouseup', () => { desenhando = false; ctx.beginPath(); });
+        canvas.addEventListener('mousemove', desenhar);
+
+        canvas.addEventListener('touchstart', (e) => { desenhando = true; e.preventDefault(); });
+        canvas.addEventListener('touchend', () => { desenhando = false; ctx.beginPath(); });
+        canvas.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            desenharComCoordenadas(touch.clientX - rect.left, touch.clientY - rect.top);
+            e.preventDefault();
+        });
     }
 
-    function selectService(element, multiplier) {
-        document.querySelectorAll('.service-card').forEach(el => el.classList.remove('selected'));
-        element.classList.add('selected');
-        updatePrice();
+    function desenhar(e) {
+        if (!desenhando || !ctx) return;
+        const rect = canvas.getBoundingClientRect();
+        desenharComCoordenadas(e.clientX - rect.left, e.clientY - rect.top);
     }
 
-    function updatePrice() {
-        const basePrice = parseInt(document.getElementById('routeSelect').value);
-        
-        // O Táxi Oficial assume exatamente o preço oficial da rota escolhida (multiplicador 1)
-        // O Carro Privado aplica um acréscimo de 30% (multiplicador 1.3)
-        // O Moto-Táxi aplica um valor de 70% da tarifa (multiplicador 0.7)
-        document.getElementById('price-taxi').innerText = `${Math.round(basePrice * 1).toLocaleString()} XOF`;
-        document.getElementById('price-privado').innerText = `${Math.round(basePrice * 1.3).toLocaleString()} XOF`;
-        document.getElementById('price-moto').innerText = `${Math.round(basePrice * 0.7).toLocaleString()} XOF`;
+    function desenharComCoordenadas(x, y) {
+        if (!ctx) return;
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#000';
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
     }
-
-    // CANVAS DE ASSINATURA
-    let sigPad, sigCtx, hasSigned = false;
-    window.onload = function() {
-        sigPad = document.getElementById('sigPad');
-        sigCtx = sigPad.getContext('2d');
-        
-        let painting = false;
-        sigPad.addEventListener('mousedown', startPos);
-        sigPad.addEventListener('mouseup', endPos);
-        sigPad.addEventListener('mousemove', draw);
-        sigPad.addEventListener('touchstart', (e) => { e.preventDefault(); startPos(e.touches[0]); });
-        sigPad.addEventListener('touchend', (e) => { e.preventDefault(); endPos(); });
-        sigPad.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
-
-        function startPos(e) { painting = true; draw(e); }
-        function endPos() { painting = false; sigCtx.beginPath(); hasSigned = true; }
-        function draw(e) {
-            if(!painting) return;
-            const rect = sigPad.getBoundingClientRect();
-            sigCtx.lineWidth = 2;
-            sigCtx.lineCap = 'round';
-            sigCtx.strokeStyle = '#000';
-            sigCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-            sigCtx.stroke();
-            sigCtx.beginPath();
-            sigCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        }
-
-        // Executa uma vez ao carregar para alinhar os preços iniciais da rota selecionada por defeito
-        updatePrice();
-    };
 
     function limparAssinatura() {
-        sigCtx.clearRect(0, 0, sigPad.width, sigPad.height);
-        hasSigned = false;
+        if (!ctx || !canvas) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
     }
 
-    // VALIDAÇÃO DE DUPLICADO POR MATRÍCULA NO SUPABASE & TERMOS
-    async function avancarParaAssinatura(e) {
-        e.preventDefault();
-        
-        const termosAceites = document.getElementById('aceiteTermos').checked;
-        if (!termosAceites) {
-            alert("Deve aceitar os termos e condições para prosseguir.");
-            return;
-        }
-
-        const matricula = document.getElementById('matriculaVeiculo').value.trim();
-        if (!matricula) {
-            alert("Por favor, insira o número de matrícula.");
-            return;
-        }
-
-        try {
-            const { data: existente, error } = await _supabase
-                .from('motoristas')
-                .select('placa_veiculo')
-                .ilike('placa_veiculo', matricula);
-
-            if (existente && existente.length > 0) {
-                alert(`⚠️ ATENÇÃO: A matrícula "${matricula.toUpperCase()}" já se encontra registada no sistema ROTA GB!\n\nNão é permitido cadastrar veículos duplicados.`);
-                return;
-            }
-        } catch (err) {
-            console.error("Erro na verificação:", err);
-        }
-
+    function avancarParaAssinatura(event) {
+        event.preventDefault();
         document.getElementById('etapaFormRegisto').style.display = 'none';
-        document.getElementById('etapaContrato').style.display = 'flex';
+        document.getElementById('sucessoRegisto').style.display = 'block';
     }
 
-    async function finalizarRegistoEGerarDocumentos() {
-        if(!hasSigned) {
-            alert("Por favor, desenhe a sua assinatura antes de concluir.");
-            return;
-        }
-
-        const nome = document.getElementById('nomeMotorista').value.trim();
-        const email = document.getElementById('emailMotorista').value.trim();
-        const tel = document.getElementById('telefoneMotorista').value.trim();
-        const tipoTransp = document.getElementById('tipoTransporte').value;
-        const veiculo = document.getElementById('marcaModelo').value.trim();
-        const matricula = document.getElementById('matriculaVeiculo').value.trim();
-        const metodo = document.getElementById('metodoRecebimentoMotorista').value;
-        const conta = document.getElementById('numeroContaMotorista').value.trim();
-        const dataAtual = new Date().toLocaleDateString('pt-PT');
-
-        const { error } = await _supabase
-            .from('motoristas')
-            .insert([{ 
-                nome: nome, 
-                email: email, 
-                telefone: tel, 
-                tipo_transporte: tipoTransp,
-                marca_modelo: veiculo,
-                placa_veiculo: matricula,
-                metodo_recebimento: metodo,
-                conta_recebimento: conta,
-                status: 'pendente' 
-            }]);
-
-        if (error) {
-            alert("Erro ao gravar no Supabase: " + error.message);
-            return;
-        }
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFillColor(28, 28, 30);
-        doc.rect(0, 0, 210, 30, 'F');
-        doc.setTextColor(0, 230, 118);
-        doc.setFontSize(22);
-        doc.text("ROTA GB — Guiné-Bissau", 15, 20);
-
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(11);
-        doc.text(`Data: ${dataAtual}`, 15, 42);
-        doc.text(`Condutor: ${nome}`, 15, 52);
-        doc.text(`Veículo: ${veiculo} | Matrícula: ${matricula}`, 15, 60);
-
-        const sigImgData = sigPad.toDataURL('image/png');
-        doc.addImage(sigImgData, 'PNG', 15, 80, 75, 30);
-        doc.save(`Contrato_ROTA_GB_${nome.replace(/\s+/g, '_')}.pdf`);
-
-        alert(`🎉 Registo concluído com sucesso! Os seus dados foram guardados no Supabase e o contrato gerado.`);
-        location.reload();
+    function reiniciarRegisto() {
+        document.getElementById('formCadastroMotorista').reset();
+        limparAssinatura();
+        document.getElementById('sucessoRegisto').style.display = 'none';
+        document.getElementById('etapaFormRegisto').style.display = 'block';
     }
+
+    // Motor do Mapa Simulado de Bissau (Com Ruas Brancas, Ponto Vermelho e 'ROTA GB Express' Animado)
+    const mapCanvas = document.getElementById('bissauMap');
+    if (mapCanvas) {
+        const mapCtx = mapCanvas.getContext('2d');
+        let moveStep = 0;
+
+        function desenharMapaBissau() {
+            const w = mapCanvas.offsetWidth || 380;
+            const h = mapCanvas.offsetHeight || 140;
+
+            if (mapCanvas.width !== w || mapCanvas.height !== h) {
+                mapCanvas.width = w;
+                mapCanvas.height = h;
+            }
+
+            // Fundo do Mapa (Bissau)
+            mapCtx.fillStyle = '#e5e3df';
+            mapCtx.fillRect(0, 0, w, h);
+
+            // Avenidas Brancas
+            mapCtx.strokeStyle = '#ffffff';
+            mapCtx.lineWidth = 14;
+
+            // Rua Diagonal Superior
+            mapCtx.beginPath();
+            mapCtx.moveTo(0, h * 0.25);
+            mapCtx.lineTo(w, h * 0.45);
+            mapCtx.stroke();
+
+            // Rua Transversal Diagonal
+            mapCtx.beginPath();
+            mapCtx.moveTo(w * 0.65, 0);
+            mapCtx.lineTo(w * 0.2, h);
+            mapCtx.stroke();
+
+            // Posição calculada do Veículo em movimento suave
+            moveStep = (moveStep + 0.3) % w;
+            const startX = moveStep;
+            const startY = h * 0.25 + (moveStep * 0.2);
+
+            // Marcador Ponto Vermelho (Veículo)
+            mapCtx.fillStyle = '#ce1126';
+            mapCtx.beginPath();
+            mapCtx.arc(startX, startY, 6, 0, Math.PI * 2);
+            mapCtx.fill();
+            mapCtx.strokeStyle = '#ffffff';
+            mapCtx.lineWidth = 2;
+            mapCtx.stroke();
+
+            // Texto Marcador '🚖 ROTA GB Express'
+            mapCtx.font = 'bold 11px sans-serif';
+            mapCtx.fillStyle = '#222222';
+            mapCtx.fillText('🚖 ROTA GB Express', startX - 45, startY - 10);
+
+            requestAnimationFrame(desenharMapaBissau);
+        }
+
+        requestAnimationFrame(desenharMapaBissau);
+    }
+
+    // Inicializa os preços na abertura da página
+    window.addEventListener('load', updatePrice);
 </script>
+
 </body>
 </html>
