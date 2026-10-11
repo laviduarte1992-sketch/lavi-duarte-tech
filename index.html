@@ -46,38 +46,39 @@
         .nav-item:hover { background: #333; color: #fff; }
         .nav-item.active { background: #00e676 !important; color: #000 !important; }
 
-        /* Área do Mapa Corrigida */
+        /* Área do Mapa (Corrigido sem bloqueio) */
         .map-area { 
-            height: 160px; 
+            height: 140px; 
             width: 100%;
             background: #e5e3df; 
             position: relative; 
             overflow: hidden; 
             z-index: 1; 
+            pointer-events: none; /* Garante que não bloqueia o toque nos outros elementos */
         }
 
         canvas#bissauMap { 
-            width: 100% !important; 
-            height: 160px !important; 
+            width: 100%; 
+            height: 100%; 
             display: block; 
         }
 
         .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); pointer-events: none; z-index: 5; }
         .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
 
-        /* Painel Inferior */
-        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 380px; position: relative; z-index: 20; }
+        /* Painel Inferior Interativo */
+        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 380px; position: relative; z-index: 10; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 11px; color: #666; font-weight: bold; }
-        select, input { padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; width: 100%; cursor: pointer; }
+        select, input { padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; width: 100%; cursor: pointer; z-index: 10; position: relative; }
 
-        /* Cartões de Serviço */
-        .service-options { display: flex; gap: 6px; }
+        /* Cartões de Serviço Clicáveis */
+        .service-options { display: flex; gap: 6px; position: relative; z-index: 10; }
         .service-card { flex: 1; border: 2px solid #eee; border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: 0.2s; user-select: none; }
         .service-card:hover { border-color: #00e676; }
         .service-card.selected { border-color: #00e676; background: rgba(0,230,118,0.08); }
-        .service-title { font-size: 10px; font-weight: bold; }
-        .service-price { font-size: 12px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
+        .service-title { font-size: 10px; font-weight: bold; pointer-events: none; }
+        .service-price { font-size: 12px; font-weight: 800; color: #1a1a1a; margin-top: 2px; pointer-events: none; }
 
         /* Painel de Espera / Cancelamento */
         .waiting-card { background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; text-align: center; }
@@ -96,8 +97,8 @@
         .signature-pad-container { border: 2px dashed #00e676; border-radius: 10px; background: #fafafa; position: relative; margin-top: 6px; }
         canvas#sigPad { width: 100%; height: 110px; touch-action: none; cursor: crosshair; display: block; }
 
-        /* Botões */
-        .btn-primary { background: #00e676; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
+        /* Botões Clicáveis */
+        .btn-primary { background: #00e676; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; position: relative; z-index: 10; }
         .btn-primary:active { transform: scale(0.98); }
         .btn-secondary { background: #eee; color: #333; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 4px; }
         
@@ -129,7 +130,7 @@
         <div class="nav-item" id="nav-recargas" onclick="switchServiceTab('recargas')">📱 Recargas</div>
     </div>
 
-    <!-- Map Engine -->
+    <!-- Map Engine (Com Animação Fluida) -->
     <div class="map-area">
         <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
         <canvas id="bissauMap"></canvas>
@@ -272,123 +273,4 @@
                 <option value="500">500 XOF</option>
                 <option value="1000" selected>1.000 XOF</option>
                 <option value="2000">2.000 XOF</option>
-                <option value="5000">5.000 XOF</option>
-            </select>
-        </div>
-
-        <!-- FORMA DE PAGAMENTO DA RECARGA -->
-        <div class="form-group" style="margin-top: 6px;">
-            <label>FORMA DE PAGAMENTO</label>
-            <div style="display: flex; gap: 8px;">
-                <label style="flex: 1; border: 1px solid #ddd; padding: 8px; border-radius: 8px; text-align: center; font-size: 11px; cursor: pointer; background: #f9f9f9;">
-                    <input type="radio" name="pagamentoRecarga" value="Orange Money" checked style="accent-color: #ff6600;"> Orange Money
-                </label>
-                <label style="flex: 1; border: 1px solid #ddd; padding: 8px; border-radius: 8px; text-align: center; font-size: 11px; cursor: pointer; background: #f9f9f9;">
-                    <input type="radio" name="pagamentoRecarga" value="Telecel Cash" style="accent-color: #e2001a;"> Telecel Cash
-                </label>
-                <label style="flex: 1; border: 1px solid #ddd; padding: 8px; border-radius: 8px; text-align: center; font-size: 11px; cursor: pointer; background: #f9f9f9;">
-                    <input type="radio" name="pagamentoRecarga" value="Cartao" style="accent-color: #00e676;"> Cartão
-                </label>
-            </div>
-        </div>
-
-        <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="processarRecarga()">Pagar Recarga Agora</button>
-    </div>
-
-    <!-- Panel Motorista -->
-    <div class="bottom-panel" id="panel-motorista" style="display: none;">
-        <div class="sub-tabs">
-            <button type="button" class="sub-tab-btn active" id="tab-painel-btn" onclick="toggleDriverTab('painel')">Painel do Condutor</button>
-            <button type="button" class="sub-tab-btn" id="tab-registo-btn" onclick="toggleDriverTab('registo')">Registar Veículo</button>
-        </div>
-
-        <div id="driver-dashboard">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <h3 style="font-size: 15px;">Painel de Trabalho em Bissau</h3>
-                <p style="font-size: 11px; color: #666;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></p>
-            </div>
-            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas...')">Aguardar Chamadas</button>
-        </div>
-
-        <!-- Form Registo Motorista -->
-        <div id="driver-register" style="display: none;">
-            <div id="etapaFormRegisto">
-                <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
-                <form id="formCadastroMotorista" onsubmit="avancarParaAssinatura(event)" style="display: flex; flex-direction: column; gap: 8px;">
-                    <input type="text" id="nomeMotorista" placeholder="Nome Completo do Condutor" required>
-                    <input type="email" id="emailMotorista" placeholder="E-mail" required>
-                    <input type="tel" id="telefoneMotorista" placeholder="Telefone de Contacto (+245)" required>
-                    
-                    <select id="tipoTransporte">
-                        <option value="Táxi Azul/Amarelo">Táxi Azul/Amarelo</option>
-                        <option value="Carro Privado">Carro Privado</option>
-                        <option value="Moto-Táxi">Moto-Táxi</option>
-                    </select>
-                    
-                    <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
-                    <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula (Placa)" required>
-                    
-                    <select id="metodoRecebimentoMotorista" required>
-                        <option value="" disabled selected>Onde quer receber os seus ganhos?</option>
-                        <option value="Orange Money">Orange Money (+245)</option>
-                        <option value="Telecel">Telecel Mobile Money (+245)</option>
-                        <option value="Cartao Debito">Cartão de Débito / Bancário</option>
-                    </select>
-                    <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira ou Conta Bancária" required>
-
-                    <!-- Termos e Condições -->
-                    <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px; color: #555; line-height: 1.4;">
-                        <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" id="aceiteTermos" required style="margin-top: 2px;">
-                            <span>Li e aceito os termos de parceria, a retenção de comissão e as normas de segurança para operadores na Guiné-Bissau.</span>
-                        </label>
-                    </div>
-
-                    <!-- Assinatura Digital -->
-                    <div class="form-group" style="margin-top: 4px;">
-                        <label>ASSINATURA DIGITAL DO CONDUTOR</label>
-                        <div class="signature-pad-container">
-                            <canvas id="sigPad"></canvas>
-                        </div>
-                        <button type="button" class="btn-secondary" onclick="limparAssinatura()">Limpar Assinatura</button>
-                    </div>
-
-                    <button type="submit" class="btn-primary" style="margin-top: 10px;">Submeter Registo & Contrato</button>
-                </form>
-            </div>
-
-            <!-- Etapa de Sucesso do Registo -->
-            <div id="sucessoRegisto" style="display: none; text-align: center; padding: 20px;">
-                <div style="font-size: 36px; margin-bottom: 10px;">🎉</div>
-                <h3 style="font-size: 16px; margin-bottom: 8px;">Registo Submetido com Sucesso!</h3>
-                <p style="font-size: 12px; color: #666; line-height: 1.4; margin-bottom: 15px;">
-                    Os seus dados e o contrato assinado foram guardados. A nossa equipa irá validar as informações para o lançamento em Bissau.
-                </p>
-                <button type="button" class="btn-primary" onclick="reiniciarRegisto()">Registar Outro Veículo</button>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- Scripts da Aplicação -->
-<script>
-    function setRole(role) {
-        document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
-        document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
-        
-        document.getElementById('panel-taxi').style.display = (role === 'passageiro') ? 'flex' : 'none';
-        document.getElementById('panel-motorista').style.display = (role === 'motorista') ? 'flex' : 'none';
-        document.getElementById('main-nav').style.display = (role === 'passageiro') ? 'flex' : 'none';
-    }
-
-    function switchServiceTab(service) {
-        ['taxi', 'comida', 'lojas', 'hoteis', 'recargas'].forEach(s => {
-            document.getElementById('nav-' + s).classList.remove('active');
-            document.getElementById('panel-' + s).style.display = 'none';
-        });
-        document.getElementById('nav-' + service).classList.add('active');
-        document.getElementById('panel-' + service).style.display = 'flex';
-    }
-
-    function updatePrice()
+                <option value="5000">5.0
