@@ -12,6 +12,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ROTA GB">
 
+    <!-- Bibliotecas Obrigatórias -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; padding: 10px; }
@@ -29,27 +33,27 @@
         }
         
         /* Header */
-        .header { background: #1a1a1a; color: #fff; padding: 16px; position: relative; z-index: 10; }
+        .header { background: #1a1a1a; color: #fff; padding: 16px; position: relative; z-index: 20; }
         .logo { font-size: 20px; font-weight: bold; color: #00e676; display: flex; align-items: center; gap: 6px; }
         .badge-gb { background: #ce1126; color: #fcd116; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
         .role-switch { background: #333; padding: 4px; border-radius: 20px; display: flex; }
-        .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; white-space: nowrap; }
         .role-btn.active { background: #00e676; color: #000; }
 
         /* Menu de Serviços */
-        .service-nav { display: flex; background: #222; padding: 6px; gap: 4px; justify-content: space-around; overflow-x: auto; position: relative; z-index: 10; }
+        .service-nav { display: flex; background: #222; padding: 6px; gap: 4px; justify-content: space-around; overflow-x: auto; position: relative; z-index: 20; }
         .nav-item { flex: 1; text-align: center; color: #ccc; font-size: 10px; font-weight: bold; padding: 10px 4px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: 0.2s; user-select: none; }
         .nav-item:hover { background: #333; color: #fff; }
         .nav-item.active { background: #00e676 !important; color: #000 !important; }
 
         /* Área do Mapa */
-        .map-area { height: 140px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; }
-        canvas { width: 100%; height: 100%; display: block; }
-        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); pointer-events: none; }
+        .map-area { height: 140px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; pointer-events: none; }
+        canvas#bissauMap { width: 100%; height: 100%; display: block; }
+        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); pointer-events: none; z-index: 5; }
         .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
 
         /* Painel Inferior */
-        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 380px; position: relative; z-index: 10; }
+        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 380px; position: relative; z-index: 20; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 11px; color: #666; font-weight: bold; }
         select, input { padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; width: 100%; cursor: pointer; }
@@ -62,22 +66,27 @@
         .service-title { font-size: 10px; font-weight: bold; }
         .service-price { font-size: 12px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
 
-        /* Painel de Espera */
+        /* Painel de Espera / Cancelamento */
         .waiting-card { background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; text-align: center; }
         .waiting-title { font-size: 13px; font-weight: bold; color: #e65100; }
         .timer-text { font-size: 22px; font-weight: 800; color: #d84315; margin: 4px 0; }
         .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
 
-        /* Listas */
-        .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; }
+        /* Listas com Scroll */
+        .store-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 2px; }
         .store-card { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fafafa; }
         .store-name { font-size: 13px; font-weight: bold; }
         .store-desc { font-size: 11px; color: #666; margin-top: 2px; }
         .price-tag { font-size: 11px; color: #00e676; font-weight: bold; margin-top: 4px; }
 
+        /* Canvas de Assinatura */
+        .signature-pad-container { border: 2px dashed #00e676; border-radius: 10px; background: #fafafa; position: relative; margin-top: 6px; }
+        canvas#sigPad { width: 100%; height: 110px; touch-action: none; cursor: crosshair; display: block; }
+
         /* Botões */
         .btn-primary { background: #00e676; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
         .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: #eee; color: #333; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 4px; }
         
         .sub-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
         .sub-tab-btn { flex: 1; padding: 8px; font-size: 11px; font-weight: bold; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; cursor: pointer; }
@@ -117,52 +126,155 @@
     <div class="bottom-panel" id="panel-taxi">
         <div id="rideFormControls">
             <div class="form-group">
-                <label>ROTA E DESTINO EM BISSAU</label>
+                <label>ROTA OFICIAL DGVTT - BISSAU</label>
                 <select id="routeSelect" onchange="updatePrice()">
-                    <option value="1500">Praça dos Heróis ➔ Aeroporto Osvaldo Vieira</option>
-                    <option value="1000">Mercado de Bandim ➔ Bairro de Penha</option>
-                    <option value="2000">Alto Bissau ➔ Santa Luzia</option>
-                    <option value="800">Praça dos Heróis ➔ Mercado de Bandim</option>
-                    <option value="1200">Bairro Militar ➔ Antula</option>
-                    <option value="2500">Bissau Central ➔ Safim</option>
+                    <!-- Rotas Oficiais DGVTT -->
+                    <option value="1500">Praça dos Heróis ➔ Aeroporto Osvaldo Vieira (1.500 XOF)</option>
+                    <option value="600">Cidade ➔ Mercado de Bandim (600 XOF)</option>
+                    <option value="250">Cidade ➔ Santa Luzia (Igreja Católica) (250 XOF)</option>
+                    <option value="250">Cidade ➔ Chapa de Bissau (250 XOF)</option>
+                    <option value="275">Cidade ➔ São Vicente Paulo (275 XOF)</option>
+                    <option value="325">Cidade ➔ Belém/Missira (325 XOF)</option>
+                    <option value="350">Cidade ➔ Bairro d'Ajuda 1º e 2ª fase (350 XOF)</option>
+                    <option value="375">Cidade ➔ Hospital 3 de Agosto (375 XOF)</option>
+                    <option value="425">Cidade ➔ Bairro Internacional (425 XOF)</option>
+                    <option value="200">Cidade ➔ Hotel Emb. América (200 XOF)</option>
+                    <option value="450">Cidade ➔ Bairro Militar / Prédio Nino (450 XOF)</option>
+                    <option value="450">Cidade ➔ Bairro Militar Feira (450 XOF)</option>
+                    <option value="475">Cidade ➔ Bairro Militar Somec (475 XOF)</option>
+                    <option value="525">Cidade ➔ B. Militar / Terminal TUB (525 XOF)</option>
+                    <option value="550">Cidade ➔ Brá / Seminário (550 XOF)</option>
+                    <option value="475">Cidade ➔ Paragem Central (475 XOF)</option>
+                    <option value="525">Cidade ➔ Guimetal (525 XOF)</option>
+                    <option value="550">Cidade ➔ São Paulo (550 XOF)</option>
+                    <option value="575">Cidade ➔ Háfia (575 XOF)</option>
+                    <option value="575">Cidade ➔ Háfia / Cruzamento (575 XOF)</option>
+                    <option value="650">Cidade ➔ Paragem Manjaco (650 XOF)</option>
+                    <option value="675">Cidade ➔ Rotunda de Aeroporto (675 XOF)</option>
+                    <option value="700">Cidade ➔ Aeroporto (700 XOF)</option>
+                    <option value="750">Cidade ➔ Base Aérea / PRAKLAS (750 XOF)</option>
+                    <option value="800">Cidade ➔ Bissalanca Poilão (800 XOF)</option>
+                    <option value="950">Cidade ➔ STENACKS (950 XOF)</option>
+                    <option value="650">Cidade ➔ Enterramento (650 XOF)</option>
+                    <option value="575">Cidade ➔ Ena (CENFA) (575 XOF)</option>
+                    <option value="700">Cidade ➔ Bairro Cupul (700 XOF)</option>
+                    <option value="775">Cidade ➔ Av. Brazil (775 XOF)</option>
+                    <option value="175">Cidade ➔ Paulo Barros (175 XOF)</option>
+                    <option value="250">Cidade ➔ Caracol (250 XOF)</option>
+                    <option value="275">Cidade ➔ Padaria Nhonho (275 XOF)</option>
+                    <option value="325">Cidade ➔ Zona 7 (325 XOF)</option>
+                    <option value="375">Cidade ➔ Bairro Plano (375 XOF)</option>
+                    <option value="375">Cidade ➔ Bairro Ministro (375 XOF)</option>
+                    <option value="425">Cidade ➔ Cuntum Madina (425 XOF)</option>
+                    <option value="450">Cidade ➔ SHEL Quelele (450 XOF)</option>
+                    <option value="475">Cidade ➔ G. Visão (Entroncamento) (475 XOF)</option>
+                    <option value="500">Cidade ➔ Sobrade (500 XOF)</option>
+                    <option value="525">Cidade ➔ Quelele (Entroncamento) (525 XOF)</option>
+                    <option value="550">Cidade ➔ Ponta Neto (550 XOF)</option>
+                    <option value="575">Cidade ➔ Bôr / Terminal TUB (575 XOF)</option>
+                    <option value="600">Cidade ➔ Aldeia SOS (600 XOF)</option>
+                    <option value="275">Cidade ➔ Cemitério de N'hala (275 XOF)</option>
+                    <option value="325">Cidade ➔ Bairro Bissack (Ponte Cibe) (325 XOF)</option>
+                    <option value="375">Cidade ➔ Bissack / Terminal TUB (375 XOF)</option>
+                    <option value="600">Cidade ➔ C. de Coqueiro / Tchada (600 XOF)</option>
+                    <option value="200">Cidade ➔ Cruzamento Santa Luzia (200 XOF)</option>
+                    <option value="275">Cidade ➔ Entrada de Djaal (275 XOF)</option>
+                    <option value="275">Cidade ➔ Estado Major / QG (275 XOF)</option>
+                    <option value="375">Cidade ➔ Discoteca Beleza (375 XOF)</option>
+                    <option value="375">Cidade ➔ Bairro Luanda (375 XOF)</option>
+                    <option value="425">Cidade ➔ Feira de QG (425 XOF)</option>
+                    <option value="425">Cidade ➔ Bairro Mpantcha (425 XOF)</option>
+                    <option value="450">Cidade ➔ Igreja Católica de Antula (450 XOF)</option>
+                    <option value="550">Cidade ➔ Antula Mercado (550 XOF)</option>
+                    <option value="350">Mercado Bandim ➔ Sobrade (350 XOF)</option>
+                    <option value="375">Mercado Bandim ➔ Quelele (Entroncamento) (375 XOF)</option>
+                    <option value="225">Mercado Bandim ➔ C. Madina / Term. TUB (225 XOF)</option>
+                    <option value="250">Mercado Bandim ➔ SHEL / Palmeiras (250 XOF)</option>
+                    <option value="325">Mercado Bandim ➔ Chapa de Bissau (325 XOF)</option>
+                    <option value="275">Mercado Bandim ➔ Belém Missira (275 XOF)</option>
+                    <option value="200">Mercado Bandim ➔ B. d'Ajuda 1ª e 2ª Fase (200 XOF)</option>
+                    <option value="275">Mercado Bandim ➔ Hospital 3 de Agosto (275 XOF)</option>
+                    <option value="375">Mercado Bandim ➔ Bairro Internacional (375 XOF)</option>
+                    <option value="175">Mercado Bandim ➔ Embaixada América (175 XOF)</option>
+                    <option value="225">Mercado Bandim ➔ B. Militar Prédio Nino (225 XOF)</option>
+                    <option value="275">Mercado Bandim ➔ B. Militar / Mercado (275 XOF)</option>
+                    <option value="275">Mercado Bandim ➔ B. Militar / Somec (275 XOF)</option>
+                    <option value="325">Mercado Bandim ➔ B. Militar / Terminal TUB (325 XOF)</option>
+                    <option value="350">Mercado Bandim ➔ Paragem Central (350 XOF)</option>
+                    <option value="350">Mercado Bandim ➔ Enterramento (350 XOF)</option>
+                    <option value="375">Mercado Bandim ➔ Seminário (375 XOF)</option>
+                    <option value="425">Mercado Bandim ➔ Lala Quema (425 XOF)</option>
+                    <option value="450">Mercado Bandim ➔ Cruzamento Háfia (450 XOF)</option>
+                    <option value="375">Mercado Bandim ➔ Paragem Manjaco (375 XOF)</option>
+                    <option value="450">Mercado Bandim ➔ Aeroporto (450 XOF)</option>
+                    <option value="400">Mercado Bandim ➔ Base Aérea / PRAKLAS (400 XOF)</option>
+                    <option value="350">Mercado Bandim ➔ STENAKS (350 XOF)</option>
+                    <option value="300">Mercado Bandim ➔ Av. Brazil (300 XOF)</option>
+                    <option value="525">Mercado Bandim ➔ Caracol (525 XOF)</option>
+                    <option value="550">Mercado Bandim ➔ Zona 7 (550 XOF)</option>
+                    <option value="275">Santa Luzia ➔ 2ª Esquadra (275 XOF)</option>
+                    <option value="275">Santa Luzia ➔ Chapa de Bissau (275 XOF)</option>
+                    <option value="200">Santa Luzia ➔ Cristo Redentor (200 XOF)</option>
+                    <option value="200">Santa Luzia ➔ Belém/Missira (200 XOF)</option>
+                    <option value="225">Santa Luzia ➔ Bº d'Ajuda 1ª e 2ª Fase (225 XOF)</option>
+                    <option value="200">Santa Luzia ➔ Entrada de Caju (200 XOF)</option>
+                    <option value="225">Santa Luzia ➔ Hoti Hotel / Embaixada (225 XOF)</option>
+                    <option value="250">Santa Luzia ➔ Bº Militar / Mercado (250 XOF)</option>
+                    <option value="225">Santa Luzia ➔ Bº Militar / SOMEC (225 XOF)</option>
+                    <option value="250">Santa Luzia ➔ Paragem Central (250 XOF)</option>
+                    <option value="275">Santa Luzia ➔ Brá / Seminário (275 XOF)</option>
+                    <option value="325">Santa Luzia ➔ Guimetal (325 XOF)</option>
+                    <option value="275">Santa Luzia ➔ Cruzamento Háfia (275 XOF)</option>
+                    <option value="375">Santa Luzia ➔ Aeroporto (375 XOF)</option>
+                    <option value="375">Santa Luzia ➔ Av. Brazil / Matadouro (375 XOF)</option>
+                    <option value="425">Santa Luzia ➔ Paulo Barros (425 XOF)</option>
+                    <option value="475">Santa Luzia ➔ Caracol (475 XOF)</option>
+                    <option value="450">Santa Luzia ➔ Zona 7 (450 XOF)</option>
+                    <option value="550">Santa Luzia ➔ Bº Plano (550 XOF)</option>
+                    <option value="525">Santa Luzia ➔ Bº Ministros (525 XOF)</option>
+                    <option value="250">Q.G ➔ Missira (250 XOF)</option>
+                    <option value="450">Q.G ➔ Bairro Militar (450 XOF)</option>
+                    <option value="200">Rotunda de Antula ➔ Entrada Djolo (200 XOF)</option>
+                    <option value="950">Aeroporto ➔ Centro da Cidade (950 XOF)</option>
+                    <option value="550">Safim ➔ Mercado Bandim (550 XOF)</option>
                 </select>
             </div>
 
             <div class="service-options" style="margin-top: 8px;">
                 <div class="service-card selected" id="card-taxi" onclick="selectService(this, 1)">
-                    <div class="service-title">🚖 Táxi Azul</div>
-                    <div class="service-price" id="price-taxi">1.500 XOF</div>
+                    <div class="service-title">🚖 Táxi Oficial</div>
+                    <div class="service-price" id="price-taxi">950 XOF</div>
                 </div>
                 <div class="service-card" id="card-privado" onclick="selectService(this, 1.3)">
                     <div class="service-title">🚘 Carro Privado</div>
-                    <div class="service-price" id="price-privado">1.950 XOF</div>
+                    <div class="service-price" id="price-privado">1.235 XOF</div>
                 </div>
                 <div class="service-card" id="card-moto" onclick="selectService(this, 0.7)">
                     <div class="service-title">🛵 Moto-Táxi</div>
-                    <div class="service-price" id="price-moto">1.050 XOF</div>
+                    <div class="service-price" id="price-moto">665 XOF</div>
                 </div>
             </div>
 
-            <!-- Seleção de Pagamento -->
             <div class="form-group" style="margin-top: 10px;">
                 <label>FORMA DE PAGAMENTO DA VIAGEM</label>
                 <select id="paymentSelect">
                     <option value="Dinheiro Vivo">💵 Dinheiro Vivo (Ao Condutor)</option>
                     <option value="Orange Money">🟧 Orange Money</option>
                     <option value="Telecel">🟥 Telecel Mobile Money</option>
-                    <option value="Cartão de Débito">💳 Cartão de Débito</option>
+                    <option value="Cartao Debito">💳 Cartão de Débito / Bancário</option>
                 </select>
             </div>
 
             <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="requestRide()">Pedir Viagem Agora</button>
         </div>
 
+        <!-- Painel de Espera / Cancelamento -->
         <div class="waiting-card" id="waitingPanel">
             <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
             <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
             <div class="timer-text" id="waitingTimer">00:00</div>
             <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
-                Preço reservado: <strong id="reservedAmount">1.500 XOF</strong>
+                Preço reservado: <strong id="reservedAmount">950 XOF</strong>
             </div>
             <div style="font-size: 11px; color: #333; margin-bottom: 6px;">
                 Pagamento via: <strong id="selectedPaymentMethod">Dinheiro Vivo</strong>
@@ -180,14 +292,35 @@
                     <div class="store-name">Papa Loca Bissau</div>
                     <div class="store-desc">Grelhados, Hambúrgueres e Fast Food</div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('Papa Loca')">Pedir</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
             </div>
             <div class="store-card">
                 <div>
                     <div class="store-name">A Padeira Africana</div>
                     <div class="store-desc">Galinha Cafriela e Comida Típica</div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirDelivery('A Padeira Africana')">Pedir</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Restaurante O Coqueiro</div>
+                    <div class="store-desc">Peixe Fresco, Marisco e Cozinha Típica</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Snack-Bar Oasis</div>
+                    <div class="store-desc">Pastelaria, Sumos Naturais e Refeições Rápidas</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Chez Sapphire</div>
+                    <div class="store-desc">Cozinha Internacional e Buffet</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
             </div>
         </div>
     </div>
@@ -199,9 +332,30 @@
             <div class="store-card">
                 <div>
                     <div class="store-name">Supermercado Hereso</div>
-                    <div class="store-desc">Alimentação Geral e Produtos Frescos</div>
+                    <div class="store-desc">Alimentação Geral, Bebidas e Frescos</div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="pedirLoja('Supermercado Hereso')">Comprar</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Mini-Mercado Bandim</div>
+                    <div class="store-desc">Produtos de Mercearia e Higiene</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Farmácia Central Bissau</div>
+                    <div class="store-desc">Medicamentos e Primeiros Socorros</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Boutique Guiné Moda</div>
+                    <div class="store-desc">Roupas, Calçados e Acessórios</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
             </div>
         </div>
     </div>
@@ -216,7 +370,31 @@
                     <div class="store-desc">Av. Amílcar Cabral — Quarto Duplo Executive</div>
                     <div class="price-tag">45.000 XOF / noite</div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="reservarHotel('Hotel Ledra Bissau')">Reservar</button>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reservado!')">Reservar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Hotel Ceiba Bissau</div>
+                    <div class="store-desc">Av. Combatentes — Suíte de Luxo com Piscina</div>
+                    <div class="price-tag">75.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reservado!')">Reservar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Coimbra Hotel & Spa</div>
+                    <div class="store-desc">Praça dos Heróis Nacionais — Quarto Standard</div>
+                    <div class="price-tag">35.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reservado!')">Reservar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Apartamentos Sol de Bissau</div>
+                    <div class="store-desc">Bairro de Penha — T1 Equipado</div>
+                    <div class="price-tag">25.000 XOF / noite</div>
+                </div>
+                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Reservado!')">Reservar</button>
             </div>
         </div>
     </div>
@@ -232,7 +410,7 @@
 
         <div class="form-group" style="margin-top: 6px;">
             <label>NÚMERO DE TELEMÓVEL (+245)</label>
-            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX" pattern="[0-9]{9}">
+            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX">
         </div>
 
         <div class="form-group" style="margin-top: 6px;">
@@ -260,44 +438,59 @@
                 <h3 style="font-size: 15px;">Painel de Trabalho em Bissau</h3>
                 <p style="font-size: 11px; color: #666;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></p>
             </div>
-
-            <div style="background: #f9f9f9; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div>
-                    <div style="font-size: 10px; color: #888;">Ganhos Hoje</div>
-                    <div style="font-size: 16px; font-weight: bold; color: #1a1a1a;">28.000 XOF</div>
-                </div>
-                <div style="font-size: 11px; background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 6px; font-weight: bold;">
-                    18 Serviços
-                </div>
-            </div>
-
-            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas em Bissau...')">Aguardar Chamadas</button>
+            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas...')">Aguardar Chamadas</button>
         </div>
 
         <!-- Form Registo Motorista -->
         <div id="driver-register" style="display: none;">
-            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
-            <form id="formCadastroMotorista" onsubmit="cadastrarMotorista(event)" style="display: flex; flex-direction: column; gap: 8px;">
-                <input type="text" id="nomeMotorista" placeholder="Nome Completo" required>
-                <input type="tel" id="telefoneMotorista" placeholder="Telefone de Contacto (+245)" required>
-                <select id="tipoTransporte">
-                    <option value="Taxi">Táxi Azul/Amarelo</option>
-                    <option value="CarroPrivado">Carro Privado</option>
-                    <option value="Moto">Moto-Táxi</option>
-                </select>
-                <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
-                <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula" required>
-                
-                <select id="metodoRecebimentoMotorista" required>
-                    <option value="" disabled selected>Onde quer receber os seus ganhos?</option>
-                    <option value="Orange Money">Orange Money (+245)</option>
-                    <option value="Telecel">Telecel Mobile Money (+245)</option>
-                    <option value="Conta Bancaria">Conta Bancária / Débito</option>
-                </select>
-                <input type="tel" id="numeroContaMotorista" placeholder="Número da Conta / Carteira de Recebimento" required>
+            <div id="etapaFormRegisto">
+                <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
+                <form id="formCadastroMotorista" onsubmit="avancarParaAssinatura(event)" style="display: flex; flex-direction: column; gap: 8px;">
+                    <input type="text" id="nomeMotorista" placeholder="Nome Completo do Condutor" required>
+                    <input type="email" id="emailMotorista" placeholder="E-mail" required>
+                    <input type="tel" id="telefoneMotorista" placeholder="Telefone de Contacto (+245)" required>
+                    
+                    <select id="tipoTransporte">
+                        <option value="Táxi Azul/Amarelo">Táxi Azul/Amarelo</option>
+                        <option value="Carro Privado">Carro Privado</option>
+                        <option value="Moto-Táxi">Moto-Táxi</option>
+                    </select>
+                    
+                    <input type="text" id="marcaModelo" placeholder="Marca e Modelo do Veículo" required>
+                    <input type="text" id="matriculaVeiculo" placeholder="Número de Matrícula (Placa)" required>
+                    
+                    <select id="metodoRecebimentoMotorista" required>
+                        <option value="" disabled selected>Onde quer receber os seus ganhos?</option>
+                        <option value="Orange Money">Orange Money (+245)</option>
+                        <option value="Telecel">Telecel Mobile Money (+245)</option>
+                        <option value="Cartao Debito">Cartão de Débito / Bancário</option>
+                    </select>
+                    <input type="tel" id="numeroContaMotorista" placeholder="Número da Carteira ou Conta Bancária" required>
 
-                <button type="submit" class="btn-primary">Submeter para Aprovação</button>
-            </form>
+                    <!-- Termos e Condições -->
+                    <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px; color: #555; line-height: 1.4;">
+                        <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="aceiteTermos" required style="margin-top: 2px; width: auto; cursor: pointer;">
+                            <span>Li e aceito os termos e condições da ROTA GB, incluindo a taxa de comissão de 15% aplicável sobre os serviços em Bissau.</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Aceitar e Assinar</button>
+                </form>
+            </div>
+
+            <!-- Etapa 2: Assinatura e Envio -->
+            <div id="etapaContrato" style="display: none; flex-direction: column; gap: 8px;">
+                <div style="font-size: 12px; font-weight: bold;">📜 CONTRATO DE PARCERIA & TERMOS</div>
+                <p style="font-size: 11px; color: #555;">Desenhe a sua assinatura no quadro abaixo para validar o contrato ROTA GB.</p>
+                
+                <div class="signature-pad-container">
+                    <canvas id="sigPad"></canvas>
+                </div>
+                <button type="button" class="btn-secondary" onclick="limparAssinatura()">🧹 Limpar Assinatura</button>
+                
+                <button type="button" class="btn-primary" onclick="finalizarRegistoEGerarDocumentos()">Submeter & Gerar Documentos</button>
+            </div>
         </div>
     </div>
     
@@ -308,14 +501,13 @@
 
 <script>
     // ==========================================
-    // CONFIGURAÇÃO PASSO 2: CONTA MERCHANT DO CEO
+    // CONFIGURAÇÃO SUPABASE
     // ==========================================
-    const ROTA_GB_MERCHANT = {
-        orangeMoneyNumber: "245955XXXXX", // Substituir pelo seu número Orange Merchant
-        telecelNumber: "245966XXXXX",     // Substituir pelo seu número Telecel Merchant
-        commissionRate: 0.15              // 15% de comissão direta para o ROTA GB
-    };
+    const SUPABASE_URL = 'https://ymuldaviwfbcvocfknaw.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdWxkYXZpd2ZiY3ZvY2ZrbmF3Ixlub2xlIjoiYW5vbiIsImlhdCI6MTc5MTE0MDg0NywiZXhwIjoyMTA2NzE2ODQ3f0.uBSZQ_YChvWUS7B7TE762qGRSBaajFf-Flh18J7E0BU';
+    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ANIMAÇÃO DO MAPA E CARRINHO GPS
     const canvas = document.getElementById('bissauMap');
     const ctx = canvas.getContext('2d');
 
@@ -363,15 +555,60 @@
     }
     drawMap();
 
-    let currentMultiplier = 1;
+    // CONTROLO DE VIAGEM E TEMPORIZADOR
     let timerInterval = null;
     let secondsElapsed = 0;
-    let activePrice = 0;
-    let currentOperator = 'Orange';
 
+    function requestRide() {
+        const basePrice = parseInt(document.getElementById('routeSelect').value);
+        const paymentMethod = document.getElementById('paymentSelect').value;
+
+        document.getElementById('reservedAmount').innerText = `${Math.round(basePrice).toLocaleString()} XOF`;
+        document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
+        
+        document.getElementById('rideFormControls').style.display = 'none';
+        document.getElementById('waitingPanel').style.display = 'flex';
+
+        secondsElapsed = 0;
+        document.getElementById('waitingTimer').innerText = "00:00";
+        if(timerInterval) clearInterval(timerInterval);
+
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('waitingTimer').innerText = `${mins}:${secs}`;
+        }, 1000);
+    }
+
+    function cancelRide() {
+        if(timerInterval) clearInterval(timerInterval);
+        document.getElementById('waitingPanel').style.display = 'none';
+        document.getElementById('rideFormControls').style.display = 'block';
+        alert("Viagem cancelada com sucesso. Reembolso processado.");
+    }
+
+    // SELEÇÃO DE OPERADORA DE RECARGA
+    let currentOperator = 'Orange';
+    function selectOperator(op) {
+        currentOperator = op;
+        document.getElementById('btn-orange-op').classList.toggle('active', op === 'Orange');
+        document.getElementById('btn-telecel-op').classList.toggle('active', op === 'Telecel');
+    }
+
+    function processarRecarga() {
+        const telefone = document.getElementById('phoneRecarga').value.trim();
+        const valor = document.getElementById('amountRecarga').value;
+        if(!telefone || telefone.length < 9) {
+            alert("Por favor, introduza um número de telemóvel válido em Bissau.");
+            return;
+        }
+        alert(`✅ Recarga de ${valor} XOF via ${currentOperator} para o número +245 ${telefone} efetuada com sucesso!`);
+    }
+
+    // INTERACTION LOGIC
     function switchServiceTab(tab) {
         document.querySelectorAll('.service-nav .nav-item').forEach(el => el.classList.remove('active'));
-        
         document.getElementById('panel-taxi').style.display = 'none';
         document.getElementById('panel-comida').style.display = 'none';
         document.getElementById('panel-lojas').style.display = 'none';
@@ -382,10 +619,6 @@
             document.getElementById('nav-taxi').classList.add('active');
             document.getElementById('panel-taxi').style.display = 'flex';
         } else if(tab === 'comida') {
-
-
-
-
             document.getElementById('nav-comida').classList.add('active');
             document.getElementById('panel-comida').style.display = 'flex';
         } else if(tab === 'lojas') {
@@ -419,137 +652,150 @@
         }
     }
 
-    function toggleDriverTab(tab) {
-        document.getElementById('tab-painel-btn').classList.toggle('active', tab === 'painel');
-        document.getElementById('tab-registo-btn').classList.toggle('active', tab === 'registo');
-        document.getElementById('driver-dashboard').style.display = tab === 'painel' ? 'block' : 'none';
-        document.getElementById('driver-register').style.display = tab === 'registo' ? 'block' : 'none';
-    }
-
     function selectService(element, multiplier) {
         document.querySelectorAll('.service-card').forEach(el => el.classList.remove('selected'));
         element.classList.add('selected');
-        currentMultiplier = multiplier;
         updatePrice();
     }
 
     function updatePrice() {
         const basePrice = parseInt(document.getElementById('routeSelect').value);
+        
+        // O Táxi Oficial assume exatamente o preço oficial da rota escolhida (multiplicador 1)
+        // O Carro Privado aplica um acréscimo de 30% (multiplicador 1.3)
+        // O Moto-Táxi aplica um valor de 70% da tarifa (multiplicador 0.7)
         document.getElementById('price-taxi').innerText = `${Math.round(basePrice * 1).toLocaleString()} XOF`;
         document.getElementById('price-privado').innerText = `${Math.round(basePrice * 1.3).toLocaleString()} XOF`;
         document.getElementById('price-moto').innerText = `${Math.round(basePrice * 0.7).toLocaleString()} XOF`;
     }
 
-    // ==========================================
-    // PROCESSAMENTO DE PAGAMENTO COM MERCHANT API
-    // ==========================================
-    async function processarPagamentoMobile(metodo, valorXOF) {
-        const comissaoCEO = valorXOF * ROTA_GB_MERCHANT.commissionRate;
-        const valorMotorista = valorXOF - comissaoCEO;
-        const merchantUsado = metodo === 'Orange Money' ? ROTA_GB_MERCHANT.orangeMoneyNumber : ROTA_GB_MERCHANT.telecelNumber;
+    // CANVAS DE ASSINATURA
+    let sigPad, sigCtx, hasSigned = false;
+    window.onload = function() {
+        sigPad = document.getElementById('sigPad');
+        sigCtx = sigPad.getContext('2d');
+        
+        let painting = false;
+        sigPad.addEventListener('mousedown', startPos);
+        sigPad.addEventListener('mouseup', endPos);
+        sigPad.addEventListener('mousemove', draw);
+        sigPad.addEventListener('touchstart', (e) => { e.preventDefault(); startPos(e.touches[0]); });
+        sigPad.addEventListener('touchend', (e) => { e.preventDefault(); endPos(); });
+        sigPad.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
 
-        console.log(`[Merchant ROTA GB] Iniciar cobrança via ${metodo} (${merchantUsado})...`);
-        console.log(`[Merchant ROTA GB] Comissão CEO (${ROTA_GB_MERCHANT.commissionRate * 100}%): ${comissaoCEO} XOF | Repartição Motorista: ${valorMotorista} XOF`);
-
-        try {
-            const response = await fetch('/api/pay', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    provider: metodo,
-                    merchant: merchantUsado,
-                    amount: valorXOF,
-                    commission: comissaoCEO
-                })
-            });
-            const res = await response.json();
-            if(res.success) {
-                alert(`Pedido USSD enviado via ${metodo}! Confirme o PIN no ecrã.`);
-            }
-        } catch(e) {
-            // Notificação em ambiente de simulação/pré-ativação contratual
-            if(metodo !== 'Dinheiro Vivo') {
-                alert(`Pagamento em processamento via ${metodo}:\n\nTotal: ${valorXOF.toLocaleString()} XOF\nComissão ROTA GB: ${comissaoCEO.toLocaleString()} XOF (Creditados na conta Merchant ${merchantUsado})\n\nPor favor, confirme no seu ecrã.`);
-            }
-        }
-    }
-
-    function requestRide() {
-        const basePrice = parseInt(document.getElementById('routeSelect').value);
-        activePrice = Math.round(basePrice * currentMultiplier);
-        const paymentMethod = document.getElementById('paymentSelect').value;
-
-        // Dispara o fluxo do Passo 2 para pagamentos móveis
-        if(paymentMethod === 'Orange Money' || paymentMethod === 'Telecel') {
-            processarPagamentoMobile(paymentMethod, activePrice);
+        function startPos(e) { painting = true; draw(e); }
+        function endPos() { painting = false; sigCtx.beginPath(); hasSigned = true; }
+        function draw(e) {
+            if(!painting) return;
+            const rect = sigPad.getBoundingClientRect();
+            sigCtx.lineWidth = 2;
+            sigCtx.lineCap = 'round';
+            sigCtx.strokeStyle = '#000';
+            sigCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            sigCtx.stroke();
+            sigCtx.beginPath();
+            sigCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         }
 
-        document.getElementById('reservedAmount').innerText = `${activePrice.toLocaleString()} XOF`;
-        document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
-        document.getElementById('rideFormControls').style.display = 'none';
-        document.getElementById('waitingPanel').style.display = 'flex';
+        // Executa uma vez ao carregar para alinhar os preços iniciais da rota selecionada por defeito
+        updatePrice();
+    };
 
-        secondsElapsed = 0;
-        document.getElementById('waitingTimer').innerText = "00:00";
-        
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            secondsElapsed++;
-            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-            const secs = String(secondsElapsed % 60).padStart(2, '0');
-            document.getElementById('waitingTimer').innerText = `${mins}:${secs}`;
-        }, 1000);
+    function limparAssinatura() {
+        sigCtx.clearRect(0, 0, sigPad.width, sigPad.height);
+        hasSigned = false;
     }
 
-    function cancelRide() {
-        clearInterval(timerInterval);
-        alert(`Pedido de viagem cancelado com sucesso!\n\nReembolso Processado:\nValor de ${activePrice.toLocaleString()} XOF restituído.`);
+    // VALIDAÇÃO DE DUPLICADO POR MATRÍCULA NO SUPABASE & TERMOS
+    async function avancarParaAssinatura(e) {
+        e.preventDefault();
         
-        document.getElementById('waitingPanel').style.display = 'none';
-        document.getElementById('rideFormControls').style.display = 'block';
-    }
-
-    function selectOperator(op) {
-        currentOperator = op;
-        document.getElementById('btn-orange-op').classList.toggle('active', op === 'Orange');
-        document.getElementById('btn-telecel-op').classList.toggle('active', op === 'Telecel');
-    }
-
-    function processarRecarga() {
-        const phone = document.getElementById('phoneRecarga').value;
-        const amount = parseInt(document.getElementById('amountRecarga').value);
-        
-        if(!phone) {
-            alert('Por favor, insira o número de telemóvel.');
+        const termosAceites = document.getElementById('aceiteTermos').checked;
+        if (!termosAceites) {
+            alert("Deve aceitar os termos e condições para prosseguir.");
             return;
         }
 
-        processarPagamentoMobile(currentOperator === 'Orange' ? 'Orange Money' : 'Telecel', amount);
+        const matricula = document.getElementById('matriculaVeiculo').value.trim();
+        if (!matricula) {
+            alert("Por favor, insira o número de matrícula.");
+            return;
+        }
+
+        try {
+            const { data: existente, error } = await _supabase
+                .from('motoristas')
+                .select('placa_veiculo')
+                .ilike('placa_veiculo', matricula);
+
+            if (existente && existente.length > 0) {
+                alert(`⚠️ ATENÇÃO: A matrícula "${matricula.toUpperCase()}" já se encontra registada no sistema ROTA GB!\n\nNão é permitido cadastrar veículos duplicados.`);
+                return;
+            }
+        } catch (err) {
+            console.error("Erro na verificação:", err);
+        }
+
+        document.getElementById('etapaFormRegisto').style.display = 'none';
+        document.getElementById('etapaContrato').style.display = 'flex';
     }
 
-    function pedirDelivery(restaurante) {
-        alert(`A abrir menu de: ${restaurante}\n\nO estafeta Moto-Táxi do ROTA GB recolherá e entregará a refeição em Bissau!`);
-    }
+    async function finalizarRegistoEGerarDocumentos() {
+        if(!hasSigned) {
+            alert("Por favor, desenhe a sua assinatura antes de concluir.");
+            return;
+        }
 
-    function pedirLoja(loja) {
-        alert(`A abrir catálogo de: ${loja}\n\nEfetue as suas compras com entrega rápida via ROTA GB Express!`);
-    }
-
-    function reservarHotel(hotel) {
-        alert(`Pedido de Reserva enviado para: ${hotel}\n\nA receção entrará em contacto para confirmar.`);
-    }
-
-    function cadastrarMotorista(event) {
-        event.preventDefault();
-        const nome = document.getElementById('nomeMotorista').value;
-        const matricula = document.getElementById('matriculaVeiculo').value;
+        const nome = document.getElementById('nomeMotorista').value.trim();
+        const email = document.getElementById('emailMotorista').value.trim();
+        const tel = document.getElementById('telefoneMotorista').value.trim();
+        const tipoTransp = document.getElementById('tipoTransporte').value;
+        const veiculo = document.getElementById('marcaModelo').value.trim();
+        const matricula = document.getElementById('matriculaVeiculo').value.trim();
         const metodo = document.getElementById('metodoRecebimentoMotorista').value;
-        const conta = document.getElementById('numeroContaMotorista').value;
-        
-        alert(`Cadastro de Condutor Submetido com Sucesso!\n\nMotorista: ${nome}\nMatrícula: ${matricula}\nRecebimento de Ganhos: ${metodo} (${conta})\n\nO ROTA GB irá validar o registo em breve.`);
-        document.getElementById('formCadastroMotorista').reset();
-        toggleDriverTab('painel');
+        const conta = document.getElementById('numeroContaMotorista').value.trim();
+        const dataAtual = new Date().toLocaleDateString('pt-PT');
+
+        const { error } = await _supabase
+            .from('motoristas')
+            .insert([{ 
+                nome: nome, 
+                email: email, 
+                telefone: tel, 
+                tipo_transporte: tipoTransp,
+                marca_modelo: veiculo,
+                placa_veiculo: matricula,
+                metodo_recebimento: metodo,
+                conta_recebimento: conta,
+                status: 'pendente' 
+            }]);
+
+        if (error) {
+            alert("Erro ao gravar no Supabase: " + error.message);
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFillColor(28, 28, 30);
+        doc.rect(0, 0, 210, 30, 'F');
+        doc.setTextColor(0, 230, 118);
+        doc.setFontSize(22);
+        doc.text("ROTA GB — Guiné-Bissau", 15, 20);
+
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(11);
+        doc.text(`Data: ${dataAtual}`, 15, 42);
+        doc.text(`Condutor: ${nome}`, 15, 52);
+        doc.text(`Veículo: ${veiculo} | Matrícula: ${matricula}`, 15, 60);
+
+        const sigImgData = sigPad.toDataURL('image/png');
+        doc.addImage(sigImgData, 'PNG', 15, 80, 75, 30);
+        doc.save(`Contrato_ROTA_GB_${nome.replace(/\s+/g, '_')}.pdf`);
+
+        alert(`🎉 Registo concluído com sucesso! Os seus dados foram guardados no Supabase e o contrato gerado.`);
+        location.reload();
     }
 </script>
-
 </body>
+</html>
