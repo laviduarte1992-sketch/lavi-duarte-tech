@@ -458,26 +458,30 @@
         }
     }
 
-    // Variáveis para gerir o cronômetro de espera
+    // Gerenciador do Cronômetro de Espera (Garantido sem bloqueio)
     let timerInterval = null;
     let segundosEspera = 0;
 
     function requestRide() {
-        const routeSelect = document.getElementById('routeSelect');
-        const paymentSelect = document.getElementById('paymentSelect');
+        // Pega o valor selecionado
         const selectedTaxiPrice = document.getElementById('price-taxi').innerText;
+        const paymentSelect = document.getElementById('paymentSelect');
+        const paymentMethod = paymentSelect ? paymentSelect.value : 'Dinheiro Vivo';
         
         document.getElementById('reservedAmount').innerText = selectedTaxiPrice;
-        document.getElementById('selectedPaymentMethod').innerText = paymentSelect.value;
+        document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
         
+        // Alterna os painéis visuais
         document.getElementById('rideFormControls').style.display = 'none';
         document.getElementById('waitingPanel').style.display = 'flex';
 
-        // Iniciar Contagem de Minutos e Segundos
+        // Inicia e força o reset do cronômetro
         segundosEspera = 0;
         document.getElementById('waitingTimer').innerText = "00:00";
         
-        if (timerInterval) clearInterval(timerInterval);
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
         
         timerInterval = setInterval(() => {
             segundosEspera++;
