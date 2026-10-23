@@ -14,6 +14,7 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            pointer-events: auto !important; /* Garante que todos os elementos aceitam cliques */
         }
 
         body {
@@ -32,9 +33,11 @@
             border-radius: 20px;
             box-shadow: 0 12px 30px rgba(0,0,0,0.12);
             overflow: hidden;
+            position: relative;
+            z-index: 10;
         }
 
-        /* Cabeçalho Escuro */
+        /* Barra Superior */
         .top-bar {
             background-color: #121212;
             padding: 16px 18px;
@@ -90,24 +93,24 @@
             background-color: #1c1c1c;
             padding: 12px;
             display: flex;
-            justify-content: space-between;
-            gap: 5px;
+            gap: 8px;
             overflow-x: auto;
+            white-space: nowrap;
         }
 
         .service-item {
             background: #2a2a2a;
             color: #ccc;
             border: none;
-            padding: 8px 10px;
+            padding: 8px 14px;
             border-radius: 20px;
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 4px;
-            white-space: nowrap;
+            gap: 6px;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
         .service-item.active {
@@ -117,7 +120,7 @@
 
         /* Área do Mapa Visual */
         .map-preview {
-            height: 120px;
+            height: 110px;
             background-color: #e5e3df;
             background-image: radial-gradient(#ccc 1px, transparent 0);
             background-size: 12px 12px;
@@ -130,13 +133,12 @@
         .gps-badge {
             background: rgba(18, 18, 18, 0.85);
             color: white;
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.75rem;
             display: flex;
             align-items: center;
             gap: 6px;
-            backdrop-filter: blur(4px);
         }
 
         .dot-green {
@@ -146,13 +148,13 @@
             border-radius: 50%;
         }
 
-        /* Painel de Formulário */
+        /* Form Seção */
         .form-section {
             padding: 18px;
         }
 
         .section-title {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: #666;
             text-transform: uppercase;
@@ -169,14 +171,10 @@
             background-color: #f9f9f9;
             margin-bottom: 12px;
             outline: none;
+            cursor: pointer;
         }
 
-        select:focus, input:focus {
-            border-color: #00e676;
-            background-color: #fff;
-        }
-
-        /* Grid de Categoria de Veículos */
+        /* Categoria de Veículos */
         .vehicles-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -187,10 +185,11 @@
         .vehicle-card {
             border: 2px solid #eee;
             border-radius: 10px;
-            padding: 10px 6px;
+            padding: 10px 4px;
             text-align: center;
             cursor: pointer;
             background: #fff;
+            user-select: none;
         }
 
         .vehicle-card.selected {
@@ -211,7 +210,6 @@
             color: #121212;
         }
 
-        /* Botão de Pedido */
         .btn-pedir {
             width: 100%;
             background-color: #00e676;
@@ -223,57 +221,46 @@
             font-weight: 800;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,230,118,0.3);
-            transition: transform 0.1s;
-        }
-
-        .btn-pedir:active {
-            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <!-- Barra Superior Escura -->
         <div class="top-bar">
             <div class="brand">
                 ROTA GB <span class="badge-gw">GW</span>
             </div>
             <div class="user-toggle">
-                <button class="toggle-btn active">Cliente</button>
-                <button class="toggle-btn">Motorista</button>
+                <button class="toggle-btn active" onclick="setRole('cliente', this)">Cliente</button>
+                <button class="toggle-btn" onclick="setRole('motorista', this)">Motorista</button>
             </div>
         </div>
 
-        <!-- Menu de Serviços -->
         <div class="services-menu">
-            <button class="service-item active">🚗 Transporte</button>
-            <button class="service-item">🍲 Comida</button>
-            <button class="service-item">🛍️ Lojas</button>
-            <button class="service-item">🏨 Hotéis & Apts</button>
-            <button class="service-item">📱 Recargas</button>
+            <button class="service-item active" onclick="selectService(this)">🚗 Transporte</button>
+            <button class="service-item" onclick="selectService(this)">🍲 Comida</button>
+            <button class="service-item" onclick="selectService(this)">🛍️ Lojas</button>
+            <button class="service-item" onclick="selectService(this)">🏨 Hotéis & Apts</button>
+            <button class="service-item" onclick="selectService(this)">📱 Recargas</button>
         </div>
 
-        <!-- Visão do Mapa -->
         <div class="map-preview">
             <div class="gps-badge">
                 <span class="dot-green"></span> GPS Bissau Ativo
             </div>
         </div>
 
-        <!-- Formulário de Pedido -->
         <div class="form-section">
             <div class="section-title">ROTA OFICIAL DGVTT - BISSAU (CORRIDA EXCLUSIVA)</div>
             <select id="rota-select">
-                <option>Cidade → Bairro Militar Somec (475 XOF)</option>
-                <option>Cidade → Bandim (400 XOF)</option>
-                <option>Cidade → Antula (500 XOF)</option>
-                <option>Outra Rota (Personalizada)</option>
+                <option value="Cidade → Bairro Militar Somec (475 XOF)">Cidade → Bairro Militar Somec (475 XOF)</option>
+                <option value="Cidade → Bandim (400 XOF)">Cidade → Bandim (400 XOF)</option>
+                <option value="Cidade → Antula (500 XOF)">Cidade → Antula (500 XOF)</option>
             </select>
 
             <input type="text" id="ponto-referencia" placeholder="Ponto de Referência (Ex: Perto do Mercado, portão verde)">
 
-            <!-- Seleção do Veículo -->
             <div class="vehicles-grid">
                 <div class="vehicle-card selected" onclick="selecionarVeiculo(this, '950 XOF')">
                     <div class="vehicle-name">🚖 Táxi Oficial</div>
@@ -291,9 +278,9 @@
 
             <div class="section-title">FORMA DE PAGAMENTO DA VIAGEM</div>
             <select id="pagamento-select">
-                <option>💵 Dinheiro Vivo (Ao Condutor)</option>
-                <option>🟧 Orange Money</option>
-                <option>🟦 Telecel Cash</option>
+                <option value="Dinheiro Vivo">💵 Dinheiro Vivo (Ao Condutor)</option>
+                <option value="Orange Money">🟧 Orange Money</option>
+                <option value="Telecel Cash">🟦 Telecel Cash</option>
             </select>
 
             <button class="btn-pedir" onclick="pedirViagem()">Pedir Viagem Agora</button>
@@ -301,10 +288,14 @@
     </div>
 
     <script>
-        // Substitua pelas suas credenciais do Supabase
-        const SUPABASE_URL = "https://SUA_URL.supabase.co";
-        const SUPABASE_ANON_KEY = "SUA_CHAVE_ANONIMA";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Configuração segura do Supabase (Ajuste com as suas chaves)
+        const SUPABASE_URL = "https://ymuldaviwfbcvocfknaw.supabase.co";
+        const SUPABASE_ANON_KEY = "SUA_CHAVE_ANONIMA_AQUI";
+        
+        let supabaseClient = null;
+        if (typeof supabase !== 'undefined' && SUPABASE_ANON_KEY !== "SUA_CHAVE_ANONIMA_AQUI") {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
 
         let precoSelecionado = "950 XOF";
 
@@ -314,22 +305,33 @@
             precoSelecionado = preco;
         }
 
+        function selectService(elemento) {
+            document.querySelectorAll('.service-item').forEach(btn => btn.classList.remove('active'));
+            elemento.classList.add('active');
+        }
+
+        function setRole(role, elemento) {
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            elemento.classList.add('active');
+        }
+
         async function pedirViagem() {
             const rota = document.getElementById('rota-select').value;
             const pontoRef = document.getElementById('ponto-referencia').value;
             const pagamento = document.getElementById('pagamento-select').value;
 
-            const { data, error } = await supabase
-                .from('viagens')
-                .insert([
-                    {
-                        destino: rota,
-                        ponto_referencia: pontoRef,
-                        status: 'pendente'
-                    }
-                ]);
+            if (!pontoRef) {
+                alert("Por favor, preencha o Ponto de Referência em Bissau!");
+                return;
+            }
 
-            alert(`🚀 Pedido enviado com sucesso!\nRota: ${rota}\nValor: ${precoSelecionado}\nPagamento: ${pagamento}`);
+            if (supabaseClient) {
+                await supabaseClient.from('viagens').insert([
+                    { destino: rota, ponto_referencia: pontoRef, status: 'pendente' }
+                ]);
+            }
+
+            alert("🚀 Pedido enviado com sucesso!\n\nRota: " + rota + "\nPreço: " + precoSelecionado + "\nPagamento: " + pagamento);
         }
     </script>
 </body>
