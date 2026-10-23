@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROTA GB - Mobilidade Urbana de Bissau</title>
-
-    <!-- Supabase JS Client -->
+    <title>ROTA GB - Bissau</title>
+    
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -17,127 +17,286 @@
         }
 
         body {
-            background-color: #f5f7fa;
+            background-color: #eef2f5;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 15px;
+            padding: 10px;
         }
 
-        .card {
-            background: #ffffff;
+        .app-container {
             width: 100%;
-            max-width: 450px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            max-width: 420px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
             overflow: hidden;
         }
 
-        .header {
-            background-color: #008751; /* Verde Oficial ROTA GB */
-            color: #ffffff;
-            padding: 24px 20px;
-            text-align: center;
+        /* Cabeçalho Escuro */
+        .top-bar {
+            background-color: #121212;
+            padding: 16px 18px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header h1 {
-            font-size: 1.4rem;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #00e676;
+        }
+
+        .badge-gw {
+            background-color: #d32f2f;
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .user-toggle {
+            background-color: #262626;
+            padding: 3px;
+            border-radius: 20px;
+            display: flex;
+        }
+
+        .toggle-btn {
+            border: none;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+            background: transparent;
+        }
+
+        .toggle-btn.active {
+            background-color: #00e676;
+            color: #121212;
+        }
+
+        /* Menu de Serviços */
+        .services-menu {
+            background-color: #1c1c1c;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+            overflow-x: auto;
+        }
+
+        .service-item {
+            background: #2a2a2a;
+            color: #ccc;
+            border: none;
+            padding: 8px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .service-item.active {
+            background: #00e676;
+            color: #121212;
+        }
+
+        /* Área do Mapa Visual */
+        .map-preview {
+            height: 120px;
+            background-color: #e5e3df;
+            background-image: radial-gradient(#ccc 1px, transparent 0);
+            background-size: 12px 12px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gps-badge {
+            background: rgba(18, 18, 18, 0.85);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+        }
+
+        .dot-green {
+            width: 8px;
+            height: 8px;
+            background-color: #00e676;
+            border-radius: 50%;
+        }
+
+        /* Painel de Formulário */
+        .form-section {
+            padding: 18px;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
             font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 8px;
             letter-spacing: 0.5px;
         }
 
-        .header p {
-            font-size: 0.85rem;
-            opacity: 0.9;
-            margin-top: 4px;
-        }
-
-        .content {
-            padding: 24px 20px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #333333;
-            margin-bottom: 6px;
-        }
-
-        input {
+        select, input {
             width: 100%;
-            padding: 14px;
-            border: 1px solid #e1e4e8;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 0.95rem;
-            color: #222222;
-            background-color: #f8fafc;
+            font-size: 0.88rem;
+            background-color: #f9f9f9;
+            margin-bottom: 12px;
             outline: none;
-            transition: all 0.2s ease;
         }
 
-        input:focus {
-            border-color: #008751;
-            background-color: #ffffff;
+        select:focus, input:focus {
+            border-color: #00e676;
+            background-color: #fff;
         }
 
-        .status-gps {
-            font-size: 0.75rem;
-            color: #28a745;
-            margin-top: 5px;
-            font-weight: 500;
+        /* Grid de Categoria de Veículos */
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
+        .vehicle-card {
+            border: 2px solid #eee;
+            border-radius: 10px;
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        .vehicle-card.selected {
+            border-color: #00e676;
+            background-color: #e8fef0;
+        }
+
+        .vehicle-name {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .vehicle-price {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #121212;
+        }
+
+        /* Botão de Pedido */
         .btn-pedir {
             width: 100%;
-            background-color: #008751;
-            color: #ffffff;
+            background-color: #00e676;
+            color: #121212;
             padding: 16px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1rem;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,230,118,0.3);
+            transition: transform 0.1s;
         }
 
-        .btn-pedir:hover {
-            background-color: #006b3f;
+        .btn-pedir:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="header">
-            <h1>🇬🇼 ROTA GB</h1>
-            <p>Mobilidade Urbana em Bissau</p>
+    <div class="app-container">
+        <!-- Barra Superior Escura -->
+        <div class="top-bar">
+            <div class="brand">
+                ROTA GB <span class="badge-gw">GW</span>
+            </div>
+            <div class="user-toggle">
+                <button class="toggle-btn active">Cliente</button>
+                <button class="toggle-btn">Motorista</button>
+            </div>
         </div>
 
-        <div class="content">
-            <div class="form-group">
-                <label>📍 Local de Recolha (GPS):</label>
-                <input type="text" id="origem-gps" value="A detetar localização..." readonly>
-                <div class="status-gps" id="status-texto">● A ligar ao GPS...</div>
+        <!-- Menu de Serviços -->
+        <div class="services-menu">
+            <button class="service-item active">🚗 Transporte</button>
+            <button class="service-item">🍲 Comida</button>
+            <button class="service-item">🛍️ Lojas</button>
+            <button class="service-item">🏨 Hotéis & Apts</button>
+            <button class="service-item">📱 Recargas</button>
+        </div>
+
+        <!-- Visão do Mapa -->
+        <div class="map-preview">
+            <div class="gps-badge">
+                <span class="dot-green"></span> GPS Bissau Ativo
+            </div>
+        </div>
+
+        <!-- Formulário de Pedido -->
+        <div class="form-section">
+            <div class="section-title">ROTA OFICIAL DGVTT - BISSAU (CORRIDA EXCLUSIVA)</div>
+            <select id="rota-select">
+                <option>Cidade → Bairro Militar Somec (475 XOF)</option>
+                <option>Cidade → Bandim (400 XOF)</option>
+                <option>Cidade → Antula (500 XOF)</option>
+                <option>Outra Rota (Personalizada)</option>
+            </select>
+
+            <input type="text" id="ponto-referencia" placeholder="Ponto de Referência (Ex: Perto do Mercado, portão verde)">
+
+            <!-- Seleção do Veículo -->
+            <div class="vehicles-grid">
+                <div class="vehicle-card selected" onclick="selecionarVeiculo(this, '950 XOF')">
+                    <div class="vehicle-name">🚖 Táxi Oficial</div>
+                    <div class="vehicle-price">950 XOF</div>
+                </div>
+                <div class="vehicle-card" onclick="selecionarVeiculo(this, '1235 XOF')">
+                    <div class="vehicle-name">🚘 Carro Privado</div>
+                    <div class="vehicle-price">1235 XOF</div>
+                </div>
+                <div class="vehicle-card" onclick="selecionarVeiculo(this, '665 XOF')">
+                    <div class="vehicle-name">🛵 Moto-Táxi</div>
+                    <div class="vehicle-price">665 XOF</div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>🏠 Ponto de Referência (Bissau):</label>
-                <input type="text" id="ponto-referencia" placeholder="Ex: Perto do Mercado de Bandim, portão verde">
-            </div>
+            <div class="section-title">FORMA DE PAGAMENTO DA VIAGEM</div>
+            <select id="pagamento-select">
+                <option>💵 Dinheiro Vivo (Ao Condutor)</option>
+                <option>🟧 Orange Money</option>
+                <option>🟦 Telecel Cash</option>
+            </select>
 
-            <div class="form-group">
-                <label>🏁 Destino:</label>
-                <input type="text" id="destino" placeholder="Para onde vai? (Ex: Praça dos Heróis)">
-            </div>
-
-            <button class="btn-pedir" onclick="pedirCorrida()">Pedir ROTA GB</button>
+            <button class="btn-pedir" onclick="pedirViagem()">Pedir Viagem Agora</button>
         </div>
     </div>
 
@@ -147,58 +306,31 @@
         const SUPABASE_ANON_KEY = "SUA_CHAVE_ANONIMA";
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let latAtual = 11.8632;
-        let lngAtual = -15.5843;
+        let precoSelecionado = "950 XOF";
 
-        // Obter GPS em tempo real
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    latAtual = pos.coords.latitude;
-                    lngAtual = pos.coords.longitude;
-                    document.getElementById('origem-gps').value = `GPS: ${latAtual.toFixed(5)}, ${lngAtual.toFixed(5)}`;
-                    document.getElementById('status-texto').innerText = "● Localização obtida com precisão";
-                },
-                (err) => {
-                    document.getElementById('origem-gps').value = "Bissau (Centro)";
-                    document.getElementById('status-texto').innerText = "● Usando localização padrão de Bissau";
-                },
-                { enableHighAccuracy: true }
-            );
+        function selecionarVeiculo(elemento, preco) {
+            document.querySelectorAll('.vehicle-card').forEach(card => card.classList.remove('selected'));
+            elemento.classList.add('selected');
+            precoSelecionado = preco;
         }
 
-        async function pedirCorrida() {
+        async function pedirViagem() {
+            const rota = document.getElementById('rota-select').value;
             const pontoRef = document.getElementById('ponto-referencia').value;
-            const destino = document.getElementById('destino').value;
-
-            if (!pontoRef) {
-                alert("Por favor, insira um ponto de referência em Bissau.");
-                return;
-            }
-            if (!destino) {
-                alert("Por favor, insira o seu destino.");
-                return;
-            }
+            const pagamento = document.getElementById('pagamento-select').value;
 
             const { data, error } = await supabase
                 .from('viagens')
                 .insert([
                     {
-                        latitude_origem: latAtual,
-                        longitude_origem: lngAtual,
+                        destino: rota,
                         ponto_referencia: pontoRef,
-                        destino: destino,
                         status: 'pendente'
                     }
                 ]);
 
-            if (error) {
-                alert("Erro ao pedir corrida. Verifique a ligação.");
-            } else {
-                alert("🚀 Corrida solicitada com sucesso!");
-            }
+            alert(`🚀 Pedido enviado com sucesso!\nRota: ${rota}\nValor: ${precoSelecionado}\nPagamento: ${pagamento}`);
         }
     </script>
-
 </body>
 </html>
