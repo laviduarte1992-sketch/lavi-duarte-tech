@@ -353,9 +353,9 @@
                 <div>
                     <div class="store-name">Papa Loca Bissau</div>
                     <div class="store-desc">Grelhados, Hambúrgueres e Fast Food</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Pedido enviado!')">Pedir</button>
-            </div>
+               </div>
+    <button class="btn-pedir" onclick="pedirComida('Papa Loca Bissau')">Pedir</button>
+</div>
             <div class="store-card">
                 <div>
                     <div class="store-name">A Padeira Africana</div>
@@ -792,8 +792,23 @@
 
         requestAnimationFrame(desenharMapaBissau);
     }
+function pedirComida(nomeRestaurante) {
+    const prato = prompt("Restaurante: " + nomeRestaurante + "\n\nO que deseja encomendar? (Ex: Hambúrguer, Grelhados...)");
+    if (!prato) return;
 
-    window.addEventListener('load', updatePrice);
+    const pagamento = prompt("Escolha a forma de pagamento:\n1 - Dinheiro Vivo (Ao Estafeta)\n2 - Orange Money\n3 - Telecel Cash", "1");
+    if (!pagamento) return;
+
+    let formaPagamento = "Dinheiro Vivo";
+    if (pagamento === "2") formaPagamento = "Orange Money";
+    if (pagamento === "3") formaPagamento = "Telecel Cash";
+
+    alert("🍲 Pedido enviado com sucesso para " + nomeRestaurante + "!\n\n" +
+          "Prato: " + prato + "\n" +
+          "Pagamento: " + formaPagamento + "\n\n" +
+          "O estafeta ROTA GB já foi notificado!");
+}
+  window.addEventListener('load', updatePrice);
 </script>
 
 </body>
