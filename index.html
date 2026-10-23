@@ -3,11 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROTA GB - Pedir Corrida</title>
+    <title>ROTA GB - Mobilidade Urbana de Bissau</title>
 
-    <!-- Leaflet CSS (Mapa Gratuito) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -16,250 +13,192 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: #f4f6f8;
+            background-color: #f5f7fa;
             display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        header {
-            background-color: #008751; /* Verde ROTA GB */
-            color: white;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             padding: 15px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        #map {
-            flex: 1;
+        .card {
+            background: #ffffff;
             width: 100%;
-            z-index: 1;
+            max-width: 450px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
 
-        .container-pedido {
-            background: white;
-            padding: 20px;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 2;
+        .header {
+            background-color: #008751; /* Verde Oficial ROTA GB */
+            color: #ffffff;
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .content {
+            padding: 24px 20px;
         }
 
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 18px;
         }
 
         label {
-            font-size: 0.85rem;
-            color: #555;
-            font-weight: 600;
             display: block;
-            margin-bottom: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 6px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 14px;
+            border: 1px solid #e1e4e8;
+            border-radius: 10px;
             font-size: 0.95rem;
+            color: #222222;
+            background-color: #f8fafc;
             outline: none;
+            transition: all 0.2s ease;
         }
 
         input:focus {
             border-color: #008751;
+            background-color: #ffffff;
         }
 
-        .gps-status {
-            font-size: 0.8rem;
+        .status-gps {
+            font-size: 0.75rem;
             color: #28a745;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            margin-top: 5px;
+            font-weight: 500;
         }
 
-        .btn-confirmar {
+        .btn-pedir {
             width: 100%;
             background-color: #008751;
-            color: white;
-            padding: 14px;
+            color: #ffffff;
+            padding: 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
             margin-top: 10px;
-            transition: background 0.3s;
+            transition: background-color 0.2s ease;
         }
 
-        .btn-confirmar:hover {
+        .btn-pedir:hover {
             background-color: #006b3f;
-        }
-
-        /* Estilo para a caixa do motorista */
-        .motorista-card {
-            display: none;
-            background: #eef9f3;
-            border: 1px solid #a3e0c0;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
-        .btn-navegar {
-            display: inline-block;
-            background-color: #4285F4;
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            margin-top: 10px;
-            text-align: center;
-            width: 100%;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        🇬🇼 ROTA GB - Bissau
-    </header>
+    <div class="card">
+        <div class="header">
+            <h1>🇬🇼 ROTA GB</h1>
+            <p>Mobilidade Urbana em Bissau</p>
+        </div>
 
-    <!-- Contentor do Mapa -->
-    <div id="map"></div>
-
-    <!-- Formulário de Pedido -->
-    <div class="container-pedido">
-        <div class="form-group">
-            <label>📍 Ponto de Recolha (GPS Atual):</label>
-            <input type="text" id="origem-gps" value="A localizar via GPS..." readonly>
-            <div class="gps-status">
-                <span>●</span> Posição exata obtida por Satélite/GPS
+        <div class="content">
+            <div class="form-group">
+                <label>📍 Local de Recolha (GPS):</label>
+                <input type="text" id="origem-gps" value="A detetar localização..." readonly>
+                <div class="status-gps" id="status-texto">● A ligar ao GPS...</div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label>🏠 Ponto de Referência (Obrigatório em Bissau):</label>
-            <input type="text" id="ponto-referencia" placeholder="Ex: Ao lado do Mercado de Bandim, portão amarelo">
-        </div>
+            <div class="form-group">
+                <label>🏠 Ponto de Referência (Bissau):</label>
+                <input type="text" id="ponto-referencia" placeholder="Ex: Perto do Mercado de Bandim, portão verde">
+            </div>
 
-        <div class="form-group">
-            <label>🏁 Destino:</label>
-            <input type="text" id="destino" placeholder="Para onde vai? (ex: Praça dos Heróis Nacionais)">
-        </div>
+            <div class="form-group">
+                <label>🏁 Destino:</label>
+                <input type="text" id="destino" placeholder="Para onde vai? (Ex: Praça dos Heróis)">
+            </div>
 
-        <button class="btn-confirmar" onclick="pedirCorrida()">Pedir ROTA GB</button>
-
-        <!-- Ecrã de Exemplo da Visão do Motorista -->
-        <div id="motorista-view" class="motorista-card">
-            <h4>Visão do Motorista:</h4>
-            <p id="info-referencia"></p>
-            <a id="btn-google-maps" href="#" target="_blank" class="btn-navegar">🗺️ Abrir Navegação no Google Maps</a>
+            <button class="btn-pedir" onclick="pedirCorrida()">Pedir ROTA GB</button>
         </div>
     </div>
 
-    <!-- Leaflet JS (Mapa) -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script>
-        // 1. CONFIGURAÇÃO DO SUPABASE (Substitua pelas suas chaves do Supabase)
-        const SUPABASE_URL = "https://SUA_URL_AQUI.supabase.co";
-        const SUPABASE_ANON_KEY = "SUA_CHAVE_ANONIMA_AQUI";
+        // Substitua pelas suas credenciais do Supabase
+        const SUPABASE_URL = "https://SUA_URL.supabase.co";
+        const SUPABASE_ANON_KEY = "SUA_CHAVE_ANONIMA";
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Coordenadas padrão de Bissau (Centro)
         let latAtual = 11.8632;
         let lngAtual = -15.5843;
 
-        // Initialize Mapa Centrado em Bissau
-        const map = L.map('map').setView([latAtual, lngAtual], 15);
-
-        // Adicionar camada do OpenStreetMap (Livre e Gratuito)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© ROTA GB'
-        }).addTo(map);
-
-        let userMarker = L.marker([latAtual, lngAtual]).addTo(map)
-            .bindPopup("A procurar a sua localização em Bissau...")
-            .openPopup();
-
-        // 2. OBTER A LOCALIZAÇÃO GPS REAL DO UTILIZADOR
+        // Obter GPS em tempo real
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    latAtual = position.coords.latitude;
-                    lngAtual = position.coords.longitude;
-
-                    // Atualiza a posição no mapa
-                    map.setView([latAtual, lngAtual], 17);
-                    userMarker.setLatLng([latAtual, lngAtual])
-                        .bindPopup("<b>Está aqui!</b><br>Coordenadas prontas para o motorista.")
-                        .openPopup();
-
+                (pos) => {
+                    latAtual = pos.coords.latitude;
+                    lngAtual = pos.coords.longitude;
                     document.getElementById('origem-gps').value = `GPS: ${latAtual.toFixed(5)}, ${lngAtual.toFixed(5)}`;
+                    document.getElementById('status-texto').innerText = "● Localização obtida com precisão";
                 },
-                (error) => {
-                    console.warn("Erro ao obter GPS, usando centro de Bissau:", error);
-                    document.getElementById('origem-gps').value = "GPS (Centro de Bissau)";
+                (err) => {
+                    document.getElementById('origem-gps').value = "Bissau (Centro)";
+                    document.getElementById('status-texto').innerText = "● Usando localização padrão de Bissau";
                 },
-                {
-                    enableHighAccuracy: true, // Máxima precisão GPS
-                    timeout: 10000
-                }
+                { enableHighAccuracy: true }
             );
         }
 
-        // 3. ENVIAR A CORRIDA PARA A BASE DE DADOS SUPABASE
         async function pedirCorrida() {
-            const pontoReferencia = document.getElementById('ponto-referencia').value;
+            const pontoRef = document.getElementById('ponto-referencia').value;
             const destino = document.getElementById('destino').value;
 
-            if (!pontoReferencia) {
-                alert("Por favor, indique um ponto de referência para ajudar o motorista a encontrá-lo em Bissau!");
+            if (!pontoRef) {
+                alert("Por favor, insira um ponto de referência em Bissau.");
                 return;
             }
-
             if (!destino) {
                 alert("Por favor, insira o seu destino.");
                 return;
             }
 
-            // Inserir corrida no Supabase na tabela 'viagens'
             const { data, error } = await supabase
                 .from('viagens')
                 .insert([
                     {
                         latitude_origem: latAtual,
                         longitude_origem: lngAtual,
-                        ponto_referencia: pontoReferencia,
+                        ponto_referencia: pontoRef,
                         destino: destino,
                         status: 'pendente'
                     }
                 ]);
 
             if (error) {
-                console.error("Erro ao guardar corrida:", error);
-                alert("Ocorreu um erro ao pedir a corrida. Tente novamente.");
+                alert("Erro ao pedir corrida. Verifique a ligação.");
             } else {
-                alert("🚀 Corrida pedida com sucesso! O motorista mais próximo já recebeu as suas coordenadas GPS.");
-
-                // GERAR O LINK DE NAVEGAÇÃO DIRETA PARA O GOOGLE MAPS DO MOTORISTA
-                const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latAtual},${lngAtual}`;
-
-                // Mostrar o resultado de teste da visão do motorista
-                document.getElementById('info-referencia').innerHTML = `<b>Ponto de Referência:</b> ${pontoReferencia}<br><b>Destino:</b> ${destino}`;
-                document.getElementById('btn-google-maps').href = googleMapsUrl;
-                document.getElementById('motorista-view').style.display = 'block';
+                alert("🚀 Corrida solicitada com sucesso!");
             }
         }
     </script>
+
 </body>
 </html>
