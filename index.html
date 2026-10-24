@@ -872,19 +872,24 @@
         requestAnimationFrame(desenharMapaBissau);
     }
 function pedirComida(nomeRestaurante) {
-    // Menu com opções e preços em Francos CFA
+    // Contactos reais/configurados dos restaurantes
+    let contacto = "+245 955 111 111";
+    if (nomeRestaurante === "A Padeira Africana") contacto = "+245 966 222 222";
+    if (nomeRestaurante === "Restaurante O Coqueiro") contacto = "+245 955 333 333";
+    if (nomeRestaurante === "Snack-Bar Oasis") contacto = "+245 966 444 444";
+    if (nomeRestaurante === "Chez Sapphire") contacto = "+245 955 555 555";
+
     const menuInfo = 
         "--- MENU: " + nomeRestaurante + " ---\n\n" +
-        "1. Hambúrguer Simples - 2.500 FCFA\n" +
-        "2. Galinha Asada / Cafriela - 4.500 FCFA\n" +
-        "3. Prato de Peixe Fresco - 5.000 FCFA\n" +
-        "4. Bife com Batatas - 6.000 FCFA\n\n" +
-        "Escreva o número ou nome do prato que deseja:";
+        "1. Hambúrguer / Lanche - 2.500 FCFA\n" +
+        "2. Prato Típico / Galinha Asada - 4.500 FCFA\n" +
+        "3. Peixe Fresco / Marisco - 5.500 FCFA\n" +
+        "4. Bife / Especial do Dia - 7.000 FCFA\n\n" +
+        "Escreva o número ou o nome do prato:";
 
     const prato = prompt(menuInfo);
     if (!prato) return;
 
-    // Pergunta a forma de pagamento
     const pagamento = prompt(
         "Escolha a forma de pagamento:\n" +
         "1 - Dinheiro Vivo (Ao Estafeta)\n" +
@@ -900,8 +905,9 @@ function pedirComida(nomeRestaurante) {
 
     alert(
         "🍲 Pedido enviado com sucesso para " + nomeRestaurante + "!\n\n" +
-        "Prato selecionado: " + prato + "\n" +
-        "Pagamento: " + formaPagamento + "\n\n" +
+        "Prato: " + prato + "\n" +
+        "Pagamento: " + formaPagamento + "\n" +
+        "Contacto do Restaurante: " + contacto + "\n\n" +
         "O estafeta ROTA GB já foi notificado!"
     );
 }
