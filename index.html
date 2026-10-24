@@ -912,7 +912,7 @@ function pedirComida(nomeRestaurante) {
     const prato = prompt(menuInfo);
     if (!prato) return;
 
-    const endereco = prompt("📍 Indique o seu Bairro ou Ponto de Referência:\n(Ex: Pilum, junto à Farmácia)");
+    const endereco = prompt("📍 Indique o seu Bairro ou Ponto de Referência:\n(Ex: Pilum, Bandim, Sintra...)");
     if (!endereco) return;
 
     const pagamento = prompt(
@@ -934,7 +934,8 @@ function pedirComida(nomeRestaurante) {
             function(position) {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
-                const linkMapa = "https://www.google.com/maps?q=" + lat + "," + lng;
+                // Link direto do Google Maps para o mototáxi navegar
+                const linkGoogleMaps = "https://www.google.com/maps?q=" + lat + "," + lng;
 
                 alert(
                     "🍲 PEDIDO CONFIRMADO COM GPS! 📍\n\n" +
@@ -943,12 +944,11 @@ function pedirComida(nomeRestaurante) {
                     "Bairro: " + endereco + "\n" +
                     "Pagamento: " + formaPagamento + "\n" +
                     "Contacto Restaurante: " + contacto + "\n\n" +
-                    "📡 GPS Localizado com Sucesso!\n" +
-                    "O mototáxi ROTA GB recebeu a sua rota exata no mapa."
+                    "📡 GPS Capturado com Sucesso!\n" +
+                    "Rota do Mototáxi: " + linkGoogleMaps
                 );
             },
             function(error) {
-                // Caso o GPS esteja desligado no telemóvel do cliente
                 alert(
                     "🍲 PEDIDO CONFIRMADO!\n\n" +
                     "Restaurante: " + nomeRestaurante + "\n" +
@@ -959,8 +959,6 @@ function pedirComida(nomeRestaurante) {
                 );
             }
         );
-    } else {
-        alert("Pedido registado para " + nomeRestaurante + " no bairro " + endereco);
     }
 }
   window.addEventListener('load', updatePrice);
