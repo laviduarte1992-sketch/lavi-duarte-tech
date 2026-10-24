@@ -345,17 +345,29 @@
         </div>
     </div>
 
-  <!-- Panel 2: Comida / Restaurantes -->
+<!-- Panel 2: Comida / Restaurantes -->
 <div id="panel-comida" class="panel" style="padding: 10px; box-sizing: border-box; width: 100%;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h3 style="margin: 0; font-size: 1.1em; color: #111;">🍲 Restaurantes Populares</h3>
-        <span style="font-size: 0.8em; color: #ff6b00; font-weight: bold;">Bissau Centro 📍</span>
+    
+    <!-- Título do Painel -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="margin: 0; font-size: 1.1em; color: #111;">🍲 Restaurantes em Bissau</h3>
+        <span style="font-size: 0.8em; color: #ff6b00; font-weight: bold;">ROTA GB Express 📍</span>
     </div>
 
+    <!-- 🏷️ Filtros Rápidos por Categoria -->
+    <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; scrollbar-width: none;">
+        <button onclick="filtrarComida('todos')" style="background: #ff6b00; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.78em; font-weight: bold; white-space: nowrap; cursor: pointer;">Todos</button>
+        <button onclick="filtrarComida('fastfood')" style="background: #f0f0f0; color: #333; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.78em; font-weight: bold; white-space: nowrap; cursor: pointer;">🍔 Fast Food</button>
+        <button onclick="filtrarComida('tipico')" style="background: #f0f0f0; color: #333; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.78em; font-weight: bold; white-space: nowrap; cursor: pointer;">🍗 Cafriela & Típico</button>
+        <button onclick="filtrarComida('peixe')" style="background: #f0f0f0; color: #333; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.78em; font-weight: bold; white-space: nowrap; cursor: pointer;">🐟 Peixe & Marisco</button>
+        <button onclick="filtrarComida('lanchonete')" style="background: #f0f0f0; color: #333; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.78em; font-weight: bold; white-space: nowrap; cursor: pointer;">🥐 Lanches & Sumos</button>
+    </div>
+
+    <!-- Lista de Restaurantes -->
     <div class="store-list" style="display: flex; flex-direction: column; gap: 14px;">
 
         <!-- 1. Papa Loca Bissau -->
-        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+        <div class="store-card item-restaurante fastfood" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="position: relative;">
                     <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200" alt="Papa Loca" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
@@ -363,8 +375,15 @@
                 </div>
                 <div>
                     <div style="font-weight: bold; font-size: 0.95em; color: #222;">Papa Loca Bissau</div>
-                    <div style="font-size: 0.78em; color: #666; margin-top: 2px;">Grelhados e Fast Food</div>
+                    <div style="font-size: 0.78em; color: #666; margin-top: 1px;">Grelhados e Fast Food</div>
                     <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 2px;">2.500 - 6.000 FCFA</div>
+                    
+                    <!-- ⏱️ Tempo e Taxa de Entrega -->
+                    <div style="font-size: 0.72em; color: #444; margin-top: 3px; display: flex; gap: 8px;">
+                        <span>⏱️ 20-30 min</span>
+                        <span>🛵 Taxa: 1.000 FCFA</span>
+                    </div>
+
                     <div style="font-size: 0.75em; color: #007bff; margin-top: 3px; font-weight: bold;">
                         📞 <a href="tel:+2456892222" style="color: #007bff; text-decoration: none;">+245 689 2222</a>
                     </div>
@@ -377,7 +396,7 @@
         </div>
 
         <!-- 2. A Padeira Africana -->
-        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+        <div class="store-card item-restaurante tipico" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="position: relative;">
                     <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=200" alt="A Padeira Africana" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
@@ -385,8 +404,15 @@
                 </div>
                 <div>
                     <div style="font-weight: bold; font-size: 0.95em; color: #222;">A Padeira Africana</div>
-                    <div style="font-size: 0.78em; color: #666; margin-top: 2px;">Galinha Cafriela e Típica</div>
+                    <div style="font-size: 0.78em; color: #666; margin-top: 1px;">Galinha Cafriela e Típica</div>
                     <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 2px;">3.000 - 7.500 FCFA</div>
+                    
+                    <!-- ⏱️ Tempo e Taxa de Entrega -->
+                    <div style="font-size: 0.72em; color: #444; margin-top: 3px; display: flex; gap: 8px;">
+                        <span>⏱️ 25-40 min</span>
+                        <span>🛵 Taxa: 1.000 FCFA</span>
+                    </div>
+
                     <div style="font-size: 0.75em; color: #007bff; margin-top: 3px; font-weight: bold;">
                         📞 <a href="tel:+245966131393" style="color: #007bff; text-decoration: none;">+245 966 131 393</a>
                     </div>
@@ -399,7 +425,7 @@
         </div>
 
         <!-- 3. Restaurante O Coqueiro -->
-        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+        <div class="store-card item-restaurante peixe" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="position: relative;">
                     <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=200" alt="O Coqueiro" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
@@ -407,8 +433,15 @@
                 </div>
                 <div>
                     <div style="font-weight: bold; font-size: 0.95em; color: #222;">Restaurante O Coqueiro</div>
-                    <div style="font-size: 0.78em; color: #666; margin-top: 2px;">Peixe Fresco e Marisco</div>
+                    <div style="font-size: 0.78em; color: #666; margin-top: 1px;">Peixe Fresco e Marisco</div>
                     <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 2px;">4.000 - 12.000 FCFA</div>
+                    
+                    <!-- ⏱️ Tempo e Taxa de Entrega -->
+                    <div style="font-size: 0.72em; color: #444; margin-top: 3px; display: flex; gap: 8px;">
+                        <span>⏱️ 30-45 min</span>
+                        <span>🛵 Taxa: 1.500 FCFA</span>
+                    </div>
+
                     <div style="font-size: 0.75em; color: #007bff; margin-top: 3px; font-weight: bold;">
                         📞 <a href="tel:+245966202174" style="color: #007bff; text-decoration: none;">+245 966 202 174</a>
                     </div>
@@ -827,12 +860,13 @@
 
         requestAnimationFrame(desenharMapaBissau);
     }
+// 📍 Função Completa para Pedir Comida com Bairro de Entrega
 function pedirComida(nomeRestaurante) {
-    // Contactos reais em Bissau
-    let contacto = "+245 689 2222"; // Papa Loca
+    let contacto = "+245 689 2222";
     if (nomeRestaurante === "A Padeira Africana") contacto = "+245 966 131 393";
     if (nomeRestaurante === "Restaurante O Coqueiro") contacto = "+245 966 202 174";
 
+    // 1. Escolha do Prato
     const menuInfo = 
         "--- MENU: " + nomeRestaurante + " ---\n\n" +
         "1. Prato Principal / Especialidade - 3.500 FCFA\n" +
@@ -843,6 +877,11 @@ function pedirComida(nomeRestaurante) {
     const prato = prompt(menuInfo);
     if (!prato) return;
 
+    // 2. Pedido do Bairro / Endereço de Entrega
+    const endereco = prompt("📍 Qual é o seu Bairro / Endereço em Bissau para entrega?\n(Ex: Bairro Militar, Praça dos Heróis, Sintra, Bandim...)");
+    if (!endereco) return;
+
+    // 3. Forma de Pagamento
     const pagamento = prompt(
         "Escolha a forma de pagamento:\n" +
         "1 - Dinheiro Vivo (Ao Estafeta)\n" +
@@ -856,13 +895,34 @@ function pedirComida(nomeRestaurante) {
     if (pagamento === "2") formaPagamento = "Orange Money";
     if (pagamento === "3") formaPagamento = "Telecel Cash";
 
+    // 4. Confirmação Final Transparente
     alert(
-        "🍲 Pedido enviado com sucesso para " + nomeRestaurante + "!\n\n" +
+        "🍲 PEDIDO CONFIRMADO!\n" +
+        "----------------------------------------\n" +
+        "Restaurante: " + nomeRestaurante + "\n" +
         "Prato: " + prato + "\n" +
+        "Local de Entrega: " + endereco + "\n" +
         "Pagamento: " + formaPagamento + "\n" +
         "Contacto do Restaurante: " + contacto + "\n\n" +
-        "O estafeta ROTA GB já foi notificado!"
+        "🛵 O estafeta ROTA GB a caminho da sua localização!"
     );
+}
+
+// 🏷️ Função para Filtrar Restaurantes por Categoria
+function filtrarComida(categoria) {
+    const itens = document.querySelectorAll('.item-restaurante');
+    
+    itens.forEach(item => {
+        if (categoria === 'todos') {
+            item.style.display = 'flex';
+        } else {
+            if (item.classList.contains(categoria)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
 }
   window.addEventListener('load', updatePrice);
 </script>
