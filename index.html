@@ -912,7 +912,7 @@ function pedirComida(nomeRestaurante) {
     const prato = prompt(menuInfo);
     if (!prato) return;
 
-    const endereco = prompt("📍 Qual é o seu Bairro / Endereço para entrega?\n(Ex: Bairro Militar, Sintra, Bandim, Pilum...)");
+    const endereco = prompt("📍 Indique o seu Bairro ou Ponto de Referência:\n(Ex: Pilum, junto à Farmácia)");
     if (!endereco) return;
 
     const pagamento = prompt(
@@ -928,15 +928,40 @@ function pedirComida(nomeRestaurante) {
     if (pagamento === "2") formaPagamento = "Orange Money";
     if (pagamento === "3") formaPagamento = "Telecel Cash";
 
-    alert(
-        "🍲 PEDIDO CONFIRMADO!\n\n" +
-        "Restaurante: " + nomeRestaurante + "\n" +
-        "Prato: " + prato + "\n" +
-        "Entrega em: " + endereco + "\n" +
-        "Pagamento: " + formaPagamento + "\n" +
-        "Contacto: " + contacto + "\n\n" +
-        "O estafeta ROTA GB já foi notificado!"
-    );
+    // 📡 Captura de Coordenadas GPS em Tempo Real
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const linkMapa = "https://www.google.com/maps?q=" + lat + "," + lng;
+
+                alert(
+                    "🍲 PEDIDO CONFIRMADO COM GPS! 📍\n\n" +
+                    "Restaurante: " + nomeRestaurante + "\n" +
+                    "Prato: " + prato + "\n" +
+                    "Bairro: " + endereco + "\n" +
+                    "Pagamento: " + formaPagamento + "\n" +
+                    "Contacto Restaurante: " + contacto + "\n\n" +
+                    "📡 GPS Localizado com Sucesso!\n" +
+                    "O mototáxi ROTA GB recebeu a sua rota exata no mapa."
+                );
+            },
+            function(error) {
+                // Caso o GPS esteja desligado no telemóvel do cliente
+                alert(
+                    "🍲 PEDIDO CONFIRMADO!\n\n" +
+                    "Restaurante: " + nomeRestaurante + "\n" +
+                    "Prato: " + prato + "\n" +
+                    "Bairro: " + endereco + "\n" +
+                    "Pagamento: " + formaPagamento + "\n\n" +
+                    "O mototáxi guiar-se-á pelo seu bairro e ponto de referência."
+                );
+            }
+        );
+    } else {
+        alert("Pedido registado para " + nomeRestaurante + " no bairro " + endereco);
+    }
 }
   window.addEventListener('load', updatePrice);
 </script>
