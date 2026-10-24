@@ -345,149 +345,127 @@
         </div>
     </div>
 
-    <!-- Panel 2: Comida / Restaurantes -->
-<div id="panel-comida" class="panel">
+   <!-- Panel 2: Comida / Restaurantes -->
+<div id="panel-comida" class="panel" style="padding: 10px; box-sizing: border-box; width: 100%;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h3 style="margin: 0; font-size: 1.2em; color: #111;">🍲 Restaurantes Populares</h3>
-        <span style="font-size: 0.85em; color: #ff6b00; font-weight: bold;">Bissau Centro 📍</span>
+        <h3 style="margin: 0; font-size: 1.1em; color: #111;">🍲 Restaurantes Populares</h3>
+        <span style="font-size: 0.8em; color: #ff6b00; font-weight: bold;">Bissau Centro 📍</span>
     </div>
 
     <div class="store-list" style="display: flex; flex-direction: column; gap: 14px;">
 
         <!-- 1. Papa Loca Bissau -->
-        <div class="store-card" style="position: relative; display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="position: relative;">
                     <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200" alt="Papa Loca" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
-                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.7em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.8</span>
+                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.8</span>
                 </div>
                 <div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="store-name" style="font-weight: bold; font-size: 1em; color: #222;">Papa Loca Bissau</span>
-                        <span style="background: #e8f5e9; color: #2e7d32; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 6px;">Rápido</span>
+                    <div style="font-weight: bold; font-size: 0.95em; color: #222;">Papa Loca Bissau</div>
+                    <div style="font-size: 0.78em; color: #666; margin-top: 2px;">Grelhados e Fast Food</div>
+                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 2px;">2.500 - 6.000 FCFA</div>
+                    <div style="font-size: 0.75em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245955111111" style="color: #007bff; text-decoration: none;">+245 955 111 111</a>
                     </div>
-                    <div class="store-desc" style="font-size: 0.8em; color: #666; margin-top: 2px;">Grelhados e Fast Food</div>
-                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 4px;">2.500 - 6.000 FCFA</div>
                 </div>
             </div>
-            <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s;" onclick="pedirComida('Papa Loca Bissau')">Pedir</button>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Papa Loca Bissau')">Pedir</button>
+                <a href="https://wa.me/245955111111" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.7em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
         </div>
 
         <!-- 2. A Padeira Africana -->
-        <div class="store-card" style="position: relative; display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="position: relative;">
                     <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=200" alt="A Padeira Africana" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
-                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.7em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.9</span>
+                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.9</span>
                 </div>
                 <div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="store-name" style="font-weight: bold; font-size: 1em; color: #222;">A Padeira Africana</span>
-                        <span style="background: #ffe0b2; color: #e65100; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 6px;">Típico</span>
+                    <div style="font-weight: bold; font-size: 0.95em; color: #222;">A Padeira Africana</div>
+                    <div style="font-size: 0.78em; color: #666; margin-top: 2px;">Galinha Cafriela e Comida Típica</div>
+                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 2px;">3.000 - 7.500 FCFA</div>
+                    <div style="font-size: 0.75em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245966222222" style="color: #007bff; text-decoration: none;">+245 966 222 222</a>
                     </div>
-                    <div class="store-desc" style="font-size: 0.8em; color: #666; margin-top: 2px;">Galinha Cafriela e Comida Típica</div>
-                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 4px;">3.000 - 7.500 FCFA</div>
                 </div>
             </div>
-            <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('A Padeira Africana')">Pedir</button>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('A Padeira Africana')">Pedir</button>
+                <a href="https://wa.me/245966222222" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.7em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
         </div>
 
         <!-- 3. Restaurante O Coqueiro -->
-        <div class="store-card" style="position: relative; display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="position: relative;">
                     <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=200" alt="O Coqueiro" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
-                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.7em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.7</span>
+                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.7</span>
                 </div>
                 <div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="store-name" style="font-weight: bold; font-size: 1em; color: #222;">O Coqueiro</span>
-                        <span style="background: #e1f5fe; color: #0288d1; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 6px;">Peixe Fresco</span>
+                    <div style="font-weight: bold; font-size: 0.95em; color: #222;">Restaurante O Coqueiro</div>
+                    <div style="font-size: 0.78em; color: #666; margin-top: 2px;">Peixe Fresco e Marisco</div>
+                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 2px;">4.000 - 12.000 FCFA</div>
+                    <div style="font-size: 0.75em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245955333333" style="color: #007bff; text-decoration: none;">+245 955 333 333</a>
                     </div>
-                    <div class="store-desc" style="font-size: 0.8em; color: #666; margin-top: 2px;">Marisco e Pratos do Mar</div>
-                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 4px;">4.000 - 12.000 FCFA</div>
                 </div>
             </div>
-            <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Restaurante O Coqueiro')">Pedir</button>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Restaurante O Coqueiro')">Pedir</button>
+                <a href="https://wa.me/245955333333" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.7em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
         </div>
-<!-- 4. Snack-Bar Oasis -->
-        <div class="store-card" style="position: relative; display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+
+        <!-- 4. Snack-Bar Oasis -->
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="position: relative;">
                     <img src="https://images.unsplash.com/photo-1509722747041-616f39b57569?w=200" alt="Snack-Bar Oasis" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
-                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.7em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.6</span>
+                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.6</span>
                 </div>
                 <div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="store-name" style="font-weight: bold; font-size: 1em; color: #222;">Snack-Bar Oasis</span>
-                        <span style="background: #f3e5f5; color: #7b1fa2; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 6px;">Pastelaria</span>
+                    <div style="font-weight: bold; font-size: 0.95em; color: #222;">Snack-Bar Oasis</div>
+                    <div style="font-size: 0.78em; color: #666; margin-top: 2px;">Pastelaria e Refeições Rápidas</div>
+                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 2px;">1.500 - 4.000 FCFA</div>
+                    <div style="font-size: 0.75em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245966444444" style="color: #007bff; text-decoration: none;">+245 966 444 444</a>
                     </div>
-                    <div class="store-desc" style="font-size: 0.8em; color: #666; margin-top: 2px;">Sumos Naturais e Lanches</div>
-                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 4px;">1.500 - 4.000 FCFA</div>
                 </div>
             </div>
-            <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Snack-Bar Oasis')">Pedir</button>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Snack-Bar Oasis')">Pedir</button>
+                <a href="https://wa.me/245966444444" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.7em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
         </div>
 
         <!-- 5. Chez Sapphire -->
-        <div class="store-card" style="position: relative; display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="position: relative;">
                     <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=200" alt="Chez Sapphire" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
-                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.7em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.9</span>
+                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.9</span>
                 </div>
                 <div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="store-name" style="font-weight: bold; font-size: 1em; color: #222;">Chez Sapphire</span>
-                        <span style="background: #e8eaf6; color: #1a237e; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 6px;">Gourmet</span>
+                    <div style="font-weight: bold; font-size: 0.95em; color: #222;">Chez Sapphire</div>
+                    <div style="font-size: 0.78em; color: #666; margin-top: 2px;">Cozinha Internacional e Buffet</div>
+                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 2px;">5.000 - 15.000 FCFA</div>
+                    <div style="font-size: 0.75em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245955555555" style="color: #007bff; text-decoration: none;">+245 955 555 555</a>
                     </div>
-                    <div class="store-desc" style="font-size: 0.8em; color: #666; margin-top: 2px;">Cozinha Internacional e Buffet</div>
-                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 4px;">5.000 - 15.000 FCFA</div>
                 </div>
             </div>
-            <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Chez Sapphire')">Pedir</button>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Chez Sapphire')">Pedir</button>
+                <a href="https://wa.me/245955555555" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.7em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
         </div>
 
-        <!-- 6. Pizzeria Calabresa Bissau -->
-        <div class="store-card" style="position: relative; display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="position: relative;">
-                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200" alt="Pizzeria Calabresa" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
-                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.7em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.8</span>
-                </div>
-                <div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="store-name" style="font-weight: bold; font-size: 1em; color: #222;">Pizzeria Calabresa</span>
-                        <span style="background: #ffebee; color: #c62828; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 6px;">Pizzas</span>
-                    </div>
-                    <div class="store-desc" style="font-size: 0.8em; color: #666; margin-top: 2px;">Pizzas em Forno de Lenha e Massas</div>
-                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 4px;">4.500 - 9.000 FCFA</div>
-                </div>
-            </div>
-            <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Pizzeria Calabresa')">Pedir</button>
-        </div>
-
-        <!-- 7. Cantinho dos Grelhados (Bandim) -->
-        <div class="store-card" style="position: relative; display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="position: relative;">
-                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200" alt="Cantinho dos Grelhados" style="width: 75px; height: 75px; border-radius: 12px; object-fit: cover;">
-                    <span style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ffb703; color: #000; font-size: 0.7em; font-weight: bold; padding: 2px 6px; border-radius: 10px;">★ 4.7</span>
-                </div>
-                <div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="store-name" style="font-weight: bold; font-size: 1em; color: #222;">Cantinho dos Grelhados</span>
-                        <span style="background: #efebe9; color: #4e342e; font-size: 0.65em; font-weight: bold; padding: 2px 6px; border-radius: 6px;">Churrasco</span>
-                    </div>
-                    <div class="store-desc" style="font-size: 0.8em; color: #666; margin-top: 2px;">Espetadas, Entrecosto e Acompanhamentos</div>
-                    <div style="font-size: 0.85em; color: #ff6b00; font-weight: bold; margin-top: 4px;">2.000 - 5.500 FCFA</div>
-                </div>
-            </div>
-            <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Cantinho dos Grelhados')">Pedir</button>
-        </div>
     </div>
 </div>
-
     <!-- Panel 3: Lojas -->
     <div class="bottom-panel" id="panel-lojas" style="display: none;">
         <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Supermercados e Lojas</div>
