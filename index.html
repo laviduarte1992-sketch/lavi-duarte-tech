@@ -909,8 +909,30 @@ function pedirComida(nomeRestaurante) {
         "3. Peixe Fresco / Menu Especial - 5.500 FCFA\n\n" +
         "Escreva o número ou nome do prato:";
 
-    const prato = prompt(menuInfo);
-    if (!prato) return;
+    const pratoInput = prompt(menuInfo);
+    if (!pratoInput) return;
+
+    // 💰 Cálculo dos Valores (Prato + Taxa de Entrega de 1.000 FCFA)
+    let valorPrato = 3500;
+    let nomePrato = "Prato Principal";
+
+    if (pratoInput.includes("2") || pratoInput.toLowerCase().includes("galinha") || pratoInput.toLowerCase().includes("pizza")) {
+        valorPrato = 4500;
+        nomePrato = "Galinha Asada / Pizza";
+    } else if (pratoInput.includes("3") || pratoInput.toLowerCase().includes("peixe")) {
+        valorPrato = 5500;
+        nomePrato = "Peixe Fresco / Menu Especial";
+    }
+
+    const taxaEntrega = 1000;
+    const totalCliente = valorPrato + taxaEntrega;
+
+    // Divisão Financeira (10% comissão prato + 20% comissão entrega)
+    const comissaoRestaurante = valorPrato * 0.10; // 350 FCFA (num prato de 3500)
+    const comissaoEntrega = taxaEntrega * 0.20;    // 200 FCFA
+    const valorRestaurante = valorPrato - comissaoRestaurante; // 3.150 FCFA
+    const ganhoMototaxi = taxaEntrega - comissaoEntrega;       // 800 FCFA
+    const comissaoRotaGB = comissaoRestaurante + comissaoEntrega; // 550 FCFA
 
     const endereco = prompt("📍 Indique o seu Bairro ou Ponto de Referência:\n(Ex: Pilum, Bandim, Sintra...)");
     if (!endereco) return;
@@ -924,7 +946,7 @@ function pedirComida(nomeRestaurante) {
     );
     if (!pagamento) return;
 
-    let formaPagamento = "Dinheiro Vivo";
+    let formaPagamento = "Dinheiro Vivo (Ao Estafeta)";
     if (pagamento === "2") formaPagamento = "Orange Money";
     if (pagamento === "3") formaPagamento = "Telecel Cash";
 
@@ -934,28 +956,49 @@ function pedirComida(nomeRestaurante) {
             function(position) {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
-                // Link direto do Google Maps para o mototáxi navegar
                 const linkGoogleMaps = "https://www.google.com/maps?q=" + lat + "," + lng;
 
                 alert(
-                    "🍲 PEDIDO CONFIRMADO COM GPS! 📍\n\n" +
+                    "🍲 PEDIDO CONFIRMADO COM GPS! 📍\n" +
+                    "----------------------------------------\n" +
                     "Restaurante: " + nomeRestaurante + "\n" +
-                    "Prato: " + prato + "\n" +
+                    "Prato: " + nomePrato + " (" + valorPrato.toLocaleString() + " FCFA)\n" +
+                    "Taxa Entrega: " + taxaEntrega.toLocaleString() + " FCFA\n" +
+                    "TOTAL A PAGAR PELO CLIENTE: " + totalCliente.toLocaleString() + " FCFA\n" +
                     "Bairro: " + endereco + "\n" +
                     "Pagamento: " + formaPagamento + "\n" +
                     "Contacto Restaurante: " + contacto + "\n\n" +
-                    "📡 GPS Capturado com Sucesso!\n" +
-                    "Rota do Mototáxi: " + linkGoogleMaps
+
+                    "📊 DESDOBRAMENTO FINANCEIRO DA ORDEM:\n" +
+                    "• Receber em Dinheiro Vivo: " + totalCliente.toLocaleString() + " FCFA\n" +
+                    "• Pagar ao Restaurante: " + valorRestaurante.toLocaleString() + " FCFA\n" +
+                    "• Lucro Líquido do Mototáxi: " + ganhoMototaxi.toLocaleString() + " FCFA\n" +
+                    "• Comissão ROTA GB: " + comissaoRotaGB.toLocaleString() + " FCFA\n\n" +
+
+                    "ℹ️ NOTA PARA O MOTOTÁXI:\n" +
+                    "A comissão da ROTA GB (" + comissaoRotaGB.toLocaleString() + " FCFA) foi registada e será debitada automaticamente do seu saldo digital de acerto diário.\n\n" +
+
+                    "📡 GPS Localizado com Sucesso!\n" +
+                    "Link da Rota: " + linkGoogleMaps
                 );
             },
             function(error) {
                 alert(
-                    "🍲 PEDIDO CONFIRMADO!\n\n" +
+                    "🍲 PEDIDO CONFIRMADO!\n" +
+                    "----------------------------------------\n" +
                     "Restaurante: " + nomeRestaurante + "\n" +
-                    "Prato: " + prato + "\n" +
+                    "Prato: " + nomePrato + " (" + valorPrato.toLocaleString() + " FCFA)\n" +
+                    "TOTAL A PAGAR: " + totalCliente.toLocaleString() + " FCFA\n" +
                     "Bairro: " + endereco + "\n" +
                     "Pagamento: " + formaPagamento + "\n\n" +
-                    "O mototáxi guiar-se-á pelo seu bairro e ponto de referência."
+
+                    "📊 DESDOBRAMENTO FINANCEIRO:\n" +
+                    "• Pagar ao Restaurante: " + valorRestaurante.toLocaleString() + " FCFA\n" +
+                    "• Lucro Mototáxi: " + ganhoMototaxi.toLocaleString() + " FCFA\n" +
+                    "• Comissão ROTA GB: " + comissaoRotaGB.toLocaleString() + " FCFA\n\n" +
+
+                    "ℹ️ NOTA PARA O MOTOTÁXI:\n" +
+                    "A comissão da ROTA GB (" + comissaoRotaGB.toLocaleString() + " FCFA) fica registada no sistema para acerto no final do dia."
                 );
             }
         );
