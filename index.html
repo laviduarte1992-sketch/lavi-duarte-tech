@@ -486,42 +486,93 @@
 
     </div>
 </div>
+<!-- Panel 3: Lojas e Supermercados -->
+<div id="panel-lojas" class="panel" style="padding: 10px; width: 100%; box-sizing: border-box;">
+    <h3 style="margin-bottom: 15px; color: #111;">Supermercados e Lojas em Bissau</h3>
 
+    <div class="store-list" style="display: flex; flex-direction: column; gap: 12px;">
 
-    <!-- Panel 3: Lojas -->
-    <div class="bottom-panel" id="panel-lojas" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Supermercados e Lojas</div>
-        <div class="store-list">
-            <div class="store-card">
+        <!-- 1. Supermercado Hereso -->
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=200" alt="Supermercado Hereso" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover;">
                 <div>
-                    <div class="store-name">Supermercado Hereso</div>
-                    <div class="store-desc">Alimentação Geral, Bebidas e Frescos</div>
+                    <div style="font-weight: bold; font-size: 1em; color: #222;">Supermercado Hereso</div>
+                    <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Alimentação Geral, Bebidas e Frescos</div>
+                    <div style="font-size: 0.85em; color: #28a745; font-weight: bold; margin-top: 3px;">Arroz, Óleo, Açúcar, Leite</div>
+                    <div style="font-size: 0.78em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245955908901" style="color: #007bff; text-decoration: none;">+245 955 908 901</a>
+                    </div>
                 </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
             </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Mini-Mercado Bandim</div>
-                    <div class="store-desc">Produtos de Mercearia e Higiene</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Farmácia Central Bissau</div>
-                    <div class="store-desc">Medicamentos e Primeiros Socorros</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
-            </div>
-            <div class="store-card">
-                <div>
-                    <div class="store-name">Boutique Guiné Moda</div>
-                    <div class="store-desc">Roupas, Calçados e Acessórios</div>
-                </div>
-                <button type="button" style="background:#00e676; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="alert('Comprando...')">Comprar</button>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarLoja('Supermercado Hereso')">Comprar</button>
+                <a href="https://wa.me/245955908901" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
+
+        <!-- 2. Mini-Mercado Bandim -->
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=200" alt="Mini-Mercado Bandim" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover;">
+                <div>
+                    <div style="font-weight: bold; font-size: 1em; color: #222;">Mini-Mercado Bandim</div>
+                    <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Produtos de Mercearia e Higiene</div>
+                    <div style="font-size: 0.85em; color: #28a745; font-weight: bold; margin-top: 3px;">Mercearia e Cabaz Familiar</div>
+                    <div style="font-size: 0.78em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245966358728" style="color: #007bff; text-decoration: none;">+245 966 358 728</a>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarLoja('Mini-Mercado Bandim')">Comprar</button>
+                <a href="https://wa.me/245966358728" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
+        </div>
+
+        <!-- 3. Farmácia Central Bissau -->
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=200" alt="Farmácia Central" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover;">
+                <div>
+                    <div style="font-weight: bold; font-size: 1em; color: #222;">Farmácia Central Bissau</div>
+                    <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Medicamentos e Primeiros Socorros</div>
+                    <div style="font-size: 0.85em; color: #28a745; font-weight: bold; margin-top: 3px;">Saúde & Higiene Pessoal</div>
+                    <div style="font-size: 0.78em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245955312929" style="color: #007bff; text-decoration: none;">+245 955 312 929</a>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarLoja('Farmácia Central Bissau')">Comprar</button>
+                <a href="https://wa.me/245955312929" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
+        </div>
+
+        <!-- 4. Boutique Guiné Moda -->
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200" alt="Boutique Guiné Moda" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover;">
+                <div>
+                    <div style="font-weight: bold; font-size: 1em; color: #222;">Boutique Guiné Moda</div>
+                    <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Roupas, Calçados e Acessórios</div>
+                    <div style="font-size: 0.85em; color: #28a745; font-weight: bold; margin-top: 3px;">Panos Tradicionais e Vestuário</div>
+                    <div style="font-size: 0.78em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245966982682" style="color: #007bff; text-decoration: none;">+245 966 982 682</a>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarLoja('Boutique Guiné Moda')">Comprar</button>
+                <a href="https://wa.me/245966982682" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
+        </div>
+
     </div>
+</div>
+
+   
+       
 
     <!-- Panel 4: Hotéis -->
     <div class="bottom-panel" id="panel-hoteis" style="display: none;">
@@ -893,48 +944,72 @@
 
         requestAnimationFrame(desenharMapaBissau);
     }
-function pedirComida(nomeRestaurante) {
-    let contacto = "+245 689 2222";
-    if (nomeRestaurante === "A Padeira Africana") contacto = "+245 966 131 393";
-    if (nomeRestaurante === "Restaurante O Coqueiro") contacto = "+245 966 202 174";
-    if (nomeRestaurante === "Snack-Bar Oasis") contacto = "+245 955 404 040";
-    if (nomeRestaurante === "Chez Sapphire") contacto = "+245 966 505 050";
-    if (nomeRestaurante === "Pizzeria Calabresa") contacto = "+245 955 606 060";
-    if (nomeRestaurante === "Cantinho dos Grelhados") contacto = "+245 966 707 070";
+    function comprarLoja(nomeLoja) {
+    let contacto = "+245 955 908 901";
+    if (nomeLoja === "Mini-Mercado Bandim") contacto = "+245 966 358 728";
+    if (nomeLoja === "Farmácia Central Bissau") contacto = "+245 955 312 929";
+    if (nomeLoja === "Boutique Guiné Moda") contacto = "+245 966 982 682";
 
-    const menuInfo = 
-        "--- MENU: " + nomeRestaurante + " ---\n\n" +
-        "1. Prato Principal / Especialidade - 3.500 FCFA\n" +
-        "2. Galinha Asada / Cafriela / Pizza - 4.500 FCFA\n" +
-        "3. Peixe Fresco / Menu Especial - 5.500 FCFA\n\n" +
-        "Escreva o número ou nome do prato:";
+    let catalogo = "";
+    if (nomeLoja.includes("Farmácia")) {
+        catalogo = 
+            "--- CATÁLOGO: " + nomeLoja + " ---\n\n" +
+            "1. Paracetamol 500mg (Caixa) - 1.000 FCFA\n" +
+            "2. Kit Primeiros Socorros / Curativos - 3.500 FCFA\n" +
+            "3. Vitamina C / Suplementos - 4.000 FCFA\n\n" +
+            "Escreva o número ou produto pretendido:";
+    } else if (nomeLoja.includes("Moda")) {
+        catalogo = 
+            "--- CATÁLOGO: " + nomeLoja + " ---\n\n" +
+            "1. Pano Tradicional Guineense - 7.500 FCFA\n" +
+            "2. T-Shirt / Camisa Casual - 5.000 FCFA\n" +
+            "3. Calçado / Chinelos de Marca - 6.500 FCFA\n\n" +
+            "Escreva o número ou produto pretendido:";
+    } else {
+        // Supermercados e Mercearias (Alimentos com Preços Reais em Bissau)
+        catalogo = 
+            "--- PRODUTOS ALIMENTARES: " + nomeLoja + " ---\n\n" +
+            "1. Saco de Arroz (25kg 100% Nhelem) - 11.000 FCFA\n" +
+            "2. Garrafão de Óleo Alimentar (5L) - 5.500 FCFA\n" +
+            "3. Saco de Açúcar (5kg) - 3.500 FCFA\n" +
+            "4. Lata de Leite Nido (900g) - 6.000 FCFA\n\n" +
+            "Escreva o número ou nome do produto:";
+    }
 
-    const pratoInput = prompt(menuInfo);
-    if (!pratoInput) return;
+    const produtoInput = prompt(catalogo);
+    if (!produtoInput) return;
 
-    // 💰 Cálculo dos Valores (Prato + Taxa de Entrega de 1.000 FCFA)
-    let valorPrato = 3500;
-    let nomePrato = "Prato Principal";
+    // Cálculo do preço real com base na escolha
+    let valorProduto = 3500;
+    let nomeProduto = "Produto Selecionado";
 
-    if (pratoInput.includes("2") || pratoInput.toLowerCase().includes("galinha") || pratoInput.toLowerCase().includes("pizza")) {
-        valorPrato = 4500;
-        nomePrato = "Galinha Asada / Pizza";
-    } else if (pratoInput.includes("3") || pratoInput.toLowerCase().includes("peixe")) {
-        valorPrato = 5500;
-        nomePrato = "Peixe Fresco / Menu Especial";
+    if (produtoInput.includes("1") || produtoInput.toLowerCase().includes("arroz") || produtoInput.toLowerCase().includes("paracetamol") || produtoInput.toLowerCase().includes("pano")) {
+        if (nomeLoja.includes("Farmácia")) { valorProduto = 1000; nomeProduto = "Paracetamol 500mg"; }
+        else if (nomeLoja.includes("Moda")) { valorProduto = 7500; nomeProduto = "Pano Tradicional"; }
+        else { valorProduto = 11000; nomeProduto = "Saco de Arroz 25kg"; }
+    } else if (produtoInput.includes("2") || produtoInput.toLowerCase().includes("óleo") || produtoInput.toLowerCase().includes("kit") || produtoInput.toLowerCase().includes("camisa")) {
+        if (nomeLoja.includes("Farmácia")) { valorProduto = 3500; nomeProduto = "Kit Primeiros Socorros"; }
+        else if (nomeLoja.includes("Moda")) { valorProduto = 5000; nomeProduto = "T-Shirt / Camisa"; }
+        else { valorProduto = 5500; nomeProduto = "Garrafão de Óleo (5L)"; }
+    } else if (produtoInput.includes("4") || produtoInput.toLowerCase().includes("leite")) {
+        valorProduto = 6000; nomeProduto = "Lata de Leite Nido (900g)";
+    } else if (produtoInput.includes("3") || produtoInput.toLowerCase().includes("açúcar") || produtoInput.toLowerCase().includes("vitamina") || produtoInput.toLowerCase().includes("calçado")) {
+        if (nomeLoja.includes("Farmácia")) { valorProduto = 4000; nomeProduto = "Vitamina C / Suplementos"; }
+        else if (nomeLoja.includes("Moda")) { valorProduto = 6500; nomeProduto = "Calçado Casual"; }
+        else { valorProduto = 3500; nomeProduto = "Saco de Açúcar (5kg)"; }
     }
 
     const taxaEntrega = 1000;
-    const totalCliente = valorPrato + taxaEntrega;
+    const totalCliente = valorProduto + taxaEntrega;
 
-    // Divisão Financeira (10% comissão prato + 20% comissão entrega)
-    const comissaoRestaurante = valorPrato * 0.10; // 350 FCFA (num prato de 3500)
-    const comissaoEntrega = taxaEntrega * 0.20;    // 200 FCFA
-    const valorRestaurante = valorPrato - comissaoRestaurante; // 3.150 FCFA
-    const ganhoMototaxi = taxaEntrega - comissaoEntrega;       // 800 FCFA
-    const comissaoRotaGB = comissaoRestaurante + comissaoEntrega; // 550 FCFA
+    // Comissão ROTA GB (10% no produto + 20% na entrega)
+    const comissaoLoja = valorProduto * 0.10;
+    const comissaoEntrega = taxaEntrega * 0.20;
+    const valorLojaNeto = valorProduto - comissaoLoja;
+    const ganhoMototaxi = taxaEntrega - comissaoEntrega;
+    const comissaoRotaGB = comissaoLoja + comissaoEntrega;
 
-    const endereco = prompt("📍 Indique o seu Bairro ou Ponto de Referência:\n(Ex: Pilum, Bandim, Sintra...)");
+    const endereco = prompt("📍 Indique o seu Bairro ou Ponto de Referência para entrega:\n(Ex: Bandim, Sintra, Bairro Militar...)");
     if (!endereco) return;
 
     const pagamento = prompt(
@@ -950,7 +1025,7 @@ function pedirComida(nomeRestaurante) {
     if (pagamento === "2") formaPagamento = "Orange Money";
     if (pagamento === "3") formaPagamento = "Telecel Cash";
 
-    // 📡 Captura de Coordenadas GPS em Tempo Real
+    // GPS em Tempo Real
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
             function(position) {
@@ -959,24 +1034,23 @@ function pedirComida(nomeRestaurante) {
                 const linkGoogleMaps = "https://www.google.com/maps?q=" + lat + "," + lng;
 
                 alert(
-                    "🍲 PEDIDO CONFIRMADO COM GPS! 📍\n" +
+                    "🛒 PEDIDO DE LOJA CONFIRMADO COM GPS! 📍\n" +
                     "----------------------------------------\n" +
-                    "Restaurante: " + nomeRestaurante + "\n" +
-                    "Prato: " + nomePrato + " (" + valorPrato.toLocaleString() + " FCFA)\n" +
+                    "Loja: " + nomeLoja + "\n" +
+                    "Produto: " + nomeProduto + " (" + valorProduto.toLocaleString() + " FCFA)\n" +
                     "Taxa Entrega: " + taxaEntrega.toLocaleString() + " FCFA\n" +
                     "TOTAL A PAGAR PELO CLIENTE: " + totalCliente.toLocaleString() + " FCFA\n" +
                     "Bairro: " + endereco + "\n" +
                     "Pagamento: " + formaPagamento + "\n" +
-                    "Contacto Restaurante: " + contacto + "\n\n" +
+                    "Contacto Loja: " + contacto + "\n\n" +
 
-                    "📊 DESDOBRAMENTO FINANCEIRO DA ORDEM:\n" +
-                    "• Receber em Dinheiro Vivo: " + totalCliente.toLocaleString() + " FCFA\n" +
-                    "• Pagar ao Restaurante: " + valorRestaurante.toLocaleString() + " FCFA\n" +
-                    "• Lucro Líquido do Mototáxi: " + ganhoMototaxi.toLocaleString() + " FCFA\n" +
+                    "📊 DESDOBRAMENTO FINANCEIRO:\n" +
+                    "• Pagar à Loja: " + valorLojaNeto.toLocaleString() + " FCFA\n" +
+                    "• Lucro Mototáxi: " + ganhoMototaxi.toLocaleString() + " FCFA\n" +
                     "• Comissão ROTA GB: " + comissaoRotaGB.toLocaleString() + " FCFA\n\n" +
 
                     "ℹ️ NOTA PARA O MOTOTÁXI:\n" +
-                    "A comissão da ROTA GB (" + comissaoRotaGB.toLocaleString() + " FCFA) foi registada e será debitada automaticamente do seu saldo digital de acerto diário.\n\n" +
+                    "A comissão da ROTA GB (" + comissaoRotaGB.toLocaleString() + " FCFA) fica registada no sistema.\n\n" +
 
                     "📡 GPS Localizado com Sucesso!\n" +
                     "Link da Rota: " + linkGoogleMaps
@@ -984,27 +1058,18 @@ function pedirComida(nomeRestaurante) {
             },
             function(error) {
                 alert(
-                    "🍲 PEDIDO CONFIRMADO!\n" +
+                    "🛒 PEDIDO DE LOJA CONFIRMADO!\n" +
                     "----------------------------------------\n" +
-                    "Restaurante: " + nomeRestaurante + "\n" +
-                    "Prato: " + nomePrato + " (" + valorPrato.toLocaleString() + " FCFA)\n" +
+                    "Loja: " + nomeLoja + "\n" +
+                    "Produto: " + nomeProduto + " (" + valorProduto.toLocaleString() + " FCFA)\n" +
                     "TOTAL A PAGAR: " + totalCliente.toLocaleString() + " FCFA\n" +
                     "Bairro: " + endereco + "\n" +
-                    "Pagamento: " + formaPagamento + "\n\n" +
-
-                    "📊 DESDOBRAMENTO FINANCEIRO:\n" +
-                    "• Pagar ao Restaurante: " + valorRestaurante.toLocaleString() + " FCFA\n" +
-                    "• Lucro Mototáxi: " + ganhoMototaxi.toLocaleString() + " FCFA\n" +
-                    "• Comissão ROTA GB: " + comissaoRotaGB.toLocaleString() + " FCFA\n\n" +
-
-                    "ℹ️ NOTA PARA O MOTOTÁXI:\n" +
-                    "A comissão da ROTA GB (" + comissaoRotaGB.toLocaleString() + " FCFA) fica registada no sistema para acerto no final do dia."
+                    "Contacto: " + contacto
                 );
             }
         );
     }
 }
-  window.addEventListener('load', updatePrice);
 </script>
 
 </body>
