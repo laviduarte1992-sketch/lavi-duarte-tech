@@ -659,33 +659,52 @@
 
   
 
-    <!-- Panel 5: Recargas -->
-    <div class="bottom-panel" id="panel-recargas" style="display: none;">
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Comprar Saldo de Telemóvel</div>
-        
-        <div class="sub-tabs">
-            <button type="button" class="sub-tab-btn active" id="btn-orange-op" onclick="selectOperator('Orange')">🟧 Orange Bissau</button>
-            <button type="button" class="sub-tab-btn" id="btn-telecel-op" onclick="selectOperator('Telecel')">🟥 Telecel Bissau</button>
+   <!-- Panel 5: Recargas -->
+<div id="panel-recargas" class="panel" style="padding: 10px; width: 100%; box-sizing: border-box;">
+    <h3 style="margin-bottom: 15px; color: #111;">Recargas de Saldo e Internet en Bissau</h3>
+
+    <div class="store-list" style="display: flex; flex-direction: column; gap: 12px;">
+
+        <!-- 1. Recarga Orange Guinea-Bissau -->
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="https://images.unsplash.com/photo-1556742049-0a67d553c253?w=200" alt="Orange GW" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover;">
+                <div>
+                    <div style="font-weight: bold; font-size: 1em; color: #222;">Orange - Saldo e Internet</div>
+                    <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Recarga Instantánea Móvil</div>
+                    <div style="font-size: 0.85em; color: #ff6600; font-weight: bold; margin-top: 3px;">500 - 10.000 FCFA</div>
+                    <div style="font-size: 0.78em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245955000123" style="color: #007bff; text-decoration: none;">+245 955 000 123</a>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #ff6600; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarRecarga('Orange Guinea-Bissau')">Recarregar</button>
+                <a href="https://wa.me/245955000123" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
         </div>
 
-        <div class="form-group" style="margin-top: 6px;">
-            <label>NÚMERO DE TELEMÓVEL (+245)</label>
-            <input type="tel" id="phoneRecarga" placeholder="Ex: 955XXXXXX ou 966XXXXXX">
+        <!-- 2. Recarga MTN / Telecel -->
+        <div class="store-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=200" alt="MTN Telecel" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover;">
+                <div>
+                    <div style="font-weight: bold; font-size: 1em; color: #222;">MTN / Telecel Cash</div>
+                    <div style="font-size: 0.8em; color: #666; margin-top: 2px;">Crédito e Dados Móveis</div>
+                    <div style="font-size: 0.85em; color: #ffcc00; font-weight: bold; margin-top: 3px;">500 - 10.000 FCFA</div>
+                    <div style="font-size: 0.78em; color: #007bff; margin-top: 3px; font-weight: bold;">
+                        📞 <a href="tel:+245966000456" style="color: #007bff; text-decoration: none;">+245 966 000 456</a>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                <button class="btn-pedir" style="background: #e6b800; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarRecarga('MTN / Telecel Cash')">Recarregar</button>
+                <a href="https://wa.me/245966000456" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
+            </div>
         </div>
 
-        <div class="form-group" style="margin-top: 6px;">
-            <label>VALOR DA RECARGA (XOF)</label>
-            <select id="amountRecarga">
-                <option value="500">500 XOF</option>
-                <option value="1000" selected>1.000 XOF</option>
-                <option value="2000">2.000 XOF</option>
-                <option value="5000">5.000 XOF</option>
-            </select>
-        </div>
-
-        <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="processarRecarga()">Pagar Recarga Agora</button>
     </div>
-
+</div>
     <!-- Panel Motorista -->
     <div class="bottom-panel" id="panel-motorista" style="display: none;">
         <div class="sub-tabs">
@@ -990,71 +1009,62 @@
 
         requestAnimationFrame(desenharMapaBissau);
     }
-   function reservarHotel(nomeHotel) {
-    let contacto = "+245 320 5100";
-    if (nomeHotel.includes("Azalai")) contacto = "+245 321 4300";
-    if (nomeHotel.includes("Dunia")) contacto = "+245 955 123 456";
-    if (nomeHotel.includes("Kala")) contacto = "+245 966 789 012";
+   function comprarRecarga(operadora) {
+    const menuRecarga = 
+        "--- RECARGA: " + operadora + " ---\n\n" +
+        "1. 500 FCFA (Saldo)\n" +
+        "2. 1.000 FCFA (Saldo / Dados)\n" +
+        "3. 2.500 FCFA (Internet 2GB)\n" +
+        "4. 5.000 FCFA (Internet 5GB)\n\n" +
+        "Seleccione el número de la opción deseada:";
 
-    const menuQuartos = 
-        "--- RESERVA: " + nomeHotel + " ---\n\n" +
-        "1. Quarto Standard / Individual - 20.000 FCFA / noite\n" +
-        "2. Quarto Duplo / Casal - 35.000 FCFA / noite\n" +
-        "3. Suite Executiva / Luxo - 60.000 FCFA / noite\n\n" +
-        "Escreva o número do quarto pretendido:";
+    const opcaoInput = prompt(menuRecarga);
+    if (!opcaoInput) return;
 
-    const quartoInput = prompt(menuQuartos);
-    if (!quartoInput) return;
+    let valorRecarga = 1000;
+    let descRecarga = "1.000 FCFA";
 
-    let precoNoite = 35000;
-    let nomeQuarto = "Quarto Duplo";
-
-    if (quartoInput.includes("1") || quartoInput.toLowerCase().includes("standard") || quartoInput.toLowerCase().includes("individual")) {
-        precoNoite = 20000;
-        nomeQuarto = "Quarto Standard";
-    } else if (quartoInput.includes("3") || quartoInput.toLowerCase().includes("suite") || quartoInput.toLowerCase().includes("luxo")) {
-        precoNoite = 60000;
-        nomeQuarto = "Suite Executiva";
+    if (opcaoInput.includes("1")) {
+        valorRecarga = 500;
+        descRecarga = "500 FCFA";
+    } else if (opcaoInput.includes("3")) {
+        valorRecarga = 2500;
+        descRecarga = "2.500 FCFA (Internet 2GB)";
+    } else if (opcaoInput.includes("4")) {
+        valorRecarga = 5000;
+        descRecarga = "5.000 FCFA (Internet 5GB)";
     }
 
-    const noitesInput = prompt("Quantas noites pretende ficar?", "1");
-    const noites = parseInt(noitesInput) || 1;
-
-    const totalReserva = precoNoite * noites;
-    const comissaoRotaGB = totalReserva * 0.12; // 12% de comissão para reservas de hotel
-    const valorHotelNeto = totalReserva - comissaoRotaGB;
-
-    const nomeCliente = prompt("👤 Qual é o seu Nome completo para a reserva?");
-    if (!nomeCliente) return;
+    const telefone = prompt("📱 Introduzca el número de teléfono para recibir la recarga:\n(Ej: +245 95XXXXX / 96XXXXX)");
+    if (!telefone) return;
 
     const pagamento = prompt(
-        "Escolha a forma de pagamento da reserva:\n" +
-        "1 - Dinheiro / Pagamento no Hotel\n" +
+        "Elija el método de pago:\n" +
+        "1 - Efectivo / Dinheiro Vivo\n" +
         "2 - Orange Money\n" +
         "3 - Telecel Cash", 
-        "1"
+        "2"
     );
     if (!pagamento) return;
 
-    let formaPagamento = "Pagamento no Hotel";
+    let formaPagamento = "Efectivo";
     if (pagamento === "2") formaPagamento = "Orange Money";
     if (pagamento === "3") formaPagamento = "Telecel Cash";
 
-    alert(
-        "🏨 RESERVA DE HOTEL CONFIRMADA! 🌟\n" +
-        "----------------------------------------\n" +
-        "Hotel: " + nomeHotel + "\n" +
-        "Hóspede: " + nomeCliente + "\n" +
-        "Acomodação: " + nomeQuarto + " (" + precoNoite.toLocaleString() + " FCFA/noite)\n" +
-        "Estadia: " + noites + " noite(s)\n" +
-        "TOTAL DA RESERVA: " + totalReserva.toLocaleString() + " FCFA\n" +
-        "Pagamento: " + formaPagamento + "\n" +
-        "Contacto do Hotel: " + contacto + "\n\n" +
+    // Comisión ROTA GB sobre recargas (ej: 5%)
+    const comissaoRotaGB = valorRecarga * 0.05;
 
-        "📊 GESTÃO FINANCEIRA ROTA GB:\n" +
-        "• Repasse ao Hotel: " + valorHotelNeto.toLocaleString() + " FCFA\n" +
-        "• Comissão ROTA GB (12%): " + comissaoRotaGB.toLocaleString() + " FCFA\n\n" +
-        "A sua reserva foi registada com sucesso no sistema ROTA GB!"
+    alert(
+        "⚡ ¡RECARGA EXITOSA EN ROTA GB! 📱\n" +
+        "----------------------------------------\n" +
+        "Operadora: " + operadora + "\n" +
+        "Paquete: " + descRecarga + "\n" +
+        "Destino: " + telefone + "\n" +
+        "Pago via: " + formaPagamento + "\n\n" +
+        "📊 GESTIÓN ROTA GB:\n" +
+        "• Valor procesado: " + valorRecarga.toLocaleString() + " FCFA\n" +
+        "• Comisión de plataforma (5%): " + comissaoRotaGB.toLocaleString() + " FCFA\n\n" +
+        "¡El saldo ha sido enviado al número de teléfono indicado!"
     );
 }
 </script>
