@@ -11,7 +11,29 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ROTA GB">
-
+<!-- Estilo para corrigir o ecrã a 100% no telemóvel -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: #f4f4f4;
+        }
+        .container, .app-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        @media (min-width: 768px) {
+            .container, .app-container {
+                max-width: 450px;
+                margin: 20px auto;
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            }
+        }
+    </style>
     <!-- Bibliotecas Obrigatórias -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
