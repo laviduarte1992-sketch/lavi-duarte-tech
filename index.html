@@ -11,26 +11,34 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ROTA GB">
-<!-- Estilo para ocupar 100% do ecrã (Largura Total) -->
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            background-color: #ffffff;
-            font-family: Arial, sans-serif;
-        }
+<style>
+    /* Força o telemóvel e o PC a lerem a largura real do ecrã */
+    * {
+        box-sizing: border-box;
+    }
 
-        .container, .app-container {
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 10px;
-            box-sizing: border-box;
-            background-color: #ffffff;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-        }
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        background-color: #ffffff !important;
+        font-family: Arial, sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* Anula qualquer largura fixa anterior e estica a 100% */
+    .container, .app-container, div {
+        max-width: 100% !important;
+    }
+
+    .app-container, body > div:first-child {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 10px !important;
+        float: none !important;
+        display: block !important;
+    }
+</style>
     </style>
         }
     </style>
@@ -1092,16 +1100,14 @@
 </script>
 <!-- FIM DO CONTEÚDO DA APLICAÇÃO -->
 
-        <!-- RODAPÉ OFICIAL A OCUPAR 100% EM BAIXO -->
-        <div style="width: 100% !important; clear: both; text-align: center; padding: 30px 15px; margin-top: 40px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em; background-color: #f9f9f9; box-sizing: border-box;">
-            <p style="margin: 0; font-weight: bold; color: #333; font-size: 1.1em;">ROTA GB — Bissau, Guiné-Bissau</p>
-            <p style="margin: 8px 0; color: #007bff; font-weight: bold;">
-                📞 Linha de Apoio / Fixo: <a href="tel:+2453100000" style="color: #007bff; text-decoration: none;">+245 310 00 00</a>
-            </p>
-            <p style="margin: 8px 0 0 0;">Powered by <strong>Engenheiro Lavi Duarte Indeque</strong> 🚀 🇬🇼</p>
-        </div>
-
-    </div> <!-- Fim da div principal .app-container -->
+        <!-- Rodapé Oficial a ocupar 100% em baixo -->
+<div style="width: 100% !important; clear: both !important; display: block !important; text-align: center; padding: 30px 10px; margin-top: 30px; border-top: 1px solid #ddd; background-color: #fafafa;">
+    <p style="margin: 0; font-weight: bold; color: #333; font-size: 1.1em;">ROTA GB — Bissau, Guiné-Bissau</p>
+    <p style="margin: 8px 0; color: #007bff; font-weight: bold;">
+        📞 Linha de Apoio / Fixo: <a href="tel:+2453100000" style="color: #007bff; text-decoration: none;">+245 310 00 00</a>
+    </p>
+    <p style="margin: 8px 0 0 0; color: #555;">Powered by <strong>Engenheiro Lavi Duarte Indeque</strong> 🚀 🇬🇼</p>
+</div>
 </body>
 </html>
 
