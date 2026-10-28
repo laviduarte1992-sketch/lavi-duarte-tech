@@ -11,27 +11,27 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ROTA GB">
-<!-- Estilo para corrigir o ecrã a 100% no telemóvel -->
+<!-- Estilo para ocupar 100% do ecrã (Largura Total) -->
     <style>
         body {
             margin: 0;
             padding: 0;
             width: 100%;
-            background-color: #f4f4f4;
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
         }
+
         .container, .app-container {
-            width: 100%;
-            max-width: 100%;
-            margin: 0 auto;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 10px;
             box-sizing: border-box;
+            background-color: #ffffff;
+            box-shadow: none !important;
+            border-radius: 0 !important;
         }
-        @media (min-width: 768px) {
-            .container, .app-container {
-                max-width: 450px;
-                margin: 20px auto;
-                border-radius: 15px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            }
+    </style>
         }
     </style>
     <!-- Bibliotecas Obrigatórias -->
