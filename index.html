@@ -20,28 +20,33 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        background-color: #f0f2f5; /* Fundo cinzento claro elegante para o PC */
+        background-color: #f0f2f5;
         font-family: Arial, sans-serif;
     }
 
-    /* Contentor Principal */
+    /* Contentor principal centrado no PC */
     .app-container, .container {
         width: 100%;
-        max-width: 480px; /* Largura perfeita de telemóvel no PC */
-        margin: 0 auto !important; /* FORÇA A FICAR NO MEIO */
-        float: none !important;
+        max-width: 480px;
+        margin: 20px auto;
         background-color: #ffffff;
-        min-height: 100vh;
+        min-height: calc(100vh - 40px);
         box-sizing: border-box;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Sombra elegante no PC */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        border-radius: 15px;
+        position: relative;
+        overflow: hidden;
     }
 
-    /* Se aceder por um telemóvel real, retira a largura máxima e ocupa 100% */
+    /* Em telemóveis, ocupa 100% sem margens */
     @media (max-width: 768px) {
         .app-container, .container {
             max-width: 100% !important;
+            width: 100% !important;
             margin: 0 !important;
+            border-radius: 0 !important;
             box-shadow: none !important;
+            min-height: 100vh;
         }
     }
 </style>
@@ -1097,13 +1102,15 @@
     );
 }
 </script>
-<!-- Rodapé Oficial a ocupar 100% em baixo -->
-<div style="width: 100% !important; clear: both !important; display: block !important; text-align: center; padding: 30px 10px; margin-top: 30px; border-top: 1px solid #ddd; background-color: #fafafa;">
-    <p style="margin: 0; font-weight: bold; color: #333; font-size: 1.1em;">ROTA GB — Bissau, Guiné-Bissau</p>
-    <p style="margin: 8px 0; color: #007bff; font-weight: bold;">
-        📞 Linha de Apoio / Fixo: <a href="tel:+2453100000" style="color: #007bff; text-decoration: none;">+245 310 00 00</a>
-    </p>
-    <p style="margin: 8px 0 0 0; color: #555;">Powered by <strong>Engenheiro Lavi Duarte Indeque</strong> 🚀 🇬🇼</p>
-</div>
+<!-- RODAPÉ OFICIAL DENTRO DO APP CONTAINER -->
+        <div style="width: 100%; clear: both; text-align: center; padding: 25px 15px; margin-top: 40px; border-top: 1px solid #eee; background-color: #fafafa; box-sizing: border-box;">
+            <p style="margin: 0; font-weight: bold; color: #333; font-size: 1.1em;">ROTA GB — Bissau, Guiné-Bissau</p>
+            <p style="margin: 8px 0; color: #007bff; font-weight: bold;">
+                📞 Linha de Apoio / Fixo: <a href="tel:+2453100000" style="color: #007bff; text-decoration: none;">+245 310 00 00</a>
+            </p>
+            <p style="margin: 8px 0 0 0; color: #555;">Powered by <strong>Engenheiro Lavi Duarte Indeque</strong> 🚀 🇬🇼</p>
+        </div>
+
+    </div> <!-- FIM DA DIV .app-container -->
 </body>
 </html>
