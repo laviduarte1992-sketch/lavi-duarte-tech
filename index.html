@@ -15,7 +15,36 @@
     <!-- Bibliotecas Obrigatórias -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        background-color: #f0f2f5; /* Fundo cinzento claro elegante para o PC */
+        font-family: Arial, sans-serif;
+    }
 
+    /* Contentor Principal */
+    .app-container, .container {
+        width: 100%;
+        max-width: 480px; /* Largura perfeita de telemóvel no PC */
+        margin: 0 auto !important; /* FORÇA A FICAR NO MEIO */
+        float: none !important;
+        background-color: #ffffff;
+        min-height: 100vh;
+        box-sizing: border-box;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Sombra elegante no PC */
+    }
+
+    /* Se aceder por um telemóvel real, retira a largura máxima e ocupa 100% */
+    @media (max-width: 768px) {
+        .app-container, .container {
+            max-width: 100% !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; padding: 10px; }
