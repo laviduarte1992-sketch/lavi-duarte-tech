@@ -17,41 +17,45 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* Estilo geral da página (fundo e centragem) */
+   /* Fundo geral da página no computador */
 body {
-    background-color: #f0f2f5; /* Fundo cinzento claro e moderno */
+    background-color: #0b0f19; /* Fundo escuro moderno e elegante */
     margin: 0;
-    padding: 0;
+    padding: 20px;
     display: flex;
-    justify-content: center;   /* Centra na horizontal */
-    align-items: center;       /* Centra na vertical */
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
+    box-sizing: border-box;
 }
 
-/* O contentor principal do ROTA GB (a moldura do app) */
-.app-container { /* (ou substitua pelo nome exato da sua div principal) */
+/* A moldura do telemóvel no PC */
+.app-container {
     width: 100%;
-    max-width: 420px;          /* Largura perfeita de telemóvel */
-    height: 100vh;
-    max-height: 840px;         /* Altura máxima para parecer um smartphone */
-    background: #000000;       /* Mantém o fundo preto do seu design */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Sombra elegante */
-    border-radius: 20px;       /* Cantos arredondados bonitos no PC */
-    overflow-y: auto;          /* Permite rolar o conteúdo para cima e para baixo */
+    max-width: 410px;          /* Largura exata de um smartphone */
+    height: 90vh;              /* Ocupa 90% da altura do ecrã */
+    max-height: 850px;
+    background: #000000;       /* Fundo preto da app */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); /* Sombra profissional */
+    border-radius: 36px;       /* Cantos arredondados estilo telemóvel */
+    border: 8px solid #222;    /* Borda grossa a simular o telemóvel */
+    overflow-y: auto;          /* PERMITE FAZER SCROLL PARA VER TUDO */
     position: relative;
 }
 
-/* Para telemóveis reais: ocupa o ecrã todo sem margens excessivas */
+/* Para telemóveis reais (Smartphones e Tablets pequenos) */
 @media (max-width: 480px) {
     body {
-        background-color: #000; /* Fundo preto no telemóvel */
+        background-color: #000;
+        padding: 0;
         display: block;
     }
     .app-container {
-        max-width: 100%;
+        max-width: 100vw;
         height: 100vh;
         max-height: none;
         border-radius: 0;
+        border: none;
         box-shadow: none;
     }
 }
