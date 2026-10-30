@@ -17,6 +17,44 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
+        /* Estilo geral da página (fundo e centragem) */
+body {
+    background-color: #f0f2f5; /* Fundo cinzento claro e moderno */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;   /* Centra na horizontal */
+    align-items: center;       /* Centra na vertical */
+    min-height: 100vh;
+}
+
+/* O contentor principal do ROTA GB (a moldura do app) */
+.app-container { /* (ou substitua pelo nome exato da sua div principal) */
+    width: 100%;
+    max-width: 420px;          /* Largura perfeita de telemóvel */
+    height: 100vh;
+    max-height: 840px;         /* Altura máxima para parecer um smartphone */
+    background: #000000;       /* Mantém o fundo preto do seu design */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Sombra elegante */
+    border-radius: 20px;       /* Cantos arredondados bonitos no PC */
+    overflow-y: auto;          /* Permite rolar o conteúdo para cima e para baixo */
+    position: relative;
+}
+
+/* Para telemóveis reais: ocupa o ecrã todo sem margens excessivas */
+@media (max-width: 480px) {
+    body {
+        background-color: #000; /* Fundo preto no telemóvel */
+        display: block;
+    }
+    .app-container {
+        max-width: 100%;
+        height: 100vh;
+        max-height: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+}
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; padding: 10px; }
         
