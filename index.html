@@ -19,8 +19,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; padding: 10px; }
-        
-     .app-container {
+.app-container {
     width: 100%;
     max-width: 410px;          
     height: 90vh;              
@@ -29,11 +28,13 @@
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); 
     border-radius: 36px;       
     border: 12px solid #222;    
-    overflow-y: auto;          /* Permite o scroll vertical perfeito */
-    overflow-x: hidden;        /* Elimina a barra horizontal e ativa os cliques */
+    overflow-y: auto;          /* Scroll vertical ativo */
+    overflow-x: hidden;        /* Sem barras horizontais */
     position: relative;
-    padding-top: 35px;         /* Mantém o topo visível e sem cortes */
+    padding-top: 35px;         
     box-sizing: border-box;    
+    pointer-events: auto;      /* GARANTE QUE OS CLIQUES FUNCIONAM */
+    z-index: 10;               /* Mantém a camada acima de qualquer fundo */
 }
         
         /* Header */
