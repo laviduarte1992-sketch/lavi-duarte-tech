@@ -1204,9 +1204,7 @@
     <p style="margin: 0; font-weight: bold; color: #333;">ROTA GB — Bissau, Guiné-Bissau</p>
     <p style="margin: 5px 0 0 0;">Powered by <strong>Engenheiro Lavi Duarte Indeque</strong> 🚀🇬🇼</p>
 </div>
-<script>
-    <script>
-    // Cole aqui a função setRole para alternar entre Cliente e Motorista
+ <script>
     function setRole(role) {
         const btnCliente = document.getElementById('btn-passageiro');
         const btnMotorista = document.getElementById('btn-motorista');
@@ -1229,23 +1227,18 @@
     let servicoAtual = "";
 
     function abrirServico(nomeServico, mensagem) {
-        // Restante do código das outras funções...
-    }
-</script>
-    let servicoAtual = "";
-
-    function abrirServico(nomeServico, mensagem) {
         servicoAtual = nomeServico;
         document.getElementById('modalTitle').innerText = nomeServico;
         document.getElementById('modalDesc').innerText = mensagem;
-        document.getElementById('modalInput').value = ""; // Limpa o campo
+        document.getElementById('modalInput').value = ""; 
         document.getElementById('orderModal').style.display = 'flex';
     }
 
     function fecharModal() {
         document.getElementById('orderModal').style.display = 'none';
     }
-function confirmarPedido() {
+
+    function confirmarPedido() {
         const local = document.getElementById('modalInput').value;
         alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + "\nLocalização: " + (local || "Centro de Bissau") + "\n\nO seu pedido foi simulado com sucesso!");
         fecharModal();
