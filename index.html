@@ -1185,6 +1185,27 @@
             "Obrigado por utilizar a ROTA GB!"
         );
     }
+    function setRole(role) {
+    const btnCliente = document.getElementById('btn-passageiro');
+    const btnMotorista = document.getElementById('btn-motorista');
+    const painelCliente = document.getElementById('client-view');
+    const painelMotorista = document.getElementById('driver-view');
+
+    if (role === 'passageiro') {
+        if(btnCliente) btnCliente.classList.add('active');
+        if(btnMotorista) btnMotorista.classList.remove('active');
+        if(painelCliente) painelCliente.style.display = 'block';
+        if(painelMotorista) painelMotorista.style.display = 'none';
+    } else {
+        if(btnMotorista) btnMotorista.classList.add('active');
+        if(btnCliente) btnCliente.classList.remove('active');
+        if(painelMotorista) painelMotorista.style.display = 'block';
+        if(painelCliente) painelCliente.style.display = 'none';
+        
+        // Garante que a página faz scroll para o formulário do motorista se necessário
+        if(painelMotorista) painelMotorista.scrollIntoView({ behavior: 'smooth' });
+    }
+}
 </script>
 </body>
 </html>
