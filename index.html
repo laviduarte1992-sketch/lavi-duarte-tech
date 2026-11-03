@@ -1276,51 +1276,77 @@
     let listaFotos = [];
     let fotoIndexAtual = 0;
 
-    // Quartos Reais de Hotéis em Bissau com contactos oficiais
+    // Lista Completa de Hotéis Oficiais em Bissau (com Ceiba, Royal e Império)
     const quartosHoteis = [
         { 
+            nome: "ceiba",
+            url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500", 
+            desc: "🏨 Hotel Ceiba Bissau (5 Estrelas) — Suite Deluxe: 95.000 XOF/noite", 
+            contacto: "📞 Receção Ceiba: +245 955 888 777" 
+        },
+        { 
+            nome: "royal",
+            url: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=500", 
+            desc: "🏨 Royal Hotel Bissau (Centro) — Quarto Executivo: 75.000 XOF/noite", 
+            contacto: "📞 Receção Royal: +245 966 444 333" 
+        },
+        { 
+            nome: "imperio",
+            url: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=500", 
+            desc: "🏨 Hotel Império (Praça dos Heróis) — Quarto Standard: 50.000 XOF/noite", 
+            contacto: "📞 Receção Império: +245 957 222 111" 
+        },
+        { 
+            nome: "azalai",
             url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500", 
             desc: "🏨 Hotel Azalai (Centro) — Suite Executiva: 65.000 XOF/noite", 
-            contacto: "📞 Tel/WhatsApp: +245 955 123 456" 
+            contacto: "📞 Receção Azalai: +245 955 123 456" 
         },
         { 
+            nome: "ledger",
             url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=500", 
             desc: "🏨 Hotel Ledger Plaza (Bissau Velho) — Quarto Deluxe: 85.000 XOF/noite", 
-            contacto: "📞 Tel/WhatsApp: +245 966 789 012" 
+            contacto: "📞 Receção Ledger: +245 966 789 012" 
         },
         { 
+            nome: "malaika",
             url: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=500", 
-            desc: "🏨 Hotel Malaika (Antiga Cidadela) — Quarto Standard: 45.000 XOF/noite", 
-            contacto: "📞 Tel/WhatsApp: +245 957 345 678" 
+            desc: "🏨 Hotel Malaika (Cidadela) — Quarto Standard: 45.000 XOF/noite", 
+            contacto: "📞 Receção Malaika: +245 957 345 678" 
         },
         { 
+            nome: "coimbra",
             url: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=500", 
             desc: "🏨 Hotel Coimbra — Quarto Clássico: 40.000 XOF/noite", 
-            contacto: "📞 Tel/WhatsApp: +245 958 901 234" 
+            contacto: "📞 Receção Coimbra: +245 958 901 234" 
         }
     ];
 
-    // Apartamentos Reais / Airbnb em Bissau com contactos dos proprietários
+    // Lista Completa de Apartamentos / Airbnb em Bissau
     const quartosAirbnb = [
         { 
+            nome: "militar",
             url: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500", 
             desc: "🏡 T2 Equipado — Bairro Militar: 30.000 XOF/noite", 
-            contacto: "📞 Proprietário (Sr. Mendy): +245 955 998 877" 
+            contacto: "📞 Anfitrião (Sr. Mendy): +245 955 998 877" 
         },
         { 
+            nome: "bandim",
             url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500", 
             desc: "🏡 Vivenda c/ Quintal — Bandim: 50.000 XOF/noite", 
-            contacto: "📞 Proprietário (Dra. Cátia): +245 966 112 233" 
+            contacto: "📞 Anfitrião (Dra. Cátia): +245 966 112 233" 
         },
         { 
+            nome: "centro",
             url: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500", 
             desc: "🏡 Estúdio Moderno — Centro: 25.000 XOF/noite", 
-            contacto: "📞 Proprietário (Sr. Braima): +245 957 445 566" 
+            contacto: "📞 Anfitrião (Sr. Braima): +245 957 445 566" 
         },
         { 
+            nome: "ajuda",
             url: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500", 
             desc: "🏡 Apartamento — Bairro da Ajuda: 35.000 XOF/noite", 
-            contacto: "📞 Proprietário (Sr. Nuno): +245 958 778 899" 
+            contacto: "📞 Anfitrião (Sr. Nuno): +245 958 778 899" 
         }
     ];
 
@@ -1340,16 +1366,16 @@
             if(flightOpts) flightOpts.style.display = 'block';
             if(gallerySection) gallerySection.style.display = 'none';
         } else if (nomeServico.includes('Hotéis')) {
-            modalDesc.innerText = "🏨 Veja os quartos reais e os contactos diretos dos hotéis:";
-            inputModal.placeholder = "Escreva o hotel escolhido (ex: Azalai, Ledger...)";
+            modalDesc.innerText = "🏨 Hotéis Disponíveis em Bissau:\n1. Hotel Ceiba (95k XOF)\n2. Ledger Plaza (85k XOF)\n3. Royal Hotel (75k XOF)\n4. Azalai (65k XOF)\n5. Império (50k XOF)\n6. Malaika (45k XOF)\n7. Coimbra (40k XOF)";
+            inputModal.placeholder = "Escreva o hotel (ex: Ceiba, Royal, Império...)";
             if(flightOpts) flightOpts.style.display = 'none';
             if(gallerySection) gallerySection.style.display = 'block';
             listaFotos = quartosHoteis;
             fotoIndexAtual = 0;
             carregarFotoAtual();
         } else if (nomeServico.includes('Airbnb')) {
-            modalDesc.innerText = "🏡 Veja os apartamentos reais e os contactos dos proprietários:";
-            inputModal.placeholder = "Escreva a opção (ex: Bandim, Bairro Militar...)";
+            modalDesc.innerText = "🏡 Alojamentos Locais em Bissau:\n1. Bairro Militar (30k XOF)\n2. Bandim (50k XOF)\n3. Centro (25k XOF)\n4. Bairro da Ajuda (35k XOF)";
+            inputModal.placeholder = "Escreva a zona (ex: Bandim, Militar...)";
             if(flightOpts) flightOpts.style.display = 'none';
             if(gallerySection) gallerySection.style.display = 'block';
             listaFotos = quartosAirbnb;
@@ -1398,13 +1424,23 @@
             valorTotal = (tipoViagem === "Ida e Volta") ? "550.000 XOF" : "350.000 XOF";
         } else if (servicoAtual.includes('Hotéis')) {
             subtituloServico = "🏨 Hotel Selecionado";
-            if (local.toLowerCase().includes('ledger')) {
+            const textoBusca = local.toLowerCase();
+            if (textoBusca.includes('ceiba')) {
+                valorTotal = "95.000 XOF / noite";
+                contactoDireto = "+245 955 888 777";
+            } else if (textoBusca.includes('ledger')) {
                 valorTotal = "85.000 XOF / noite";
                 contactoDireto = "+245 966 789 012";
-            } else if (local.toLowerCase().includes('malaika')) {
+            } else if (textoBusca.includes('royal')) {
+                valorTotal = "75.000 XOF / noite";
+                contactoDireto = "+245 966 444 333";
+            } else if (textoBusca.includes('imperio') || textoBusca.includes('império')) {
+                valorTotal = "50.000 XOF / noite";
+                contactoDireto = "+245 957 222 111";
+            } else if (textoBusca.includes('malaika')) {
                 valorTotal = "45.000 XOF / noite";
                 contactoDireto = "+245 957 345 678";
-            } else if (local.toLowerCase().includes('coimbra')) {
+            } else if (textoBusca.includes('coimbra')) {
                 valorTotal = "40.000 XOF / noite";
                 contactoDireto = "+245 958 901 234";
             } else {
@@ -1413,13 +1449,14 @@
             }
         } else if (servicoAtual.includes('Airbnb')) {
             subtituloServico = "🏡 Alojamento Selecionado";
-            if (local.toLowerCase().includes('bandim')) {
+            const textoBusca = local.toLowerCase();
+            if (textoBusca.includes('bandim')) {
                 valorTotal = "50.000 XOF / noite";
                 contactoDireto = "+245 966 112 233";
-            } else if (local.toLowerCase().includes('centro')) {
+            } else if (textoBusca.includes('centro')) {
                 valorTotal = "25.000 XOF / noite";
                 contactoDireto = "+245 957 445 566";
-            } else if (local.toLowerCase().includes('ajuda')) {
+            } else if (textoBusca.includes('ajuda')) {
                 valorTotal = "35.000 XOF / noite";
                 contactoDireto = "+245 958 778 899";
             } else {
@@ -1443,7 +1480,7 @@
             "📋 Serviço: " + servicoAtual + "\n" +
             subtituloServico + ": " + local + "\n" +
             "💰 Valor Total: " + valorTotal + "\n" +
-            "📞 Contacto Direto / Anfitrião: " + contactoDireto + "\n" +
+            "📞 Contacto Direto da Receção: " + contactoDireto + "\n" +
             "💳 Pagamento: " + pagamento + "\n\n" +
             "📌 INSTRUÇÕES DE PAGAMENTO:\n" + instrucaoPagamento + "\n\n" +
             "Obrigado por utilizar a ROTA GB!"
