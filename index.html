@@ -233,13 +233,22 @@
     <span class="icon">✈️</span>
     <span>Voos / Bilhetes</span>
 </div>
-    <!-- Janela de Simulação de Pedido (Modal) -->
-<div id="orderModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
-    <div style="background:#ffffff; width:100%; max-width:320px; padding:20px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:center;">
+ <!-- Janela de Simulação de Pedido (Modal) -->
+<div id="orderModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+    <div style="background:#ffffff; width:100%; max-width:340px; padding:20px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:center;">
         <h3 id="modalTitle" style="color:#111; margin-bottom:8px; font-size:18px;">Simular Pedido</h3>
-        <p id="modalDesc" style="color:#666; font-size:13px; margin-bottom:15px;"></p>
+        <p id="modalDesc" style="color:#666; font-size:12px; margin-bottom:12px; text-align:left; white-space:pre-line;"></p>
         
-        <input type="text" id="modalInput" placeholder="Indique a zona (ex: Bairro Militar, Bandim...)" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:15px; font-size:13px; box-sizing:border-box;">
+        <!-- Opções de Ida / Ida e Volta (Visível apenas em Voos) -->
+        <div id="flightOptions" style="display:none; margin-bottom:12px; text-align:left;">
+            <label style="font-size:12px; font-weight:bold; color:#333; display:block; margin-bottom:5px;">Tipo de Viagem:</label>
+            <select id="flightType" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:13px; margin-bottom:8px;">
+                <option value="Ida e Volta">Ida e Volta</option>
+                <option value="Só Ida">Só Ida</option>
+            </select>
+        </div>
+
+        <input type="text" id="modalInput" placeholder="Indique a zona ou destino" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:12px; font-size:13px; box-sizing:border-box;">
         
         <button onclick="confirmarPedido()" style="width:100%; background:#00e676; color:#000; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:8px; font-size:14px;">Confirmar Pedido</button>
         <button onclick="fecharModal()" style="width:100%; background:#f1f1f1; color:#333; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:13px;">Cancelar</button>
@@ -1224,33 +1233,42 @@
 
     let servicoAtual = "";
 
-   function abrirServico(nomeServico, mensagem) {
+function abrirServico(nomeServico, mensagem) {
     servicoAtual = nomeServico;
     document.getElementById('modalTitle').innerText = nomeServico;
     document.getElementById('modalDesc').innerText = mensagem;
     
     const inputModal = document.getElementById('modalInput');
+    const flightOpts = document.getElementById('flightOptions');
     inputModal.value = ""; 
-    
-    // Altera o texto de exemplo consoante o serviço escolhido
+
     if (nomeServico.includes('Voos')) {
-        inputModal.placeholder = "Indique o destino de viagem (ex: Lisboa, Dakar...)";
+        inputModal.placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
+        flightOpts.style.display = 'block'; // Mostra o menu de Ida/Volta
     } else {
         inputModal.placeholder = "Indique a zona (ex: Bairro Militar, Bandim...)";
+        flightOpts.style.display = 'none'; // Esconde em outros serviços
     }
-    
+
     document.getElementById('orderModal').style.display = 'flex';
 }
 
-    function fecharModal() {
-        document.getElementById('orderModal').style.display = 'none';
+function fecharModal() {
+    document.getElementById('orderModal').style.display = 'none';
+}
+
+function confirmarPedido() {
+    const local = document.getElementById('modalInput').value;
+    const tipoViagem = document.getElementById('flightType').value;
+    
+    let detalheViagem = "";
+    if (servicoAtual.includes('Voos')) {
+        detalheViagem = "\nTipo: " + tipoViagem;
     }
 
-    function confirmarPedido() {
-        const local = document.getElementById('modalInput').value;
-        alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + "\nLocalização: " + (local || "Centro de Bissau") + "\n\nO seu pedido foi simulado com sucesso!");
-        fecharModal();
-    }
+    alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + detalheViagem + "\nDestino/Local: " + (local || "Bissau") + "\n\nO seu pedido foi registrado com sucesso!");
+    fecharModal();
+}
 </script>
 </body>
 </html>
