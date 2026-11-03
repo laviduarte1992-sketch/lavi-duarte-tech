@@ -1268,22 +1268,38 @@ function fecharModal() {
 }
 
 function confirmarPedido() {
-    const local = document.getElementById('modalInput').value;
+    const local = document.getElementById('modalInput').value || "Lisboa";
     const tipoViagem = document.getElementById('flightType').value;
     const pagamento = document.getElementById('paymentMethod').value;
     
-    let detalheViagem = "";
-    let valorTotal = "";
-
-    if (servicoAtual.includes('Voos')) {
-        detalheViagem = "\nTipo: " + tipoViagem;
-        // Se for Ida e Volta, o valor estimado dobra em relação à tarifa base (ex: TAP Lisboa)
-        if (tipoViagem === "Ida e Volta") {
-            valorTotal = "\nValor Estimado: 550.000 XOF";
-        } else {
-            valorTotal = "\nValor Estimado: 350.000 XOF";
-        }
+    let valorTotal = "350.000 XOF";
+    if (tipoViagem === "Ida e Volta") {
+        valorTotal = "550.000 XOF";
     }
+
+    // Fecha o modal atual
+    fecharModal();
+
+    // Dados de pagamento específicos para Mobile Money / Transferência
+    let instrucaoPagamento = "Apresente este código no posto ROTA GB ou pague via Mobile Money.";
+    if (pagamento.includes("Mobile Money")) {
+        instrucaoPagamento = "Envie " + valorTotal + " para o número Orange/MTN: +245 955 000 000 com o Ref: RGB-" + Math.floor(1000 + Math.random() * 9000);
+    } else if (pagamento.includes("Cartão")) {
+        instrucaoPagamento = "Pagamento processado via Terminal TPA / Multibanco no balcão.";
+    }
+
+    // Exibe o Bilhete Digital final
+    alert(
+        "🎫 --- BILHETE DIGITAL DE VIAGEM — ROTA GB ---\n\n" +
+        "📋 Serviço: " + servicoAtual + "\n" +
+        "✈️ Rota / Destino: Bissau (OXB) ➔ " + local + "\n" +
+        "🔄 Tipo: " + tipoViagem + "\n" +
+        "💰 Total a Pagar: " + valorTotal + "\n" +
+        "💳 Método: " + pagamento + "\n\n" +
+        "📌 INSTRUÇÕES DE PAGAMENTO:\n" + instrucaoPagamento + "\n\n" +
+        "Obrigado por viajar com a ROTA GB! Guarde este comprovativo."
+    );
+}
 
     alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + detalheViagem + "\nDestino/Local: " + (local || "Bissau") + valorTotal + "\nPagamento: " + pagamento + "\n\nO seu pedido e pagamento foram registrados com sucesso!");
     fecharModal();
