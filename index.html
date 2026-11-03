@@ -1218,8 +1218,7 @@
     function fecharModal() {
         document.getElementById('orderModal').style.display = 'none';
     }
-
-  function confirmarPedido() {
+function confirmarPedido() {
         const local = document.getElementById('modalInput').value;
         alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + "\nLocalização: " + (local || "Centro de Bissau") + "\n\nO seu pedido foi simulado com sucesso!");
         fecharModal();
