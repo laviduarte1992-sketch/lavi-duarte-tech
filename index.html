@@ -186,7 +186,7 @@
             <span class="icon">🚌</span>
             <span>Toca-toca (Interior)</span>
         </div>
-       <div class="service-card" onclick="abrirServico('Voos e Bilhetes (Bissau)', '✈️ Companhias a partir de Osvaldo Vieira:\n• TAP (Lisboa): 350.000 XOF\n• Air Sénégal (Dakar): 120.000 XOF\n• Royal Air Maroc: 280.000 XOF\n\n🏨 Alojamento:\n• Hotéis em Bissau: 45.000 XOF/noite')">
+     <div class="service-card" onclick="abrirServico('Voos e Bilhetes', 'Companhias a partir de Osvaldo Vieira:\n- TAP (Lisboa): 350.000 XOF\n- Air Senegal (Dakar): 120.000 XOF')">
     <span class="icon">✈️</span>
     <span>Voos / Bilhetes</span>
 </div>
@@ -1221,7 +1221,7 @@
     <p style="margin: 0; font-weight: bold; color: #333;">ROTA GB — Bissau, Guiné-Bissau</p>
     <p style="margin: 5px 0 0 0;">Powered by <strong>Engenheiro Lavi Duarte Indeque</strong> 🚀🇬🇼</p>
 </div>
- <script>
+<script>
     function setRole(role) {
         const btnCliente = document.getElementById('btn-passageiro');
         const btnMotorista = document.getElementById('btn-motorista');
@@ -1243,62 +1243,59 @@
 
     let servicoAtual = "";
 
-function abrirServico(nomeServico, mensagem) {
-    servicoAtual = nomeServico;
-    document.getElementById('modalTitle').innerText = nomeServico;
-    document.getElementById('modalDesc').innerText = mensagem;
-    
-    const inputModal = document.getElementById('modalInput');
-    const flightOpts = document.getElementById('flightOptions');
-    inputModal.value = ""; 
+    function abrirServico(nomeServico, mensagem) {
+        servicoAtual = nomeServico;
+        document.getElementById('modalTitle').innerText = nomeServico;
+        document.getElementById('modalDesc').innerText = mensagem;
+        
+        const inputModal = document.getElementById('modalInput');
+        const flightOpts = document.getElementById('flightOptions');
+        inputModal.value = ""; 
 
-    if (nomeServico.includes('Voos')) {
-        inputModal.placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
-        flightOpts.style.display = 'block'; // Mostra o menu de Ida/Volta
-    } else {
-        inputModal.placeholder = "Indique a zona (ex: Bairro Militar, Bandim...)";
-        flightOpts.style.display = 'none'; // Esconde em outros serviços
+        if (nomeServico.includes('Voos')) {
+            inputModal.placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
+            if(flightOpts) flightOpts.style.display = 'block';
+        } else {
+            inputModal.placeholder = "Indique a zona (ex: Bairro Militar, Bandim...)";
+            if(flightOpts) flightOpts.style.display = 'none';
+        }
+
+        document.getElementById('orderModal').style.display = 'flex';
     }
 
-    document.getElementById('orderModal').style.display = 'flex';
-}
-
-function fecharModal() {
-    document.getElementById('orderModal').style.display = 'none';
-}
-
-function confirmarPedido() {
-    const local = document.getElementById('modalInput').value || "Lisboa";
-    const tipoViagem = document.getElementById('flightType').value;
-    const pagamento = document.getElementById('paymentMethod').value;
-    
-    let valorTotal = "350.000 XOF";
-    if (tipoViagem === "Ida e Volta") {
-        valorTotal = "550.000 XOF";
+    function fecharModal() {
+        document.getElementById('orderModal').style.display = 'none';
     }
 
-    // Fecha o modal atual
-    fecharModal();
+    function confirmarPedido() {
+        const local = document.getElementById('modalInput').value || "Lisboa";
+        const tipoViagem = document.getElementById('flightType') ? document.getElementById('flightType').value : "Ida e Volta";
+        const pagamento = document.getElementById('paymentMethod') ? document.getElementById('paymentMethod').value : "Mobile Money";
+        
+        let valorTotal = "350.000 XOF";
+        if (tipoViagem === "Ida e Volta") {
+            valorTotal = "550.000 XOF";
+        }
 
-    // Dados de pagamento específicos para Mobile Money / Transferência
-    let instrucaoPagamento = "Apresente este código no posto ROTA GB ou pague via Mobile Money.";
-    if (pagamento.includes("Mobile Money")) {
-        instrucaoPagamento = "Envie " + valorTotal + " para o número Orange/MTN: +245 955 000 000 com o Ref: RGB-" + Math.floor(1000 + Math.random() * 9000);
-    } else if (pagamento.includes("Cartão")) {
-        instrucaoPagamento = "Pagamento processado via Terminal TPA / Multibanco no balcão.";
+        fecharModal();
+
+        let instrucaoPagamento = "Apresente este código no posto ROTA GB.";
+        if (pagamento.includes("Mobile Money")) {
+            instrucaoPagamento = "Envie " + valorTotal + " para o número Orange/MTN: +245 955 000 000 (Ref: RGB-" + Math.floor(1000 + Math.random() * 9000) + ")";
+        }
+
+        alert(
+            "🎫 --- BILHETE DIGITAL DE VIAGEM — ROTA GB ---\n\n" +
+            "📋 Serviço: " + servicoAtual + "\n" +
+            "✈️ Destino: " + local + "\n" +
+            "🔄 Tipo: " + tipoViagem + "\n" +
+            "💰 Total: " + valorTotal + "\n" +
+            "💳 Pagamento: " + pagamento + "\n\n" +
+            "📌 INSTRUÇÕES:\n" + instrucaoPagamento + "\n\n" +
+            "Obrigado por viajar com a ROTA GB!"
+        );
     }
-
-    // Exibe o Bilhete Digital final
-    alert(
-        "🎫 --- BILHETE DIGITAL DE VIAGEM — ROTA GB ---\n\n" +
-        "📋 Serviço: " + servicoAtual + "\n" +
-        "✈️ Rota / Destino: Bissau (OXB) ➔ " + local + "\n" +
-        "🔄 Tipo: " + tipoViagem + "\n" +
-        "💰 Total a Pagar: " + valorTotal + "\n" +
-        "💳 Método: " + pagamento + "\n\n" +
-        "📌 INSTRUÇÕES DE PAGAMENTO:\n" + instrucaoPagamento + "\n\n" +
-        "Obrigado por viajar com a ROTA GB! Guarde este comprovativo."
-    );
+</script>
 }
 
     alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + detalheViagem + "\nDestino/Local: " + (local || "Bissau") + valorTotal + "\nPagamento: " + pagamento + "\n\nO seu pedido e pagamento foram registrados com sucesso!");
