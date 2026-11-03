@@ -1183,11 +1183,17 @@
             "Obrigado por utilizar a ROTA GB!"
         );
     }
-    function setRole(role) {
+   function setRole(role) {
     const btnCliente = document.getElementById('btn-passageiro');
     const btnMotorista = document.getElementById('btn-motorista');
     const painelCliente = document.getElementById('client-view');
     const painelMotorista = document.getElementById('driver-view');
+
+    // Elementos internos do motorista
+    const btnPainel = document.getElementById('tab-painel-btn');
+    const btnRegisto = document.getElementById('tab-registo-btn');
+    const painelCondutor = document.getElementById('driver-panel-content');
+    const registoCondutor = document.getElementById('driver-register');
 
     if (role === 'passageiro') {
         if(btnCliente) btnCliente.classList.add('active');
@@ -1200,10 +1206,16 @@
         if(painelMotorista) painelMotorista.style.display = 'block';
         if(painelCliente) painelCliente.style.display = 'none';
         
-        // Garante que a página faz scroll para o formulário do motorista se necessário
+        // Abre por defeito o painel de trabalho do condutor
+        if(btnPainel) btnPainel.classList.add('active');
+        if(btnRegisto) btnRegisto.classList.remove('active');
+        if(painelCondutor) painelCondutor.style.display = 'block';
+        if(registoCondutor) registoCondutor.style.display = 'none';
+
+        // Faz scroll suave para a secção do motorista
         if(painelMotorista) painelMotorista.scrollIntoView({ behavior: 'smooth' });
     }
-    }
+}
 function toggleDriverTab(tab) {
     const btnPainel = document.getElementById('tab-painel-btn');
     const btnRegisto = document.getElementById('tab-registo-btn');
