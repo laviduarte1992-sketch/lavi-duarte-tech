@@ -1214,8 +1214,27 @@
 
         // NOTA: Removi o scrollIntoView para a tela não saltar para baixo sozinha!
     }
-}
-   
+    }
+
+    // Cole a função toggleDriverTab aqui:
+    function toggleDriverTab(tab) {
+        const btnPainel = document.getElementById('tab-painel-btn');
+        const btnRegisto = document.getElementById('tab-registo-btn');
+        const painelCondutor = document.getElementById('driver-panel-content');
+        const registoCondutor = document.getElementById('driver-register');
+
+        if (tab === 'painel') {
+            if(btnPainel) btnPainel.classList.add('active');
+            if(btnRegisto) btnRegisto.classList.remove('active');
+            if(painelCondutor) painelCondutor.style.display = 'block';
+            if(registoCondutor) regoCondutor.style.display = 'none'; // separe ou mantenha registoCondutor
+        } else if (tab === 'registo') {
+            if(btnRegisto) btnRegisto.classList.add('active');
+            if(btnPainel) btnPainel.classList.remove('active');
+            if(registoCondutor) registoCondutor.style.display = 'block';
+            if(painelCondutor) painelCondutor.style.display = 'none';
+        }
+    }
 </script>
 </body>
 </html>
