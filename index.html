@@ -233,11 +233,11 @@
     <span class="icon">✈️</span>
     <span>Voos / Bilhetes</span>
 </div>
-<!-- Janela de Simulação de Pedido (Modal) -->
+<!-- Janela de Simulação de Pedido & Reserva (Modal) -->
 <div id="orderModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
-    <div style="background:#ffffff; width:100%; max-width:340px; padding:20px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:center;">
+    <div style="background:#ffffff; width:100%; max-width:360px; padding:20px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:center;">
         <h3 id="modalTitle" style="color:#111; margin-bottom:8px; font-size:18px;">Simular Pedido</h3>
-        <p id="modalDesc" style="color:#666; font-size:12px; margin-bottom:12px; text-align:left; white-space:pre-line;"></p>
+        <p id="modalDesc" style="color:#555; font-size:12px; margin-bottom:12px; text-align:left; white-space:pre-line; line-height: 1.4;"></p>
         
         <!-- Opções de Ida / Ida e Volta (Visível apenas em Voos) -->
         <div id="flightOptions" style="display:none; margin-bottom:10px; text-align:left;">
@@ -247,6 +247,30 @@
                 <option value="Só Ida">Só Ida</option>
             </select>
         </div>
+
+        <input type="text" id="modalInput" placeholder="Indique os detalhes..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px; font-size:13px; box-sizing:border-box;">
+
+        <!-- Detalhes do Quarto & Contacto do Proprietário (Visível em Hotéis / Airbnb) -->
+        <div id="roomContactSection" style="display:none; background:#f0fdf4; border:1px dashed #22c55e; border-radius:10px; padding:10px; margin-bottom:12px; text-align:left;">
+            <p style="font-size:11px; font-weight:bold; color:#15803d; margin-bottom:4px;">📸 Ver Fotos & Falar com Proprietário:</p>
+            <p id="contactInfo" style="font-size:11px; color:#333; margin-bottom:6px;">WhatsApp: +245 957 888 999</p>
+            <a id="whatsappLink" href="https://wa.me/245957888999" target="_blank" style="display:inline-block; background:#25d366; color:white; text-decoration:none; font-size:11px; font-weight:bold; padding:6px 12px; border-radius:6px;">💬 Ver Fotos no WhatsApp</a>
+        </div>
+
+        <!-- Opção de Método de Pagamento -->
+        <div style="margin-bottom:12px; text-align:left;">
+            <label style="font-size:12px; font-weight:bold; color:#333; display:block; margin-bottom:3px;">Método de Pagamento:</label>
+            <select id="paymentMethod" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:13px;">
+                <option value="Mobile Money (Orange/MTN)">Mobile Money (Orange / MTN)</option>
+                <option value="Dinheiro (Cash)">Dinheiro (Cash)</option>
+                <option value="Cartão Bancário / Multibanco">Cartão Bancário / Multibanco</option>
+            </select>
+        </div>
+        
+        <button onclick="confirmarPedido()" style="width:100%; background:#00e676; color:#000; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:8px; font-size:14px;">Confirmar Reserva</button>
+        <button onclick="fecharModal()" style="width:100%; background:#f1f1f1; color:#333; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:13px;">Cancelar</button>
+    </div>
+</div>
 
         <input type="text" id="modalInput" placeholder="Indique a zona ou destino" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px; font-size:13px; box-sizing:border-box;">
 
@@ -1241,26 +1265,40 @@
         }
     }
 
-   let servicoAtual = "";
+  let servicoAtual = "";
 
-function abrirServico(nomeServico, mensagem) {
+function abrirServico(nomeServico) {
     servicoAtual = nomeServico;
     document.getElementById('modalTitle').innerText = nomeServico;
-    document.getElementById('modalDesc').innerText = mensagem;
     
     const inputModal = document.getElementById('modalInput');
     const flightOpts = document.getElementById('flightOptions');
+    const roomContact = document.getElementById('roomContactSection');
+    const modalDesc = document.getElementById('modalDesc');
     inputModal.value = ""; 
 
     if (nomeServico.includes('Voos')) {
+        modalDesc.innerText = "✈️ Companhias a partir de Osvaldo Vieira:\n• TAP (Lisboa): 350.000 XOF (Ida) / 550.000 XOF (Ida/Volta)\n• Air Sénégal (Dakar): 120.000 XOF\n• Royal Air Maroc: 280.000 XOF";
         inputModal.placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
-        if(flightOpts) flightOpts.style.display = 'block';
-    } else if (nomeServico.includes('Hotel') || nomeServico.includes('Airbnb')) {
-        inputModal.placeholder = "Indique o nome do Hotel/Apt e noites (ex: Azalai - 2 noites)";
-        if(flightOpts) flightOpts.style.display = 'none';
+        flightOpts.style.display = 'block';
+        roomContact.style.display = 'none';
+    } else if (nomeServico.includes('Hotéis')) {
+        modalDesc.innerText = "🏨 Hotéis em Bissau (Preços reais/noite):\n• Hotel Azalai: 65.000 XOF\n• Hotel Ledger Plaza: 85.000 XOF\n• Hotel Malaika: 45.000 XOF\n• Hotel Coimbra: 40.000 XOF";
+        inputModal.placeholder = "Escreva o nome do Hotel (ex: Azalai, Ledger...)";
+        flightOpts.style.display = 'none';
+        roomContact.style.display = 'block';
+        document.getElementById('contactInfo').innerText = "📞 Receção dos Hotéis: +245 966 333 444";
+    } else if (nomeServico.includes('Airbnb')) {
+        modalDesc.innerText = "🏡 Alojamentos Locais (Preços reais/noite):\n• T2 Bairro Militar: 30.000 XOF\n• Vivenda em Bandim: 50.000 XOF\n• Estúdio Centro: 25.000 XOF\n• Apartamento Ajuda: 35.000 XOF";
+        inputModal.placeholder = "Escreva a opção (ex: Bandim, Bairro Militar...)";
+        flightOpts.style.display = 'none';
+        roomContact.style.display = 'block';
+        document.getElementById('contactInfo').innerText = "📞 Proprietário / Anfitrião: +245 957 888 999";
     } else {
-        inputModal.placeholder = "Indique a zona (ex: Bairro Militar, Bandim...)";
-        if(flightOpts) flightOpts.style.display = 'none';
+        modalDesc.innerText = "Indique os detalhes do seu pedido ou endereço em Bissau:";
+        inputModal.placeholder = "Indique o bairro ou zona de recolha";
+        flightOpts.style.display = 'none';
+        roomContact.style.display = 'none';
     }
 
     document.getElementById('orderModal').style.display = 'flex';
@@ -1271,34 +1309,35 @@ function fecharModal() {
 }
 
 function confirmarPedido() {
-    const local = document.getElementById('modalInput').value || "Reserva Padrão";
+    const local = document.getElementById('modalInput').value || "Bissau";
     const tipoViagem = document.getElementById('flightType') ? document.getElementById('flightType').value : "Ida e Volta";
-    const pagamento = document.getElementById('paymentMethod') ? document.getElementById('paymentMethod').value : "Mobile Money";
+    const pagamento = document.getElementById('paymentMethod').value;
     
     let valorTotal = "350.000 XOF";
     let subtituloServico = "Destino";
+    let contactoAnfitriao = "+245 955 111 222";
 
     if (servicoAtual.includes('Voos')) {
         subtituloServico = "✈️ Destino";
-        if (tipoViagem === "Ida e Volta") {
-            valorTotal = "550.000 XOF";
-        }
+        valorTotal = (tipoViagem === "Ida e Volta") ? "550.000 XOF" : "350.000 XOF";
     } else if (servicoAtual.includes('Hotéis')) {
-        subtituloServico = "🏨 Hotel Escolhido";
-        valorTotal = "65.000 XOF / noite";
+        subtituloServico = "🏨 Hotel Selecionado";
+        valorTotal = local.toLowerCase().includes('ledger') ? "85.000 XOF / noite" : "65.000 XOF / noite";
+        contactoAnfitriao = "+245 966 333 444 (Balcão do Hotel)";
     } else if (servicoAtual.includes('Airbnb')) {
-        subtituloServico = "🏡 Alojamento Escolhido";
+        subtituloServico = "🏡 Alojamento Selecionado";
         valorTotal = "30.000 XOF / noite";
+        contactoAnfitriao = "+245 957 888 999 (Proprietário Direto)";
     } else {
         subtituloServico = "📍 Localização";
-        valorTotal = "10.000 XOF (Estimado)";
+        valorTotal = "2.500 XOF (Tarifa Base)";
     }
 
     fecharModal();
 
     let instrucaoPagamento = "Apresente este código no balcão ROTA GB.";
     if (pagamento.includes("Mobile Money")) {
-        instrucaoPagamento = "Envie o valor correspondente para o número Orange/MTN: +245 955 000 000 (Ref: RGB-" + Math.floor(1000 + Math.random() * 9000) + ")";
+        instrucaoPagamento = "Envie para Orange/MTN: +245 955 000 000 (Ref: RGB-" + Math.floor(1000 + Math.random() * 9000) + ")";
     }
 
     alert(
@@ -1308,8 +1347,9 @@ function confirmarPedido() {
         (servicoAtual.includes('Voos') ? "🔄 Tipo: " + tipoViagem + "\n" : "") +
         "💰 Valor: " + valorTotal + "\n" +
         "💳 Pagamento: " + pagamento + "\n\n" +
-        "📌 INSTRUÇÕES:\n" + instrucaoPagamento + "\n\n" +
-        "Obrigado por usar a ROTA GB!"
+        "📞 CONTACTO ANFITRIÃO / PROPRIETÁRIO:\n" + contactoAnfitriao + "\n\n" +
+        "📌 INSTRUÇÕES DE PAGAMENTO:\n" + instrucaoPagamento + "\n\n" +
+        "Obrigado por utilizar a ROTA GB!"
     );
 }
 </script>
