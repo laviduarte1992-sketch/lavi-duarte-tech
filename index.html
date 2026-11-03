@@ -1250,7 +1250,7 @@
     <div style="text-align: center; padding: 20px; font-size: 12px; color: #666;">
         <p><strong>ROTA GB — Bissau, Guiné-Bissau</strong></p>
         <p>Powered by Engenheiro Lavi Duarte Indeque 🚀 GW</p>
-    </div>
+    </script>
 
 <script>
     function setRole(role) {
@@ -1276,64 +1276,64 @@
     let listaFotos = [];
     let fotoIndexAtual = 0;
 
-    // Lista Completa de Hotéis Oficiais em Bissau (com Ceiba, Royal e Império)
+    // Hotéis Oficiais em Bissau com imagens de estilo tropical/urbano real
     const quartosHoteis = [
         { 
             nome: "ceiba",
-            url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500", 
+            url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=500", 
             desc: "🏨 Hotel Ceiba Bissau (5 Estrelas) — Suite Deluxe: 95.000 XOF/noite", 
             contacto: "📞 Receção Ceiba: +245 955 888 777" 
         },
         { 
             nome: "royal",
-            url: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=500", 
+            url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500", 
             desc: "🏨 Royal Hotel Bissau (Centro) — Quarto Executivo: 75.000 XOF/noite", 
             contacto: "📞 Receção Royal: +245 966 444 333" 
         },
         { 
             nome: "imperio",
-            url: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=500", 
+            url: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=500", 
             desc: "🏨 Hotel Império (Praça dos Heróis) — Quarto Standard: 50.000 XOF/noite", 
             contacto: "📞 Receção Império: +245 957 222 111" 
         },
         { 
             nome: "azalai",
-            url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500", 
+            url: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500", 
             desc: "🏨 Hotel Azalai (Centro) — Suite Executiva: 65.000 XOF/noite", 
             contacto: "📞 Receção Azalai: +245 955 123 456" 
         },
         { 
             nome: "ledger",
-            url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=500", 
+            url: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500", 
             desc: "🏨 Hotel Ledger Plaza (Bissau Velho) — Quarto Deluxe: 85.000 XOF/noite", 
             contacto: "📞 Receção Ledger: +245 966 789 012" 
         },
         { 
             nome: "malaika",
-            url: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=500", 
+            url: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=500", 
             desc: "🏨 Hotel Malaika (Cidadela) — Quarto Standard: 45.000 XOF/noite", 
             contacto: "📞 Receção Malaika: +245 957 345 678" 
         },
         { 
             nome: "coimbra",
-            url: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=500", 
+            url: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=500", 
             desc: "🏨 Hotel Coimbra — Quarto Clássico: 40.000 XOF/noite", 
             contacto: "📞 Receção Coimbra: +245 958 901 234" 
         }
     ];
 
-    // Lista Completa de Apartamentos / Airbnb em Bissau
+    // Apartamentos e Vivendas locais adaptadas à realidade de Bissau (Bairro Militar, Bandim, etc.)
     const quartosAirbnb = [
         { 
             nome: "militar",
-            url: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500", 
+            url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500", 
             desc: "🏡 T2 Equipado — Bairro Militar: 30.000 XOF/noite", 
             contacto: "📞 Anfitrião (Sr. Mendy): +245 955 998 877" 
         },
         { 
             nome: "bandim",
-            url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500", 
-            desc: "🏡 Vivenda c/ Quintal — Bandim: 50.000 XOF/noite", 
+            url: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500", 
+            desc: "🏡 Vivenda c/ Quintal Murado — Bandim: 50.000 XOF/noite", 
             contacto: "📞 Anfitrião (Dra. Cátia): +245 966 112 233" 
         },
         { 
@@ -1367,7 +1367,7 @@
             if(gallerySection) gallerySection.style.display = 'none';
         } else if (nomeServico.includes('Hotéis')) {
             modalDesc.innerText = "🏨 Hotéis Disponíveis em Bissau:\n1. Hotel Ceiba (95k XOF)\n2. Ledger Plaza (85k XOF)\n3. Royal Hotel (75k XOF)\n4. Azalai (65k XOF)\n5. Império (50k XOF)\n6. Malaika (45k XOF)\n7. Coimbra (40k XOF)";
-            inputModal.placeholder = "Escreva o hotel (ex: Ceiba, Royal, Império...)";
+            inputModal.placeholder = "Escreva o hotel (ex: Ceiba, Royal, Azalai...)";
             if(flightOpts) flightOpts.style.display = 'none';
             if(gallerySection) gallerySection.style.display = 'block';
             listaFotos = quartosHoteis;
