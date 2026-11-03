@@ -887,14 +887,22 @@
 
     </div>
 </div>
-   <!-- Panel Motorista -->
+ <!-- Panel Motorista -->
     <div class="bottom-panel" id="driver-view" style="display: none;">
         <div class="sub-tabs">
             <button type="button" class="sub-tab-btn" id="tab-painel-btn" onclick="toggleDriverTab('painel')">Painel do Condutor</button>
             <button type="button" class="sub-tab-btn active" id="tab-registo-btn" onclick="toggleDriverTab('registo')">Registar Veículo</button>
         </div>
 
-        <div id="driver-register" style="display: block; margin-top: 15px;">
+        <!-- 1. Vista do Painel do Condutor (trabalhar / chamadas) -->
+        <div id="driver-panel-content" style="display: none; text-align: center; padding: 20px;">
+            <h3 style="font-size: 15px;">Painel de Trabalho em Bissau</h3>
+            <p style="font-size: 11px; color: #666; margin-bottom: 15px;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></p>
+            <button type="button" class="btn-primary" style="background: #1a1a1a; color: #fff;" onclick="alert('A procurar chamadas...')">Aguardar Chamadas</button>
+        </div>
+
+        <!-- 2. Vista do Formulário de Registo -->
+        <div id="driver-register" style="display: block;">
             <div id="etapaFormRegisto">
                 <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">Registo de Veículo & Dados de Pagamento</div>
                 <form id="formCadastroMotorista" onsubmit="avancarParaAssinatura(event)" style="display: flex; flex-direction: column; gap: 8px;">
@@ -947,7 +955,6 @@
             </div>
         </div>
     </div>
-</div>
 <!-- Scripts da Aplicação -->
 <script>
     function setRole(role) {
@@ -1196,7 +1203,26 @@
         // Garante que a página faz scroll para o formulário do motorista se necessário
         if(painelMotorista) painelMotorista.scrollIntoView({ behavior: 'smooth' });
     }
+    }
+function toggleDriverTab(tab) {
+    const btnPainel = document.getElementById('tab-painel-btn');
+    const btnRegisto = document.getElementById('tab-registo-btn');
+    const painelCondutor = document.getElementById('driver-panel-content');
+    const registoCondutor = document.getElementById('driver-register');
+
+    if (tab === 'painel') {
+        if(btnPainel) btnPainel.classList.add('active');
+        if(btnRegisto) btnRegisto.classList.remove('active');
+        if(painelCondutor) painelCondutor.style.display = 'block';
+        if(registoCondutor) registoCondutor.style.display = 'none';
+    } else {
+        if(btnRegisto) btnRegisto.classList.add('active');
+        if(btnPainel) btnPainel.classList.remove('active');
+        if(registoCondutor) registoCondutor.style.display = 'block';
+        if(painelCondutor) painelCondutor.style.display = 'none';
+    }
 }
+   
 </script>
 </body>
 </html>
