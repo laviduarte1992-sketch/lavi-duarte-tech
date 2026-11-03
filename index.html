@@ -193,20 +193,20 @@
 </div>
 
 <!-- Secção: Alojamento (Hotéis & Airbnb local) -->
-    <div class="services-section">
-        <h3>Alojamento & Estadias</h3>
-        <div class="services-grid">
-            <div class="service-card" onclick="abrirServico('Hotéis em Bissau', '🏨 Hotéis Oficiais em Bissau (Por Noite):\n• Hotel Azalai (Centro): 65.000 XOF\n• Hotel Ledger Plaza: 85.000 XOF\n• Hotel Malaika: 45.000 XOF\n• Hotel Coimbra: 40.000 XOF')">
-                <span class="icon">🏨</span>
-                <span>Hotéis em Bissau</span>
-            </div>
-            <div class="service-card promo" onclick="abrirServico('Airbnb e Aportamentos Locais', '🏡 Apartamentos & Estúdios Equipados:\n• T2 Bairro Militar: 30.000 XOF/noite\n• Vivenda em Bandim: 50.000 XOF/noite\n• Estúdio Centro: 25.000 XOF/noite\n• Apartamento Ajuda: 35.000 XOF/noite')">
-                <span class="badge">Novo</span>
-                <span class="icon">🏡</span>
-                <span>Airbnb / Apts Locais</span>
-            </div>
+<div class="services-section">
+    <h3>Alojamento & Estadias</h3>
+    <div class="services-grid">
+        <div class="service-card" onclick="abrirServico('Hotéis em Bissau')">
+            <span class="icon">🏨</span>
+            <span>Hotéis em Bissau</span>
+        </div>
+        <div class="service-card promo" onclick="abrirServico('Airbnb / Apts Locais')">
+            <span class="badge">Novo</span>
+            <span class="icon">🏡</span>
+            <span>Airbnb / Apts Locais</span>
         </div>
     </div>
+</div>
 
 <!-- Secção: Get anything delivered (Entregas e Comércio) -->
 <div class="services-section">
@@ -1221,118 +1221,108 @@
         <p>Powered by Engenheiro Lavi Duarte Indeque 🚀 GW</p>
     </div>
 
-    <script>
-        function setRole(role) {
-            const btnCliente = document.getElementById('btn-passageiro');
-            const btnMotorista = document.getElementById('btn-motorista');
-            const painelCliente = document.getElementById('client-view');
-            const painelMotorista = document.getElementById('driver-view');
+   <script>
+    function setRole(role) {
+        const btnCliente = document.getElementById('btn-passageiro');
+        const btnMotorista = document.getElementById('btn-motorista');
+        const painelCliente = document.getElementById('client-view');
+        const painelMotorista = document.getElementById('driver-view');
 
-            if (role === 'passageiro') {
-                if(btnCliente) btnCliente.classList.add('active');
-                if(btnMotorista) btnMotorista.classList.remove('active');
-                if(painelCliente) painelCliente.style.display = 'block';
-                if(painelMotorista) painelMotorista.style.display = 'none';
-            } else {
-                if(btnMotorista) btnMotorista.classList.add('active');
-                if(btnCliente) btnCliente.classList.remove('active');
-                if(painelMotorista) painelMotorista.style.display = 'block';
-                if(painelCliente) painelCliente.style.display = 'none';
-            }
+        if (role === 'passageiro') {
+            if(btnCliente) btnCliente.classList.add('active');
+            if(btnMotorista) btnMotorista.classList.remove('active');
+            if(painelCliente) painelCliente.style.display = 'block';
+            if(painelMotorista) painelMotorista.style.display = 'none';
+        } else {
+            if(btnMotorista) btnMotorista.classList.add('active');
+            if(btnCliente) btnCliente.classList.remove('active');
+            if(painelMotorista) painelMotorista.style.display = 'block';
+            if(painelCliente) painelCliente.style.display = 'none';
         }
-
-        let servicoAtual = "";
-
-        function abrirServico(nomeServico, mensagem) {
-            servicoAtual = nomeServico;
-            document.getElementById('modalTitle').innerText = nomeServico;
-            document.getElementById('modalDesc').innerText = mensagem;
-            
-            const inputModal = document.getElementById('modalInput');
-            const flightOpts = document.getElementById('flightOptions');
-            inputModal.value = ""; 
-
-            if (nomeServico.includes('Voos')) {
-                inputModal.placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
-                if(flightOpts) flightOpts.style.display = 'block';
-            } else if (nomeServico.includes('Hotel') || nomeServico.includes('Airbnb')) {
-                inputModal.placeholder = "Indique o hotel/apartamento e noites";
-                if(flightOpts) flightOpts.style.display = 'none';
-            } else {
-                inputModal.placeholder = "Indique a zona (ex: Bairro Militar, Bandim...)";
-                if(flightOpts) flightOpts.style.display = 'none';
-            }
-
-            document.getElementById('orderModal').style.display = 'flex';
-        }
-
-        function fecharModal() {
-            document.getElementById('orderModal').style.display = 'none';
-        }
-
-        function confirmarPedido() {
-    const local = document.getElementById('modalInput').value || "Bissau";
-    const tipoViagem = document.getElementById('flightType') ? document.getElementById('flightType').value : "Ida e Volta";
-    const pagamento = document.getElementById('paymentMethod') ? document.getElementById('paymentMethod').value : "Mobile Money";
-    
-    let valorTotal = "350.000 XOF";
-    let subtituloServico = "Destino";
-    let contactoAnfitriao = "+245 955 111 222"; // Número do suporte/proprietário em Bissau
-
-    if (servicoAtual.includes('Voos')) {
-        subtituloServico = "✈️ Destino";
-        valorTotal = (tipoViagem === "Ida e Volta") ? "550.000 XOF" : "350.000 XOF";
-    } else if (servicoAtual.includes('Hotéis')) {
-        subtituloServico = "🏨 Hotel Selecionado";
-        valorTotal = local.toLowerCase().includes('ledger') ? "85.000 XOF / noite" : "65.000 XOF / noite";
-        contactoAnfitriao = "+245 966 333 444 (Balcão do Hotel)";
-    } else if (servicoAtual.includes('Airbnb')) {
-        subtituloServico = "🏡 Alojamento Selecionado";
-        valorTotal = "30.000 XOF / noite";
-        contactoAnfitriao = "+245 957 888 999 (Proprietário Direto)";
-    } else {
-        subtituloServico = "📍 Localização";
-        valorTotal = "10.000 XOF";
     }
 
-    fecharModal();
+    let servicoAtual = "";
 
-    let instrucaoPagamento = "Apresente este código no balcão ROTA GB.";
-    if (pagamento.includes("Mobile Money")) {
-        instrucaoPagamento = "Envie para o Orange/MTN: +245 955 000 000 (Ref: RGB-" + Math.floor(1000 + Math.random() * 9000) + ")";
+    function abrirServico(nomeServico) {
+        servicoAtual = nomeServico;
+        document.getElementById('modalTitle').innerText = nomeServico;
+        
+        const inputModal = document.getElementById('modalInput');
+        const flightOpts = document.getElementById('flightOptions');
+        const modalDesc = document.getElementById('modalDesc');
+        inputModal.value = ""; 
+
+        if (nomeServico.includes('Voos')) {
+            modalDesc.innerText = "✈️ Companhias a partir de Osvaldo Vieira:\n• TAP (Lisboa): 350.000 XOF (Ida) / 550.000 XOF (Ida e Volta)\n• Air Sénégal (Dakar): 120.000 XOF\n• Royal Air Maroc: 280.000 XOF";
+            inputModal.placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
+            if(flightOpts) flightOpts.style.display = 'block';
+        } else if (nomeServico.includes('Hotéis')) {
+            modalDesc.innerText = "🏨 Hotéis em Bissau (Preços por noite):\n• Hotel Azalai: 65.000 XOF\n• Hotel Ledger Plaza: 85.000 XOF\n• Hotel Malaika: 45.000 XOF\n• Hotel Coimbra: 40.000 XOF";
+            inputModal.placeholder = "Escreva o nome do Hotel (ex: Azalai, Ledger...)";
+            if(flightOpts) flightOpts.style.display = 'none';
+        } else if (nomeServico.includes('Airbnb')) {
+            modalDesc.innerText = "🏡 Alojamentos Locais (Preços por noite):\n• T2 Bairro Militar: 30.000 XOF\n• Vivenda em Bandim: 50.000 XOF\n• Estúdio Centro: 25.000 XOF\n• Apartamento Ajuda: 35.000 XOF";
+            inputModal.placeholder = "Escreva o local (ex: Bandim, Bairro Militar...)";
+            if(flightOpts) flightOpts.style.display = 'none';
+        } else {
+            modalDesc.innerText = "Indique os detalhes do seu pedido:";
+            inputModal.placeholder = "Indique a zona ou endereço";
+            if(flightOpts) flightOpts.style.display = 'none';
+        }
+
+        document.getElementById('orderModal').style.display = 'flex';
     }
 
-    alert(
-        "🎫 --- BILHETE DIGITAL DE PRÉ-RESERVA — ROTA GB ---\n\n" +
-        "📋 Serviço: " + servicoAtual + "\n" +
-        subtituloServico + ": " + local + "\n" +
-        "💰 Valor: " + valorTotal + "\n" +
-        "💳 Pagamento: " + pagamento + "\n\n" +
-        "📞 CONTACTAR ANFITRIÃO / PROPRIETÁRIO:\n" +
-        "WhatsApp / Tel: " + contactoAnfitriao + "\n" +
-        "(Ligue ou mande mensagem para ver fotos dos quartos antes de pagar)\n\n" +
-        "📌 PAGAMENTO:\n" + instrucaoPagamento + "\n\n" +
-        "Obrigado por utilizar a ROTA GB!"
-    );
-}
-            fecharModal();
+    function fecharModal() {
+        document.getElementById('orderModal').style.display = 'none';
+    }
 
-            let instrucaoPagamento = "Apresente este código no balcão ROTA GB.";
-            if (pagamento.includes("Mobile Money")) {
-                instrucaoPagamento = "Envie para o número Orange/MTN: +245 955 000 000 (Ref: RGB-" + Math.floor(1000 + Math.random() * 9000) + ")";
-            }
+    function confirmarPedido() {
+        const local = document.getElementById('modalInput').value || "Bissau";
+        const tipoViagem = document.getElementById('flightType') ? document.getElementById('flightType').value : "Ida e Volta";
+        const pagamento = document.getElementById('paymentMethod') ? document.getElementById('paymentMethod').value : "Mobile Money";
+        
+        let valorTotal = "350.000 XOF";
+        let subtituloServico = "Destino";
+        let contactoAnfitriao = "+245 955 111 222";
 
-            alert(
-                "🎫 --- BILHETE DIGITAL DE RESERVA — ROTA GB ---\n\n" +
-                "📋 Serviço: " + servicoAtual + "\n" +
-                subtituloServico + ": " + local + "\n" +
-                (servicoAtual.includes('Voos') ? "🔄 Tipo: " + tipoViagem + "\n" : "") +
-                "💰 Valor: " + valorTotal + "\n" +
-                "💳 Pagamento: " + pagamento + "\n\n" +
-                "📌 INSTRUÇÕES:\n" + instrucaoPagamento + "\n\n" +
-                "Obrigado por utilizar a ROTA GB!"
-            );
+        if (servicoAtual.includes('Voos')) {
+            subtituloServico = "✈️ Destino";
+            valorTotal = (tipoViagem === "Ida e Volta") ? "550.000 XOF" : "350.000 XOF";
+        } else if (servicoAtual.includes('Hotéis')) {
+            subtituloServico = "🏨 Hotel Selecionado";
+            valorTotal = local.toLowerCase().includes('ledger') ? "85.000 XOF / noite" : "65.000 XOF / noite";
+            contactoAnfitriao = "+245 966 333 444 (Balcão do Hotel)";
+        } else if (servicoAtual.includes('Airbnb')) {
+            subtituloServico = "🏡 Alojamento Selecionado";
+            valorTotal = "30.000 XOF / noite";
+            contactoAnfitriao = "+245 957 888 999 (Proprietário Direto)";
+        } else {
+            subtituloServico = "📍 Localização";
+            valorTotal = "10.000 XOF";
         }
-    </script>
+
+        fecharModal();
+
+        let instrucaoPagamento = "Apresente este código no balcão ROTA GB.";
+        if (pagamento.includes("Mobile Money")) {
+            instrucaoPagamento = "Envie para Orange/MTN: +245 955 000 000 (Ref: RGB-" + Math.floor(1000 + Math.random() * 9000) + ")";
+        }
+
+        alert(
+            "🎫 --- BILHETE DIGITAL DE RESERVA — ROTA GB ---\n\n" +
+            "📋 Serviço: " + servicoAtual + "\n" +
+            subtituloServico + ": " + local + "\n" +
+            (servicoAtual.includes('Voos') ? "🔄 Tipo: " + tipoViagem + "\n" : "") +
+            "💰 Valor: " + valorTotal + "\n" +
+            "💳 Pagamento: " + pagamento + "\n\n" +
+            "📞 CONTACTAR ANFITRIÃO / PROPRIETÁRIO:\n" +
+            "WhatsApp / Tel: " + contactoAnfitriao + "\n" +
+            "(Contacte para ver fotos dos quartos antes de pagar)\n\n" +
+            "📌 PAGAMENTO:\n" + instrucaoPagamento + "\n\n" +
+            "Obrigado por utilizar a ROTA GB!"
+        );
+    }
+</script>
 </body>
 </html>
