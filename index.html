@@ -174,19 +174,19 @@
 <div class="services-section">
     <h3>Go anywhere</h3>
     <div class="services-grid">
-        <div class="service-card">
+        <div class="service-card" onclick="abrirServico('Trip (Táxi / Moto)', 'A procurar condutor próximo em Bissau...')">
             <span class="icon">🚗</span>
             <span>Trip (Táxi / Moto)</span>
         </div>
-        <div class="service-card">
+        <div class="service-card" onclick="abrirServico('Aluguer Carros', 'Selecione a viatura (com ou sem motorista):')">
             <span class="icon">🚙</span>
             <span>Aluguer Carros</span>
         </div>
-        <div class="service-card">
+        <div class="service-card" onclick="abrirServico('Toca-toca (Interior)', 'Selecione o destino no interior (Cacheu, Bafatá, Gabú...):')">
             <span class="icon">🚌</span>
             <span>Toca-toca (Interior)</span>
         </div>
-        <div class="service-card">
+        <div class="service-card" onclick="abrirServico('Voos / Bilhetes', 'Companhias disponíveis em Osvaldo Vieira (TAP, Air Sénégal...):')">
             <span class="icon">✈️</span>
             <span>Voos / Bilhetes</span>
         </div>
@@ -197,11 +197,11 @@
 <div class="services-section">
     <h3>Alojamento & Estadias</h3>
     <div class="services-grid">
-        <div class="service-card active">
+        <div class="service-card" onclick="abrirServico('Hotéis em Bissau', 'A carregar lista de hotéis parceiros (Ledger, Azalai...):')">
             <span class="icon">🏨</span>
             <span>Hotéis em Bissau</span>
         </div>
-        <div class="service-card promo">
+        <div class="service-card promo" onclick="abrirServico('Airbnb / Apts Locais', 'Apartamentos e casas de temporada disponíveis em Bissau:')">
             <span class="badge">Novo</span>
             <span class="icon">🏡</span>
             <span>Airbnb / Apts Locais</span>
@@ -213,33 +213,24 @@
 <div class="services-section">
     <h3>Get anything delivered</h3>
     <div class="services-grid">
-        <div class="service-card">
+        <div class="service-card" onclick="abrirServico('Comida (Restaurantes)', 'Restaurantes disponíveis em Bissau (Papa Loca, etc.):')">
             <span class="icon">🍲</span>
             <span>Comida (Restaurantes)</span>
         </div>
-        <div class="service-card">
+        <div class="service-card" onclick="abrirServico('Mercado / Supermercado', 'Entregas do Mercado de Bandim ou Supermercados:')">
             <span class="icon">🛒</span>
             <span>Mercado / Supermercado</span>
         </div>
-        <div class="service-card">
+        <div class="service-card" onclick="abrirServico('Farmácia & Saúde', 'Serviço de entrega urgente de medicamentos ao domicílio:')">
             <span class="icon">💊</span>
             <span>Farmácia & Saúde</span>
         </div>
-        <div class="service-card">
+        <div class="service-card" onclick="abrirServico('Lojas & Conveniência', 'Lojas e artigos diversos com entrega rápida:')">
             <span class="icon">📦</span>
             <span>Lojas & Conveniência</span>
         </div>
     </div>
 </div>
-    <!-- Navegação Principais Serviços -->
-    <div class="service-nav" id="main-nav">
-        <div class="nav-item active" id="nav-taxi" onclick="switchServiceTab('taxi')">🚗 Transporte</div>
-        <div class="nav-item" id="nav-comida" onclick="switchServiceTab('comida')">🍲 Comida</div>
-        <div class="nav-item" id="nav-lojas" onclick="switchServiceTab('lojas')">🛒 Lojas</div>
-        <div class="nav-item" id="nav-hoteis" onclick="switchServiceTab('hoteis')">🏨 Hotéis & Apts</div>
-        <div class="nav-item" id="nav-recargas" onclick="switchServiceTab('recargas')">📱 Recargas</div>
-    </div>
-
     <!-- Map Engine -->
     <div class="map-area">
         <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
@@ -1197,5 +1188,11 @@
     <p style="margin: 0; font-weight: bold; color: #333;">ROTA GB — Bissau, Guiné-Bissau</p>
     <p style="margin: 5px 0 0 0;">Powered by <strong>Engenheiro Lavi Duarte Indeque</strong> 🚀🇬🇼</p>
 </div>
+    <script>
+    function abrirServico(nomeServico, mensagem) {
+        // Alerta dinâmico de simulação do pedido ROTA GB
+        alert("ROTA GB 🇬🇼\n\nServiço selecionado: " + nomeServico + "\n" + mensagem);
+    }
+</script>
 </body>
 </html>
