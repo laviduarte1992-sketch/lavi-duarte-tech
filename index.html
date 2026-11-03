@@ -1215,91 +1215,101 @@
     );
 }
 </script>
-<!-- Rodapé / Assinatura do Autor -->
-<div style="text-align: center; padding: 20px 10px; margin-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 0.85em;">
-    <p style="margin: 0; font-weight: bold; color: #333;">ROTA GB — Bissau, Guiné-Bissau</p>
-    <p style="margin: 5px 0 0 0;">Powered by <strong>Engenheiro Lavi Duarte Indeque</strong> 🚀🇬🇼</p>
-</div>
-<script>
-    function setRole(role) {
-        const btnCliente = document.getElementById('btn-passageiro');
-        const btnMotorista = document.getElementById('btn-motorista');
-        const painelCliente = document.getElementById('client-view');
-        const painelMotorista = document.getElementById('driver-view');
+<!-- Rodapé da Aplicação -->
+    <div style="text-align: center; padding: 20px; font-size: 12px; color: #666;">
+        <p><strong>ROTA GB — Bissau, Guiné-Bissau</strong></p>
+        <p>Powered by Engenheiro Lavi Duarte Indeque 🚀 GW</p>
+    </div>
 
-        if (role === 'passageiro') {
-            if(btnCliente) btnCliente.classList.add('active');
-            if(btnMotorista) btnMotorista.classList.remove('active');
-            if(painelCliente) painelCliente.style.display = 'block';
-            if(painelMotorista) painelMotorista.style.display = 'none';
-        } else {
-            if(btnMotorista) btnMotorista.classList.add('active');
-            if(btnCliente) btnCliente.classList.remove('active');
-            if(painelMotorista) painelMotorista.style.display = 'block';
-            if(painelCliente) painelCliente.style.display = 'none';
-        }
-    }
+    <script>
+        function setRole(role) {
+            const btnCliente = document.getElementById('btn-passageiro');
+            const btnMotorista = document.getElementById('btn-motorista');
+            const painelCliente = document.getElementById('client-view');
+            const painelMotorista = document.getElementById('driver-view');
 
-    let servicoAtual = "";
-
-    function abrirServico(nomeServico, mensagem) {
-        servicoAtual = nomeServico;
-        document.getElementById('modalTitle').innerText = nomeServico;
-        document.getElementById('modalDesc').innerText = mensagem;
-        
-        const inputModal = document.getElementById('modalInput');
-        const flightOpts = document.getElementById('flightOptions');
-        inputModal.value = ""; 
-
-        if (nomeServico.includes('Voos')) {
-            inputModal.placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
-            if(flightOpts) flightOpts.style.display = 'block';
-        } else {
-            inputModal.placeholder = "Indique a zona (ex: Bairro Militar, Bandim...)";
-            if(flightOpts) flightOpts.style.display = 'none';
+            if (role === 'passageiro') {
+                if(btnCliente) btnCliente.classList.add('active');
+                if(btnMotorista) btnMotorista.classList.remove('active');
+                if(painelCliente) painelCliente.style.display = 'block';
+                if(painelMotorista) painelMotorista.style.display = 'none';
+            } else {
+                if(btnMotorista) btnMotorista.classList.add('active');
+                if(btnCliente) btnCliente.classList.remove('active');
+                if(painelMotorista) painelMotorista.style.display = 'block';
+                if(painelCliente) painelCliente.style.display = 'none';
+            }
         }
 
-        document.getElementById('orderModal').style.display = 'flex';
-    }
+        let servicoAtual = "";
 
-    function fecharModal() {
-        document.getElementById('orderModal').style.display = 'none';
-    }
+        function abrirServico(nomeServico, mensagem) {
+            servicoAtual = nomeServico;
+            document.getElementById('modalTitle').innerText = nomeServico;
+            document.getElementById('modalDesc').innerText = mensagem;
+            
+            const inputModal = document.getElementById('modalInput');
+            const flightOpts = document.getElementById('flightOptions');
+            inputModal.value = ""; 
 
-    function confirmarPedido() {
-        const local = document.getElementById('modalInput').value || "Lisboa";
-        const tipoViagem = document.getElementById('flightType') ? document.getElementById('flightType').value : "Ida e Volta";
-        const pagamento = document.getElementById('paymentMethod') ? document.getElementById('paymentMethod').value : "Mobile Money";
-        
-        let valorTotal = "350.000 XOF";
-        if (tipoViagem === "Ida e Volta") {
-            valorTotal = "550.000 XOF";
+            if (nomeServico.includes('Voos')) {
+                inputModal.placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
+                if(flightOpts) flightOpts.style.display = 'block';
+            } else if (nomeServico.includes('Hotel') || nomeServico.includes('Airbnb')) {
+                inputModal.placeholder = "Indique o hotel/apartamento e noites";
+                if(flightOpts) flightOpts.style.display = 'none';
+            } else {
+                inputModal.placeholder = "Indique a zona (ex: Bairro Militar, Bandim...)";
+                if(flightOpts) flightOpts.style.display = 'none';
+            }
+
+            document.getElementById('orderModal').style.display = 'flex';
         }
 
-        fecharModal();
-
-        let instrucaoPagamento = "Apresente este código no posto ROTA GB.";
-        if (pagamento.includes("Mobile Money")) {
-            instrucaoPagamento = "Envie " + valorTotal + " para o número Orange/MTN: +245 955 000 000 (Ref: RGB-" + Math.floor(1000 + Math.random() * 9000) + ")";
+        function fecharModal() {
+            document.getElementById('orderModal').style.display = 'none';
         }
 
-        alert(
-            "🎫 --- BILHETE DIGITAL DE VIAGEM — ROTA GB ---\n\n" +
-            "📋 Serviço: " + servicoAtual + "\n" +
-            "✈️ Destino: " + local + "\n" +
-            "🔄 Tipo: " + tipoViagem + "\n" +
-            "💰 Total: " + valorTotal + "\n" +
-            "💳 Pagamento: " + pagamento + "\n\n" +
-            "📌 INSTRUÇÕES:\n" + instrucaoPagamento + "\n\n" +
-            "Obrigado por viajar com a ROTA GB!"
-        );
-    }
-</script>
-}
+        function confirmarPedido() {
+            const local = document.getElementById('modalInput').value || "Bissau";
+            const tipoViagem = document.getElementById('flightType') ? document.getElementById('flightType').value : "Ida e Volta";
+            const pagamento = document.getElementById('paymentMethod') ? document.getElementById('paymentMethod').value : "Mobile Money";
+            
+            let valorTotal = "350.000 XOF";
+            let subtituloServico = "Destino";
 
-    alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + detalheViagem + "\nDestino/Local: " + (local || "Bissau") + valorTotal + "\nPagamento: " + pagamento + "\n\nO seu pedido e pagamento foram registrados com sucesso!");
-    fecharModal();
-}
-</script>
+            if (servicoAtual.includes('Voos')) {
+                subtituloServico = "✈️ Destino";
+                valorTotal = (tipoViagem === "Ida e Volta") ? "550.000 XOF" : "350.000 XOF";
+            } else if (servicoAtual.includes('Hotéis')) {
+                subtituloServico = "🏨 Hotel Selecionado";
+                valorTotal = local.toLowerCase().includes('ledger') ? "85.000 XOF / noite" : "65.000 XOF / noite";
+            } else if (servicoAtual.includes('Airbnb')) {
+                subtituloServico = "🏡 Alojamento Selecionado";
+                valorTotal = "30.000 XOF / noite";
+            } else {
+                subtituloServico = "📍 Localização";
+                valorTotal = "10.000 XOF";
+            }
+
+            fecharModal();
+
+            let instrucaoPagamento = "Apresente este código no balcão ROTA GB.";
+            if (pagamento.includes("Mobile Money")) {
+                instrucaoPagamento = "Envie para o número Orange/MTN: +245 955 000 000 (Ref: RGB-" + Math.floor(1000 + Math.random() * 9000) + ")";
+            }
+
+            alert(
+                "🎫 --- BILHETE DIGITAL DE RESERVA — ROTA GB ---\n\n" +
+                "📋 Serviço: " + servicoAtual + "\n" +
+                subtituloServico + ": " + local + "\n" +
+                (servicoAtual.includes('Voos') ? "🔄 Tipo: " + tipoViagem + "\n" : "") +
+                "💰 Valor: " + valorTotal + "\n" +
+                "💳 Pagamento: " + pagamento + "\n\n" +
+                "📌 INSTRUÇÕES:\n" + instrucaoPagamento + "\n\n" +
+                "Obrigado por utilizar a ROTA GB!"
+            );
+        }
+    </script>
 </body>
 </html>
