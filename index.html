@@ -1273,11 +1273,19 @@ function confirmarPedido() {
     const pagamento = document.getElementById('paymentMethod').value;
     
     let detalheViagem = "";
+    let valorTotal = "";
+
     if (servicoAtual.includes('Voos')) {
         detalheViagem = "\nTipo: " + tipoViagem;
+        // Se for Ida e Volta, o valor estimado dobra em relação à tarifa base (ex: TAP Lisboa)
+        if (tipoViagem === "Ida e Volta") {
+            valorTotal = "\nValor Estimado: 550.000 XOF";
+        } else {
+            valorTotal = "\nValor Estimado: 350.000 XOF";
+        }
     }
 
-    alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + detalheViagem + "\nDestino/Local: " + (local || "Bissau") + "\nPagamento: " + pagamento + "\n\nO seu pedido e pagamento foram registrados com sucesso!");
+    alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + detalheViagem + "\nDestino/Local: " + (local || "Bissau") + valorTotal + "\nPagamento: " + pagamento + "\n\nO seu pedido e pagamento foram registrados com sucesso!");
     fecharModal();
 }
 </script>
