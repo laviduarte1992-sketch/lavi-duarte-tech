@@ -1206,32 +1206,13 @@
         if(painelMotorista) painelMotorista.style.display = 'block';
         if(painelCliente) painelCliente.style.display = 'none';
         
-        // Abre por defeito o painel de trabalho do condutor
+        // Abre por defeito o Painel do Condutor ou o Registo (pode escolher)
         if(btnPainel) btnPainel.classList.add('active');
         if(btnRegisto) btnRegisto.classList.remove('active');
         if(painelCondutor) painelCondutor.style.display = 'block';
         if(registoCondutor) registoCondutor.style.display = 'none';
 
-        // Faz scroll suave para a secção do motorista
-        if(painelMotorista) painelMotorista.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-function toggleDriverTab(tab) {
-    const btnPainel = document.getElementById('tab-painel-btn');
-    const btnRegisto = document.getElementById('tab-registo-btn');
-    const painelCondutor = document.getElementById('driver-panel-content');
-    const registoCondutor = document.getElementById('driver-register');
-
-    if (tab === 'painel') {
-        if(btnPainel) btnPainel.classList.add('active');
-        if(btnRegisto) btnRegisto.classList.remove('active');
-        if(painelCondutor) painelCondutor.style.display = 'block';
-        if(registoCondutor) registoCondutor.style.display = 'none';
-    } else {
-        if(btnRegisto) btnRegisto.classList.add('active');
-        if(btnPainel) btnPainel.classList.remove('active');
-        if(registoCondutor) registoCondutor.style.display = 'block';
-        if(painelCondutor) painelCondutor.style.display = 'none';
+        // NOTA: Removi o scrollIntoView para a tela não saltar para baixo sozinha!
     }
 }
    
