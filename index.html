@@ -960,303 +960,6 @@
 <!-- Scripts da Aplicação -->
 <script>
     function setRole(role) {
-        document.getElementById('btn-passageiro').classList.toggle('active', role === 'passageiro');
-        document.getElementById('btn-motorista').classList.toggle('active', role === 'motorista');
-        
-        if (role === 'passageiro') {
-            document.getElementById('main-nav').style.display = 'flex';
-            document.getElementById('panel-motorista').style.display = 'none';
-            switchServiceTab('taxi');
-        } else {
-            document.getElementById('main-nav').style.display = 'none';
-            ['panel-taxi', 'panel-comida', 'panel-lojas', 'panel-hoteis', 'panel-recargas'].forEach(p => {
-                document.getElementById(p).style.display = 'none';
-            });
-            document.getElementById('panel-motorista').style.display = 'flex';
-            toggleDriverTab('registo');
-        }
-    }
-
-    function switchServiceTab(service) {
-        ['taxi', 'comida', 'lojas', 'hoteis', 'recargas'].forEach(s => {
-            document.getElementById('nav-' + s).classList.remove('active');
-            document.getElementById('panel-' + s).style.display = 'none';
-        });
-        document.getElementById('nav-' + service).classList.add('active');
-        document.getElementById('panel-' + service).style.display = 'flex';
-    }
-
-    function updatePrice() {
-        const select = document.getElementById('routeSelect');
-        const basePriceDGVTT = parseInt(select.value) || 375;
-        const basePrice = basePriceDGVTT * 2;
-
-        document.getElementById('price-taxi').innerText = basePrice.toLocaleString('pt-PT') + ' XOF';
-        document.getElementById('price-privado').innerText = Math.round(basePrice * 1.3).toLocaleString('pt-PT') + ' XOF';
-        document.getElementById('price-moto').innerText = Math.round(basePrice * 0.7).toLocaleString('pt-PT') + ' XOF';
-    }
-
-    function selectService(card, multiplier) {
-        document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-    }
-
-    function toggleDriverTab(tab) {
-        document.getElementById('tab-painel-btn').classList.toggle('active', tab === 'painel');
-        document.getElementById('tab-registo-btn').classList.toggle('active', tab === 'registo');
-        document.getElementById('driver-dashboard').style.display = (tab === 'painel') ? 'block' : 'none';
-        document.getElementById('driver-register').style.display = (tab === 'registo') ? 'block' : 'none';
-        if (tab === 'registo') {
-            setTimeout(ajustarCanvas, 100);
-        }
-    }
-
-    // Gerenciador do Cronômetro de Espera (Garantido sem bloqueio)
-    let timerInterval = null;
-    let segundosEspera = 0;
-
-    function requestRide() {
-        // Pega o valor selecionado
-        const selectedTaxiPrice = document.getElementById('price-taxi').innerText;
-        const paymentSelect = document.getElementById('paymentSelect');
-        const paymentMethod = paymentSelect ? paymentSelect.value : 'Dinheiro Vivo';
-        
-        document.getElementById('reservedAmount').innerText = selectedTaxiPrice;
-        document.getElementById('selectedPaymentMethod').innerText = paymentMethod;
-        
-        // Alterna os painéis visuais
-        document.getElementById('rideFormControls').style.display = 'none';
-        document.getElementById('orderModal').style.display = 'flex';
-
-        // Inicia e força o reset do cronômetro
-        segundosEspera = 0;
-        document.getElementById('waitingTimer').innerText = "00:00";
-        
-        if (timerInterval) {
-            clearInterval(timerInterval);
-        }
-        
-        timerInterval = setInterval(() => {
-            segundosEspera++;
-            const mins = Math.floor(segundosEspera / 60);
-            const secs = segundosEspera % 60;
-            const formatoMins = mins < 10 ? '0' + mins : mins;
-            const formatoSecs = secs < 10 ? '0' + secs : secs;
-            document.getElementById('waitingTimer').innerText = `${formatoMins}:${formatoSecs}`;
-        }, 1000);
-    }
-
-    function cancelRide() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-        }
-        document.getElementById('waitingPanel').style.display = 'none';
-        document.getElementById('rideFormControls').style.display = 'block';
-    }
-
-    function selectOperator(op) {
-        document.getElementById('btn-orange-op').classList.toggle('active', op === 'Orange');
-        document.getElementById('btn-telecel-op').classList.toggle('active', op === 'Telecel');
-    }
-
-    function processarRecarga() {
-        const phone = document.getElementById('phoneRecarga').value;
-        const amount = document.getElementById('amountRecarga').value;
-        if(!phone || phone.length < 7) {
-            alert('Por favor, insira um número de telemóvel válido para a recarga.');
-            return;
-        }
-        alert('Processo de recarga de ' + amount + ' XOF iniciado para o número +245 ' + phone);
-    }
-
-    // Assinatura Digital (Canvas)
-    const canvas = document.getElementById('sigPad');
-    let ctx = null;
-    let desenhando = false;
-
-    if (canvas) {
-        ctx = canvas.getContext('2d');
-    }
-
-    function ajustarCanvas() {
-        if(canvas && ctx) {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-        }
-    }
-    window.addEventListener('load', ajustarCanvas);
-
-    if(canvas && ctx) {
-        canvas.addEventListener('mousedown', () => desenhando = true);
-        canvas.addEventListener('mouseup', () => { desenhando = false; ctx.beginPath(); });
-        canvas.addEventListener('mousemove', desenhar);
-
-        canvas.addEventListener('touchstart', (e) => { desenhando = true; e.preventDefault(); });
-        canvas.addEventListener('touchend', () => { desenhando = false; ctx.beginPath(); });
-        canvas.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            desenharComCoordenadas(touch.clientX - rect.left, touch.clientY - rect.top);
-            e.preventDefault();
-        });
-    }
-
-    function desenhar(e) {
-        if (!desenhando || !ctx) return;
-        const rect = canvas.getBoundingClientRect();
-        desenharComCoordenadas(e.clientX - rect.left, e.clientY - rect.top);
-    }
-
-    function desenharComCoordenadas(x, y) {
-        if (!ctx) return;
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = '#000';
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-
-    function limparAssinatura() {
-        if (!ctx || !canvas) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-    }
-
-    function avancarParaAssinatura(event) {
-        event.preventDefault();
-        document.getElementById('etapaFormRegisto').style.display = 'none';
-        document.getElementById('sucessoRegisto').style.display = 'block';
-    }
-
-    function reiniciarRegisto() {
-        document.getElementById('formCadastroMotorista').reset();
-        limparAssinatura();
-        document.getElementById('sucessoRegisto').style.display = 'none';
-        document.getElementById('etapaFormRegisto').style.display = 'block';
-    }
-
-    // Motor do Mapa Simulado de Bissau
-    const mapCanvas = document.getElementById('bissauMap');
-    if (mapCanvas) {
-        const mapCtx = mapCanvas.getContext('2d');
-        let moveStep = 0;
-
-        function desenharMapaBissau() {
-            const w = mapCanvas.offsetWidth || 380;
-            const h = mapCanvas.offsetHeight || 140;
-
-            if (mapCanvas.width !== w || mapCanvas.height !== h) {
-                mapCanvas.width = w;
-                mapCanvas.height = h;
-            }
-
-            mapCtx.fillStyle = '#e5e3df';
-            mapCtx.fillRect(0, 0, w, h);
-
-            mapCtx.strokeStyle = '#ffffff';
-            mapCtx.lineWidth = 14;
-
-            mapCtx.beginPath();
-            mapCtx.moveTo(0, h * 0.25);
-            mapCtx.lineTo(w, h * 0.45);
-            mapCtx.stroke();
-
-            mapCtx.beginPath();
-            mapCtx.moveTo(w * 0.65, 0);
-            mapCtx.lineTo(w * 0.2, h);
-            mapCtx.stroke();
-
-            moveStep = (moveStep + 0.3) % w;
-            const startX = moveStep;
-            const startY = h * 0.25 + (moveStep * 0.2);
-
-            mapCtx.fillStyle = '#ce1126';
-            mapCtx.beginPath();
-            mapCtx.arc(startX, startY, 6, 0, Math.PI * 2);
-            mapCtx.fill();
-            mapCtx.strokeStyle = '#ffffff';
-            mapCtx.lineWidth = 2;
-            mapCtx.stroke();
-
-            mapCtx.font = 'bold 11px sans-serif';
-            mapCtx.fillStyle = '#222222';
-            mapCtx.fillText('🚖 ROTA GB Express', startX - 45, startY - 10);
-
-            requestAnimationFrame(desenharMapaBissau);
-        }
-
-        requestAnimationFrame(desenharMapaBissau);
-    }
-   function comprarRecarga(operadora) {
-    const menuRecarga = 
-        "--- RECARGA: " + operadora + " ---\n\n" +
-        "1. 500 FCFA (Saldo)\n" +
-        "2. 1.000 FCFA (Saldo / Dados)\n" +
-        "3. 2.500 FCFA (Internet 2GB)\n" +
-        "4. 5.000 FCFA (Internet 5GB)\n\n" +
-        "Seleccione el número de la opción deseada:";
-
-    const opcaoInput = prompt(menuRecarga);
-    if (!opcaoInput) return;
-
-    let valorRecarga = 1000;
-    let descRecarga = "1.000 FCFA";
-
-    if (opcaoInput.includes("1")) {
-        valorRecarga = 500;
-        descRecarga = "500 FCFA";
-    } else if (opcaoInput.includes("3")) {
-        valorRecarga = 2500;
-        descRecarga = "2.500 FCFA (Internet 2GB)";
-    } else if (opcaoInput.includes("4")) {
-        valorRecarga = 5000;
-        descRecarga = "5.000 FCFA (Internet 5GB)";
-    }
-
-    const telefone = prompt("📱 Introduzca el número de teléfono para recibir la recarga:\n(Ej: +245 95XXXXX / 96XXXXX)");
-    if (!telefone) return;
-
-    const pagamento = prompt(
-        "Elija el método de pago:\n" +
-        "1 - Efectivo / Dinheiro Vivo\n" +
-        "2 - Orange Money\n" +
-        "3 - Telecel Cash", 
-        "2"
-    );
-    if (!pagamento) return;
-
-    let formaPagamento = "Efectivo";
-    if (pagamento === "2") formaPagamento = "Orange Money";
-    if (pagamento === "3") formaPagamento = "Telecel Cash";
-
-    // Comisión ROTA GB sobre recargas (ej: 5%)
-    const comissaoRotaGB = valorRecarga * 0.05;
-
-    alert(
-        "⚡ ¡RECARGA EXITOSA EN ROTA GB! 📱\n" +
-        "----------------------------------------\n" +
-        "Operadora: " + operadora + "\n" +
-        "Paquete: " + descRecarga + "\n" +
-        "Destino: " + telefone + "\n" +
-        "Pago via: " + formaPagamento + "\n\n" +
-        "📊 GESTIÓN ROTA GB:\n" +
-        "• Valor procesado: " + valorRecarga.toLocaleString() + " FCFA\n" +
-        "• Comisión de plataforma (5%): " + comissaoRotaGB.toLocaleString() + " FCFA\n\n" +
-        "¡El saldo ha sido enviado al número de teléfono indicado!"
-    );
-}
-</script>
-<!-- Rodapé da Aplicação -->
-    <div style="text-align: center; padding: 20px; font-size: 12px; color: #666;">
-        <p><strong>ROTA GB — Bissau, Guiné-Bissau</strong></p>
-        <p>Powered by Engenheiro Lavi Duarte Indeque 🚀 GW</p>
-    </script>
-
-<script>
-    function setRole(role) {
         const btnCliente = document.getElementById('btn-passageiro');
         const btnMotorista = document.getElementById('btn-motorista');
         const painelCliente = document.getElementById('client-view');
@@ -1279,78 +982,47 @@
     let listaFotos = [];
     let fotoIndexAtual = 0;
 
-    // Hotéis Oficiais em Bissau com imagens de estilo tropical/urbano real
+    // 1. Hotéis Oficiais em Bissau
     const quartosHoteis = [
-        { 
-            nome: "ceiba",
-            url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=500", 
-            desc: "🏨 Hotel Ceiba Bissau (5 Estrelas) — Suite Deluxe: 95.000 XOF/noite", 
-            contacto: "📞 Receção Ceiba: +245 955 888 777" 
-        },
-        { 
-            nome: "royal",
-            url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500", 
-            desc: "🏨 Royal Hotel Bissau (Centro) — Quarto Executivo: 75.000 XOF/noite", 
-            contacto: "📞 Receção Royal: +245 966 444 333" 
-        },
-        { 
-            nome: "imperio",
-            url: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=500", 
-            desc: "🏨 Hotel Império (Praça dos Heróis) — Quarto Standard: 50.000 XOF/noite", 
-            contacto: "📞 Receção Império: +245 957 222 111" 
-        },
-        { 
-            nome: "azalai",
-            url: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500", 
-            desc: "🏨 Hotel Azalai (Centro) — Suite Executiva: 65.000 XOF/noite", 
-            contacto: "📞 Receção Azalai: +245 955 123 456" 
-        },
-        { 
-            nome: "ledger",
-            url: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500", 
-            desc: "🏨 Hotel Ledger Plaza (Bissau Velho) — Quarto Deluxe: 85.000 XOF/noite", 
-            contacto: "📞 Receção Ledger: +245 966 789 012" 
-        },
-        { 
-            nome: "malaika",
-            url: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=500", 
-            desc: "🏨 Hotel Malaika (Cidadela) — Quarto Standard: 45.000 XOF/noite", 
-            contacto: "📞 Receção Malaika: +245 957 345 678" 
-        },
-        { 
-            nome: "coimbra",
-            url: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=500", 
-            desc: "🏨 Hotel Coimbra — Quarto Clássico: 40.000 XOF/noite", 
-            contacto: "📞 Receção Coimbra: +245 958 901 234" 
-        }
+        { nome: "ceiba", url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=500", desc: "🏨 Hotel Ceiba Bissau (5 Estrelas) — 95.000 XOF/noite", contacto: "📞 Receção Ceiba: +245 955 888 777" },
+        { nome: "ledger", url: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500", desc: "🏨 Hotel Ledger Plaza — 85.000 XOF/noite", contacto: "📞 Receção Ledger: +245 966 789 012" },
+        { nome: "royal", url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500", desc: "🏨 Royal Hotel Bissau — 75.000 XOF/noite", contacto: "📞 Receção Royal: +245 966 444 333" },
+        { nome: "azalai", url: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500", desc: "🏨 Hotel Azalai (Centro) — 65.000 XOF/noite", contacto: "📞 Receção Azalai: +245 955 123 456" },
+        { nome: "imperio", url: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=500", desc: "🏨 Hotel Império — 50.000 XOF/noite", contacto: "📞 Receção Império: +245 957 222 111" },
+        { nome: "malaika", url: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=500", desc: "🏨 Hotel Malaika — 45.000 XOF/noite", contacto: "📞 Receção Malaika: +245 957 345 678" },
+        { nome: "coimbra", url: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=500", desc: "🏨 Hotel Coimbra — 40.000 XOF/noite", contacto: "📞 Receção Coimbra: +245 958 901 234" }
     ];
 
-    // Apartamentos e Vivendas locais adaptadas à realidade de Bissau (Bairro Militar, Bandim, etc.)
+    // 2. Alojamentos Locais / Airbnb em Bissau
     const quartosAirbnb = [
-        { 
-            nome: "militar",
-            url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500", 
-            desc: "🏡 T2 Equipado — Bairro Militar: 30.000 XOF/noite", 
-            contacto: "📞 Anfitrião (Sr. Mendy): +245 955 998 877" 
-        },
-        { 
-            nome: "bandim",
-            url: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500", 
-            desc: "🏡 Vivenda c/ Quintal Murado — Bandim: 50.000 XOF/noite", 
-            contacto: "📞 Anfitrião (Dra. Cátia): +245 966 112 233" 
-        },
-        { 
-            nome: "centro",
-            url: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500", 
-            desc: "🏡 Estúdio Moderno — Centro: 25.000 XOF/noite", 
-            contacto: "📞 Anfitrião (Sr. Braima): +245 957 445 566" 
-        },
-        { 
-            nome: "ajuda",
-            url: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500", 
-            desc: "🏡 Apartamento — Bairro da Ajuda: 35.000 XOF/noite", 
-            contacto: "📞 Anfitrião (Sr. Nuno): +245 958 778 899" 
-        }
+        { nome: "bandim", url: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500", desc: "🏡 Vivenda c/ Quintal (Bandim) — 50.000 XOF/noite", contacto: "📞 Anfitrião (Dra. Cátia): +245 966 112 233" },
+        { nome: "ajuda", url: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500", desc: "🏡 Apartamento (Bairro Ajuda) — 35.000 XOF/noite", contacto: "📞 Anfitrião (Sr. Nuno): +245 958 778 899" },
+        { nome: "militar", url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500", desc: "🏡 T2 Equipado (Bairro Militar) — 30.000 XOF/noite", contacto: "📞 Anfitrião (Sr. Mendy): +245 955 998 877" },
+        { nome: "centro", url: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500", desc: "🏡 Estúdio Moderno (Centro) — 25.000 XOF/noite", contacto: "📞 Anfitrião (Sr. Braima): +245 957 445 566" }
+    ];
+
+    // 3. Restaurantes Parceiros em Bissau (Comida)
+    const listaComida = [
+        { nome: "pescadores", url: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500", desc: "🍲 O 2 Pescadores (Frutos do Mar / Peixe Fresco) — Pratos desde 8.000 XOF", contacto: "📞 Pedidos / Mesa: +245 955 333 222" },
+        { nome: "pizzeria", url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500", desc: "🍕 Pizzeria Bissau (Pizzas e Massas) — Desde 5.500 XOF", contacto: "📞 Pedidos: +245 966 222 111" },
+        { nome: "lebao", url: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500", desc: "🍗 Le Bão (Grelhados e Pratos do Dia) — Desde 4.500 XOF", contacto: "📞 Pedidos: +245 957 111 000" }
+    ];
+
+    // 4. Supermercados / Mercados em Bissau
+    const listaMercado = [
+        { nome: "supermercado", url: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=500", desc: "🛒 Supermercado Central Bissau (Cesta Básica, Arroz, Óleo, Bebidas)", contacto: "📞 Entregas: +245 955 444 333" },
+        { nome: "bandim", url: "https://images.unsplash.com/photo-1534483503378-1aabc7e761b7?w=500", desc: "🛒 Mercado de Bandim (Produtos Frescos, Frutas e Legumes)", contacto: "📞 Central Bandim: +245 966 555 444" }
+    ];
+
+    // 5. Farmácias de Serviço em Bissau
+    const listaFarmacia = [
+        { nome: "central", url: "https://images.unsplash.com/photo-1586015518255-a55b3990c377?w=500", desc: "💊 Farmácia Central (Bissau Centro) — Medicamentos e 1º Socorros", contacto: "📞 Urgências: +245 955 555 444" },
+        { nome: "povo", url: "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=500", desc: "💊 Farmácia do Povo (Bandim) — Produtos de Saúde e Higiene", contacto: "📞 Urgências: +245 966 666 555" }
+    ];
+
+    // 6. Lojas & Conveniência em Bissau
+    const listaLojas = [
+        { nome: "loja", url: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=500", desc: "📦 Loja de Conveniência ROTA GB (Acessórios, Eletrónicos e Utilidades)", contacto: "📞 Apoio: +245 955 666 555" }
     ];
 
     function abrirServico(nomeServico) {
@@ -1364,12 +1036,12 @@
         inputModal.value = ""; 
 
         if (nomeServico.includes('Voos')) {
-            modalDesc.innerText = "✈️ Companhias a partir de Osvaldo Vieira:\n• TAP (Lisboa): 350.000 XOF (Ida) / 550.000 XOF (Ida/Volta)\n• Air Sénégal (Dakar): 120.000 XOF\n• Royal Air Maroc: 280.000 XOF";
+            modalDesc.innerText = "✈️ Companhias a partir de Osvaldo Vieira:\n• TAP (Lisboa): 350.000 XOF (Ida) / 550.000 XOF (Ida/Volta)\n• Air Sénégal (Dakar): 120.000 XOF";
             inputModal.placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
             if(flightOpts) flightOpts.style.display = 'block';
             if(gallerySection) gallerySection.style.display = 'none';
         } else if (nomeServico.includes('Hotéis')) {
-            modalDesc.innerText = "🏨 Hotéis em Bissau (Preços reais/noite):\n• Hotel Ceiba: 95.000 XOF\n• Ledger Plaza: 85.000 XOF\n• Royal Hotel: 75.000 XOF\n• Azalai: 65.000 XOF\n• Império: 50.000 XOF\n• Malaika: 45.000 XOF\n• Coimbra: 40.000 XOF";
+            modalDesc.innerText = "🏨 Escolha o hotel abaixo:";
             inputModal.placeholder = "Escreva o hotel (ex: Ceiba, Royal, Azalai...)";
             if(flightOpts) flightOpts.style.display = 'none';
             if(gallerySection) gallerySection.style.display = 'block';
@@ -1377,7 +1049,7 @@
             fotoIndexAtual = 0;
             carregarFotoAtual();
         } else if (nomeServico.includes('Airbnb')) {
-            modalDesc.innerText = "🏡 Alojamentos Locais em Bissau:\n• Bairro Militar: 30.000 XOF\n• Bandim: 50.000 XOF\n• Centro: 25.000 XOF\n• Bairro da Ajuda: 35.000 XOF";
+            modalDesc.innerText = "🏡 Escolha a zona do apartamento:";
             inputModal.placeholder = "Escreva a zona (ex: Bandim, Militar...)";
             if(flightOpts) flightOpts.style.display = 'none';
             if(gallerySection) gallerySection.style.display = 'block';
@@ -1385,33 +1057,64 @@
             fotoIndexAtual = 0;
             carregarFotoAtual();
         } else if (nomeServico.includes('Comida')) {
-            modalDesc.innerText = "🍲 Restaurantes Parceiros em Bissau:\n• Pizzeria Bissau (Pizza/Massas): 6.500 XOF\n• Le Bão (Grelhados/Peixe): 8.000 XOF\n• O 2 Pescadores (Frutos do Mar): 10.000 XOF\n• Fast Food Bissau: 4.500 XOF";
-            inputModal.placeholder = "Indique o prato ou restaurante e morada";
+            modalDesc.innerText = "🍲 Escolha o restaurante parceiro:";
+            inputModal.placeholder = "Escreva o restaurante (ex: Pescadores, Pizzeria...)";
             if(flightOpts) flightOpts.style.display = 'none';
-            if(gallerySection) gallerySection.style.display = 'none';
+            if(gallerySection) gallerySection.style.display = 'block';
+            listaFotos = listaComida;
+            fotoIndexAtual = 0;
+            carregarFotoAtual();
         } else if (nomeServico.includes('Mercado')) {
-            modalDesc.innerText = "🛒 Supermercados & Mercados (Bandim / Centro):\n• Cesta Básica / Mantimentos (Arroz, Óleo, Peixe seco)\n• Taxa de entrega rápida ao domicílio em Bissau.";
-            inputModal.placeholder = "Indique os itens da lista de compras";
+            modalDesc.innerText = "🛒 Escolha o local de compras:";
+            inputModal.placeholder = "Escreva o mercado ou itens pretendidos";
             if(flightOpts) flightOpts.style.display = 'none';
-            if(gallerySection) gallerySection.style.display = 'none';
+            if(gallerySection) gallerySection.style.display = 'block';
+            listaFotos = listaMercado;
+            fotoIndexAtual = 0;
+            carregarFotoAtual();
         } else if (nomeServico.includes('Farmácia')) {
-            modalDesc.innerText = "💊 Farmácias de Serviço em Bissau:\n• Farmácia Central (Bissau Centro)\n• Farmácia do Povo (Bandim)\n• Entrega urgente de medicamentos e 1º socorros.";
-            inputModal.placeholder = "Indique o medicamento ou prescrição";
+            modalDesc.innerText = "💊 Escolha a farmácia de serviço:";
+            inputModal.placeholder = "Escreva a farmácia ou medicamento";
             if(flightOpts) flightOpts.style.display = 'none';
-            if(gallerySection) gallerySection.style.display = 'none';
+            if(gallerySection) gallerySection.style.display = 'block';
+            listaFotos = listaFarmacia;
+            fotoIndexAtual = 0;
+            carregarFotoAtual();
         } else if (nomeServico.includes('Lojas')) {
-            modalDesc.innerText = "📦 Lojas & Conveniência:\n• Eletrónicos, acessórios telemóvel, bebidas e utilidades.\n• Entrega rápida em qualquer bairro de Bissau.";
-            inputModal.placeholder = "Indique o artigo pretendido";
+            modalDesc.innerText = "📦 Lojas de Conveniência:";
+            inputModal.placeholder = "Escreva o artigo pretendido";
             if(flightOpts) flightOpts.style.display = 'none';
-            if(gallerySection) gallerySection.style.display = 'none';
+            if(gallerySection) gallerySection.style.display = 'block';
+            listaFotos = listaLojas;
+            fotoIndexAtual = 0;
+            carregarFotoAtual();
         } else {
             modalDesc.innerText = "Indique os detalhes do seu pedido em Bissau:";
-            inputModal.placeholder = "Indique a zona ou endereço";
+            inputModal.placeholder = "Indique a morada ou zona";
             if(flightOpts) flightOpts.style.display = 'none';
             if(gallerySection) gallerySection.style.display = 'none';
         }
 
         document.getElementById('orderModal').style.display = 'flex';
+    }
+
+    function carregarFotoAtual() {
+        if(listaFotos.length > 0) {
+            document.getElementById('roomPhoto').src = listaFotos[fotoIndexAtual].url;
+            document.getElementById('roomCaption').innerText = listaFotos[fotoIndexAtual].desc;
+            document.getElementById('roomContact').innerText = listaFotos[fotoIndexAtual].contacto;
+        }
+    }
+
+    function mudarFoto(direcao) {
+        fotoIndexAtual += direcao;
+        if (fotoIndexAtual < 0) fotoIndexAtual = listaFotos.length - 1;
+        if (fotoIndexAtual >= listaFotos.length) fotoIndexAtual = 0;
+        carregarFotoAtual();
+    }
+
+    function fecharModal() {
+        document.getElementById('orderModal').style.display = 'none';
     }
 
     function confirmarPedido() {
@@ -1428,60 +1131,36 @@
             valorTotal = (tipoViagem === "Ida e Volta") ? "550.000 XOF" : "350.000 XOF";
         } else if (servicoAtual.includes('Hotéis')) {
             subtituloServico = "🏨 Hotel Selecionado";
-            const textoBusca = local.toLowerCase();
-            if (textoBusca.includes('ceiba')) {
-                valorTotal = "95.000 XOF / noite";
-                contactoDireto = "+245 955 888 777";
-            } else if (textoBusca.includes('ledger')) {
-                valorTotal = "85.000 XOF / noite";
-                contactoDireto = "+245 966 789 012";
-            } else if (textoBusca.includes('royal')) {
-                valorTotal = "75.000 XOF / noite";
-                contactoDireto = "+245 966 444 333";
-            } else if (textoBusca.includes('imperio') || textoBusca.includes('império')) {
-                valorTotal = "50.000 XOF / noite";
-                contactoDireto = "+245 957 222 111";
-            } else if (textoBusca.includes('malaika')) {
-                valorTotal = "45.000 XOF / noite";
-                contactoDireto = "+245 957 345 678";
-            } else if (textoBusca.includes('coimbra')) {
-                valorTotal = "40.000 XOF / noite";
-                contactoDireto = "+245 958 901 234";
-            } else {
-                valorTotal = "65.000 XOF / noite";
-                contactoDireto = "+245 955 123 456";
-            }
+            const tb = local.toLowerCase();
+            if (tb.includes('ceiba')) { valorTotal = "95.000 XOF / noite"; contactoDireto = "+245 955 888 777"; }
+            else if (tb.includes('ledger')) { valorTotal = "85.000 XOF / noite"; contactoDireto = "+245 966 789 012"; }
+            else if (tb.includes('royal')) { valorTotal = "75.000 XOF / noite"; contactoDireto = "+245 966 444 333"; }
+            else if (tb.includes('imperio') || tb.includes('império')) { valorTotal = "50.000 XOF / noite"; contactoDireto = "+245 957 222 111"; }
+            else if (tb.includes('malaika')) { valorTotal = "45.000 XOF / noite"; contactoDireto = "+245 957 345 678"; }
+            else if (tb.includes('coimbra')) { valorTotal = "40.000 XOF / noite"; contactoDireto = "+245 958 901 234"; }
+            else { valorTotal = "65.000 XOF / noite"; contactoDireto = "+245 955 123 456"; }
         } else if (servicoAtual.includes('Airbnb')) {
             subtituloServico = "🏡 Alojamento Selecionado";
-            const textoBusca = local.toLowerCase();
-            if (textoBusca.includes('bandim')) {
-                valorTotal = "50.000 XOF / noite";
-                contactoDireto = "+245 966 112 233";
-            } else if (textoBusca.includes('centro')) {
-                valorTotal = "25.000 XOF / noite";
-                contactoDireto = "+245 957 445 566";
-            } else if (textoBusca.includes('ajuda')) {
-                valorTotal = "35.000 XOF / noite";
-                contactoDireto = "+245 958 778 899";
-            } else {
-                valorTotal = "30.000 XOF / noite";
-                contactoDireto = "+245 955 998 877";
-            }
+            const tb = local.toLowerCase();
+            if (tb.includes('bandim')) { valorTotal = "50.000 XOF / noite"; contactoDireto = "+245 966 112 233"; }
+            else if (tb.includes('ajuda')) { valorTotal = "35.000 XOF / noite"; contactoDireto = "+245 958 778 899"; }
+            else if (tb.includes('centro')) { valorTotal = "25.000 XOF / noite"; contactoDireto = "+245 957 445 566"; }
+            else { valorTotal = "30.000 XOF / noite"; contactoDireto = "+245 955 998 877"; }
         } else if (servicoAtual.includes('Comida')) {
-            subtituloServico = "🍲 Pedido / Restaurante";
-            valorTotal = "7.500 XOF (Média Refeição + Entrega)";
-            contactoDireto = "+245 955 333 222 (Estafeta ROTA GB)";
+            subtituloServico = "🍲 Restaurante Selecionado";
+            valorTotal = "7.500 XOF (Prato + Entrega)";
+            contactoDireto = "+245 955 333 222";
         } else if (servicoAtual.includes('Mercado')) {
-            subtituloServico = "🛒 Lista de Compras";
-            valorTotal = "15.000 XOF (Estimativa + Taxa)";
-            contactoDireto = "+245 955 444 333 (Supermercado)";
+            subtituloServico = "🛒 Local de Compras";
+            valorTotal = "15.000 XOF (Estimativa)";
+            contactoDireto = "+245 955 444 333";
         } else if (servicoAtual.includes('Farmácia')) {
-            subtituloServico = "💊 Medicamento / Urgência";
-            valorTotal = "5.000 XOF (Conforme receita)";
-            contactoDireto = "+245 955 555 444 (Farmácia de Serviço)";
+            subtituloServico = "💊 Farmácia / Saúde";
+            valorTotal = "5.000 XOF (Urgência)";
+            contactoDireto = "+245 955 555 444";
         } else if (servicoAtual.includes('Lojas')) {
-            subtituloServico = "📦 Artigo de Conveniência";
-            valorTotal = "10.000 XOF (Estimativa)";
+            subtituloServico = "📦 Loja de Conveniência";
+            valorTotal = "10.000 XOF";
             contactoDireto = "+245 955 666 555";
         } else {
             subtituloServico = "📍 Localização";
@@ -1500,7 +1179,7 @@
             "📋 Serviço: " + servicoAtual + "\n" +
             subtituloServico + ": " + local + "\n" +
             "💰 Valor Total: " + valorTotal + "\n" +
-            "📞 Contacto / Estafeta: " + contactoDireto + "\n" +
+            "📞 Contacto Direto: " + contactoDireto + "\n" +
             "💳 Pagamento: " + pagamento + "\n\n" +
             "📌 INSTRUÇÕES DE PAGAMENTO:\n" + instrucaoPagamento + "\n\n" +
             "Obrigado por utilizar a ROTA GB!"
