@@ -1183,7 +1183,7 @@
             "Obrigado por utilizar a ROTA GB!"
         );
     }
-   function setRole(role) {
+  function setRole(role) {
     const btnCliente = document.getElementById('btn-passageiro');
     const btnMotorista = document.getElementById('btn-motorista');
     const painelCliente = document.getElementById('client-view');
@@ -1206,35 +1206,34 @@
         if(painelMotorista) painelMotorista.style.display = 'block';
         if(painelCliente) painelCliente.style.display = 'none';
         
-        // Abre por defeito o Painel do Condutor ou o Registo (pode escolher)
+        // Abre por defeito o painel de trabalho do condutor
         if(btnPainel) btnPainel.classList.add('active');
         if(btnRegisto) btnRegisto.classList.remove('active');
         if(painelCondutor) painelCondutor.style.display = 'block';
         if(registoCondutor) registoCondutor.style.display = 'none';
 
-        // NOTA: Removi o scrollIntoView para a tela não saltar para baixo sozinha!
+        // Faz scroll suave para a secção do motorista
+        if(painelMotorista) painelMotorista.scrollIntoView({ behavior: 'smooth' });
     }
-    }
+}
+  function toggleDriverTab(tab) {
+    const btnPainel = document.getElementById('tab-painel-btn');
+    const btnRegisto = document.getElementById('tab-registo-btn');
+    const painelCondutor = document.getElementById('driver-panel-content');
+    const registoCondutor = document.getElementById('driver-register');
 
-    // Cole a função toggleDriverTab aqui:
-    function toggleDriverTab(tab) {
-        const btnPainel = document.getElementById('tab-painel-btn');
-        const btnRegisto = document.getElementById('tab-registo-btn');
-        const painelCondutor = document.getElementById('driver-panel-content');
-        const registoCondutor = document.getElementById('driver-register');
-
-        if (tab === 'painel') {
-            if(btnPainel) btnPainel.classList.add('active');
-            if(btnRegisto) btnRegisto.classList.remove('active');
-            if(painelCondutor) painelCondutor.style.display = 'block';
-            if(registoCondutor) regoCondutor.style.display = 'none'; // separe ou mantenha registoCondutor
-        } else if (tab === 'registo') {
-            if(btnRegisto) btnRegisto.classList.add('active');
-            if(btnPainel) btnPainel.classList.remove('active');
-            if(registoCondutor) registoCondutor.style.display = 'block';
-            if(painelCondutor) painelCondutor.style.display = 'none';
-        }
+    if (tab === 'painel') {
+        if(btnPainel) btnPainel.classList.add('active');
+        if(btnRegisto) btnRegisto.classList.remove('active');
+        if(painelCondutor) painelCondutor.style.display = 'block';
+        if(registoCondutor) registoCondutor.style.display = 'none';
+    } else if (tab === 'registo') {
+        if(btnRegisto) btnRegisto.classList.add('active');
+        if(btnPainel) btnPainel.classList.remove('active');
+        if(registoCondutor) registoCondutor.style.display = 'block';
+        if(painelCondutor) painelCondutor.style.display = 'none';
     }
+}
 </script>
     <!-- Rodapé / Assinatura do Autor -->
 <div style="text-align: center; padding: 20px 10px; margin-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 0.85em;">
