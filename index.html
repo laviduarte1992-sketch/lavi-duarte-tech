@@ -233,22 +233,32 @@
     <span class="icon">✈️</span>
     <span>Voos / Bilhetes</span>
 </div>
- <!-- Janela de Simulação de Pedido (Modal) -->
+<!-- Janela de Simulação de Pedido (Modal) -->
 <div id="orderModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
     <div style="background:#ffffff; width:100%; max-width:340px; padding:20px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:center;">
         <h3 id="modalTitle" style="color:#111; margin-bottom:8px; font-size:18px;">Simular Pedido</h3>
         <p id="modalDesc" style="color:#666; font-size:12px; margin-bottom:12px; text-align:left; white-space:pre-line;"></p>
         
         <!-- Opções de Ida / Ida e Volta (Visível apenas em Voos) -->
-        <div id="flightOptions" style="display:none; margin-bottom:12px; text-align:left;">
-            <label style="font-size:12px; font-weight:bold; color:#333; display:block; margin-bottom:5px;">Tipo de Viagem:</label>
-            <select id="flightType" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:13px; margin-bottom:8px;">
+        <div id="flightOptions" style="display:none; margin-bottom:10px; text-align:left;">
+            <label style="font-size:12px; font-weight:bold; color:#333; display:block; margin-bottom:3px;">Tipo de Viagem:</label>
+            <select id="flightType" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:13px;">
                 <option value="Ida e Volta">Ida e Volta</option>
                 <option value="Só Ida">Só Ida</option>
             </select>
         </div>
 
-        <input type="text" id="modalInput" placeholder="Indique a zona ou destino" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:12px; font-size:13px; box-sizing:border-box;">
+        <input type="text" id="modalInput" placeholder="Indique a zona ou destino" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px; font-size:13px; box-sizing:border-box;">
+
+        <!-- Opção de Método de Pagamento -->
+        <div style="margin-bottom:12px; text-align:left;">
+            <label style="font-size:12px; font-weight:bold; color:#333; display:block; margin-bottom:3px;">Método de Pagamento:</label>
+            <select id="paymentMethod" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:13px;">
+                <option value="Mobile Money (Orange/MTN)">Mobile Money (Orange / MTN)</option>
+                <option value="Dinheiro (Cash)">Dinheiro (Cash)</option>
+                <option value="Cartão Bancário / Multibanco">Cartão Bancário / Multibanco</option>
+            </select>
+        </div>
         
         <button onclick="confirmarPedido()" style="width:100%; background:#00e676; color:#000; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:8px; font-size:14px;">Confirmar Pedido</button>
         <button onclick="fecharModal()" style="width:100%; background:#f1f1f1; color:#333; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:13px;">Cancelar</button>
@@ -1260,13 +1270,14 @@ function fecharModal() {
 function confirmarPedido() {
     const local = document.getElementById('modalInput').value;
     const tipoViagem = document.getElementById('flightType').value;
+    const pagamento = document.getElementById('paymentMethod').value;
     
     let detalheViagem = "";
     if (servicoAtual.includes('Voos')) {
         detalheViagem = "\nTipo: " + tipoViagem;
     }
 
-    alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + detalheViagem + "\nDestino/Local: " + (local || "Bissau") + "\n\nO seu pedido foi registrado com sucesso!");
+    alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + detalheViagem + "\nDestino/Local: " + (local || "Bissau") + "\nPagamento: " + pagamento + "\n\nO seu pedido e pagamento foram registrados com sucesso!");
     fecharModal();
 }
 </script>
