@@ -231,6 +231,18 @@
         </div>
     </div>
 </div>
+    <!-- Janela de Simulação de Pedido (Modal) -->
+<div id="orderModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+    <div style="background:#ffffff; width:100%; max-width:320px; padding:20px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:center;">
+        <h3 id="modalTitle" style="color:#111; margin-bottom:8px; font-size:18px;">Simular Pedido</h3>
+        <p id="modalDesc" style="color:#666; font-size:13px; margin-bottom:15px;"></p>
+        
+        <input type="text" id="modalInput" placeholder="Indique a zona (ex: Bairro Militar, Bandim...)" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:15px; font-size:13px; box-sizing:border-box;">
+        
+        <button onclick="confirmarPedido()" style="width:100%; background:#00e676; color:#000; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:8px; font-size:14px;">Confirmar Pedido</button>
+        <button onclick="fecharModal()" style="width:100%; background:#f1f1f1; color:#333; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:13px;">Cancelar</button>
+    </div>
+</div>
     <!-- Map Engine -->
     <div class="map-area">
         <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
@@ -1188,10 +1200,25 @@
     <p style="margin: 0; font-weight: bold; color: #333;">ROTA GB — Bissau, Guiné-Bissau</p>
     <p style="margin: 5px 0 0 0;">Powered by <strong>Engenheiro Lavi Duarte Indeque</strong> 🚀🇬🇼</p>
 </div>
-    <script>
+<script>
+    let servicoAtual = "";
+
     function abrirServico(nomeServico, mensagem) {
-        // Alerta dinâmico de simulação do pedido ROTA GB
-        alert("ROTA GB 🇬🇼\n\nServiço selecionado: " + nomeServico + "\n" + mensagem);
+        servicoAtual = nomeServico;
+        document.getElementById('modalTitle').innerText = nomeServico;
+        document.getElementById('modalDesc').innerText = mensagem;
+        document.getElementById('modalInput').value = ""; // Limpa o campo
+        document.getElementById('orderModal').style.display = 'flex';
+    }
+
+    function fecharModal() {
+        document.getElementById('orderModal').style.display = 'none';
+    }
+
+  function confirmarPedido() {
+        const local = document.getElementById('modalInput').value;
+        alert("🇬🇼 ROTA GB — Pedido Confirmado!\n\nServiço: " + servicoAtual + "\nLocalização: " + (local || "Centro de Bissau") + "\n\nO seu pedido foi simulado com sucesso!");
+        fecharModal();
     }
 </script>
 </body>
