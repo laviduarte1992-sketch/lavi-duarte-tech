@@ -299,17 +299,17 @@
     </div>
 </div>
    <!-- Map Engine com Veículo ROTA Express Animado -->
-    <div class="map-area" style="position: relative;">
-        <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
+    <div class="map-area" style="position: relative; height: 140px; background: #e5e3df; overflow: hidden; z-index: 10;">
+        <div class="status-pill" style="z-index: 20;"><div class="dot-green"></div> GPS Bissau Ativo</div>
         
         <!-- Carro a mover / ROTA Express -->
-        <div id="rota-express-car" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; text-align: center; pointer-events: none;">
-            <div style="background: #000; color: #00ff66; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+        <div id="rota-express-car" style="position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); z-index: 99; text-align: center; pointer-events: none;">
+            <div style="background: #000000; color: #00ff66; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #00ff66; box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap;">
                 🚗 ROTA Express
             </div>
         </div>
 
-        <canvas id="bissauMap"></canvas>
+        <canvas id="bissauMap" style="width: 100%; height: 100%; display: block;"></canvas>
     </div>
 
     <!-- Panel 1: Transporte -->
