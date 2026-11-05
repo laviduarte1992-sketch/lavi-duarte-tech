@@ -977,6 +977,34 @@
         return `GW-${regiao}-${bairro}-${hash}`;
     }
 
+    // FUNÇÃO PARA PEDIR VIAGEM E ANIMAR O CARRO ROTA EXPRESS
+    function pedirViagem() {
+        let rotaSelect = document.getElementById('routeSelect');
+        let rotaNome = rotaSelect ? rotaSelect.options[rotaSelect.selectedIndex].text : 'Corrida Bissau';
+        let pagSelect = document.getElementById('ridePaymentMethod');
+        let metodoPag = pagSelect ? pagSelect.value : 'Dinheiro Vivo';
+
+        alert('🚕 Viagem Confirmada na ROTA GB!\n\nMotorista a caminho da sua localização.\nRota: ' + rotaNome + '\nPagamento: ' + metodoPag);
+
+        let carro = document.getElementById('rota-express-car');
+        if (carro) {
+            let posicaoX = 0;
+            let contador = 0;
+            
+            let intervalo = setInterval(() => {
+                posicaoX += 4;
+                let posicaoY = Math.sin(contador) * 6;
+                carro.style.transform = `translate(calc(-50% + ${posicaoX}px), calc(-50% + ${posicaoY}px))`;
+                contador += 0.2;
+                
+                if (posicaoX >= 140) {
+                    clearInterval(intervalo);
+                    alert('🏁 O motorista ROTA Express chegou ao local de recolha!');
+                }
+            }, 50);
+        }
+    }
+
     function setRole(role) {
         const btnCliente = document.getElementById('btn-passageiro');
         // ... restante do código existente ...
