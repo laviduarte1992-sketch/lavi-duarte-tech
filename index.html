@@ -508,9 +508,7 @@
                     <option value="Cartao Debito">💳 Cartão de Débito / Bancário</option>
                 </select>
             </div>
-<button type="button" onclick="cancelarViagem()" style="background:#d32f2f; color:#fff; border:none; padding:12px; border-radius:8px; font-size:13px; font-weight:bold; cursor:pointer; width:100%;">
-    Cancelar Viagem & Pedir Reembolso
-</button>
+<button type="button" class="btn-cancel" onclick="cancelarViagem()">Cancelar Viagem & Pedir Reembolso</button>
 
         <!-- Painel de Espera / Cancelamento -->
         <div class="waiting-card" id="waitingPanel">
@@ -960,6 +958,26 @@
     </div>
 <!-- Scripts da Aplicação -->
 <script>
+    let tipoVeiculoSelecionado = 'Táxi Oficial';
+
+function selecionarTipoVeiculo(tipo) {
+    // Remove a classe selecionada de todos os cartões
+    document.getElementById('card-taxi').classList.remove('selected');
+    document.getElementById('card-privado').classList.remove('selected');
+    document.getElementById('card-moto').classList.remove('selected');
+
+    // Adiciona ao cartão clicado e guarda o tipo
+    if (tipo === 'taxi') {
+        document.getElementById('card-taxi').classList.add('selected');
+        tipoVeiculoSelecionado = 'Táxi Oficial';
+    } else if (tipo === 'privado') {
+        document.getElementById('card-privado').classList.add('selected');
+        tipoVeiculoSelecionado = 'Carro Privado';
+    } else if (tipo === 'moto') {
+        document.getElementById('card-moto').classList.add('selected');
+        tipoVeiculoSelecionado = 'Moto-Táxi';
+    }
+}
     function setRole(role) {
         const btnCliente = document.getElementById('btn-passageiro');
         const btnMotorista = document.getElementById('btn-motorista');
