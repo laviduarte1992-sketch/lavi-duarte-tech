@@ -508,7 +508,9 @@
                     <option value="Cartao Debito">💳 Cartão de Débito / Bancário</option>
                 </select>
             </div>
-<button type="button" class="btn-cancel" onclick="cancelarViagem()">Cancelar Viagem & Pedir Reembolso</button>
+<button type="button" onclick="pedirViagem()" class="btn-primary" style="background:#00e676; color:#000; margin-top: 14px; width:100%; padding:14px; border-radius:10px; border:none; font-weight:bold; cursor:pointer;">
+    Pedir Viagem Agora
+</button>
 
         <!-- Painel de Espera / Cancelamento -->
         <div class="waiting-card" id="waitingPanel">
@@ -958,6 +960,79 @@
     </div>
 <!-- Scripts da Aplicação -->
 <script>
+    let timerInterval = null;
+let secondsElapsed = 0;
+
+function pedirViagem() {
+    let rotaSelect = document.getElementById('routeSelect');
+    let rotaNome = rotaSelect ? rotaSelect.options[rotaSelect.selectedIndex].text : 'Corrida Bissau';
+    let pagSelect = document.getElementById('ridePaymentMethod');
+    let metodoPag = pagSelect ? pagSelect.value : 'Dinheiro Vivo';
+
+    // Oculta o formulário de pedido e mostra o painel de espera
+    let formControls = document.getElementById('rideFormControls');
+    let waitingPanel = document.getElementById('waitingPanel');
+    let summaryInfo = document.getElementById('rideSummaryInfo');
+
+    if (formControls) formControls.style.display = 'none';
+    if (waitingPanel) waitingPanel.style.display = 'flex'; // ou 'block'
+    
+    // Atualiza o texto do resumo se existir
+    let paymentDisplay = document.getElementById('selectedPaymentMethod');
+    if (paymentDisplay) paymentDisplay.innerText = metodoPag;
+
+    // Inicia o cronómetro
+    secondsElapsed = 0;
+    updateTimerDisplay();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerDisplay();
+    }, 1000);
+
+    // Animação do veículo ROTA Express
+    animarCarroMapa();
+}
+
+function updateTimerDisplay() {
+    let minutes = Math.floor(secondsElapsed / 60);
+    let seconds = secondsElapsed % 60;
+    let formattedTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+    let timerElem = document.getElementById('waitingTimer');
+    if (timerElem) timerElem.innerText = formattedTime;
+}
+
+function cancelarViagem() {
+    if (timerInterval) clearInterval(timerInterval);
+    
+    // Restaura o formulário e oculta o painel de espera
+    let formControls = document.getElementById('rideFormControls');
+    let waitingPanel = document.getElementById('waitingPanel');
+
+    if (formControls) formControls.style.display = 'block';
+    if (waitingPanel) waitingPanel.style.display = 'none';
+}
+
+function animarCarroMapa() {
+    let carro = document.getElementById('rota-express-car');
+    if (!carro) return;
+    
+    let pos = 0;
+    let direcao = 1;
+    let animacao = setInterval(() => {
+        let waitingPanel = document.getElementById('waitingPanel');
+        if (!waitingPanel || waitingPanel.style.display === 'none') {
+            clearInterval(animacao);
+            return;
+        }
+
+        pos += 2 * direcao;
+        if (pos > 80 || pos < -80) {
+            direcao *= -1;
+        }
+        carro.style.transform = `translate(calc(-50% + ${pos}px), -50%)`;
+    }, 100);
+}
     let tipoVeiculoSelecionado = 'Táxi Oficial';
 
 function selecionarTipoVeiculo(tipo) {
