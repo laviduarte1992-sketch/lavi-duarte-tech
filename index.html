@@ -969,6 +969,15 @@
     </div>
 <!-- Scripts da Aplicação -->
 <script>
+    // FUNÇÃO DO CÓDIGO POSTAL DIGITAL NACIONAL
+    function gerarCodigoPostalCasa(lat, lng, regiao, bairro) {
+        let hash = Math.abs(Math.sin(lat * 1000 + lng * 2000) * 10000).toString(36).substring(0, 4).toUpperCase();
+        return `GW-${regiao}-${bairro}-${hash}`;
+    }
+
+    function setRole(role) {
+        const btnCliente = document.getElementById('btn-passageiro');
+        // ... restante do código existente ...
     function setRole(role) {
         const btnCliente = document.getElementById('btn-passageiro');
         const btnMotorista = document.getElementById('btn-motorista');
