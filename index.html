@@ -550,10 +550,23 @@
                     <option value="Cartao Debito">💳 Cartão de Débito / Bancário</option>
                 </select>
             </div>
+  <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="requestRide()">Pedir Viagem Agora</button>
+        </div>
 
-            <button onclick="pedirViagem()" class="btn-primary" style="background:#00e676; color:#000; font-weight:bold; width:100%; padding:14px; border-radius:10px; border:none; cursor:pointer;">
-    Pedir Viagem Agora
-</button>
+        <!-- Painel de Espera / Cancelamento -->
+        <div class="waiting-card" id="waitingPanel">
+            <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
+            <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
+            <div class="timer-text" id="waitingTimer">00:00</div>
+            <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
+                Preço reservado: <strong id="reservedAmount">750 XOF</strong>
+            </div>
+            <div style="font-size: 11px; color: #333; margin-bottom: 6px;">
+                Pagamento via: <strong id="selectedPaymentMethod">Dinheiro Vivo</strong>
+            </div>
+            <button type="button" class="btn-cancel" onclick="cancelRide()">Cancelar Viagem & Pedir Reembolso</button>
+        </div>
+    </div>
         </div>
 
         <!-- Painel de Espera / Cancelamento -->
