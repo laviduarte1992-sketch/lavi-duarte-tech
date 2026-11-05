@@ -959,40 +959,52 @@
     </div>
 <!-- Scripts da Aplicação -->
 <script>
-    let timerInterval = null;
-let secondsElapsed = 0;
-
-function pedirViagem() {
+  // Garante que a função está globalmente acessível pelo botão
+window.pedirViagem = function() {
     let rotaSelect = document.getElementById('routeSelect');
     let rotaNome = rotaSelect ? rotaSelect.options[rotaSelect.selectedIndex].text : 'Corrida Bissau';
     let pagSelect = document.getElementById('ridePaymentMethod');
     let metodoPag = pagSelect ? pagSelect.value : 'Dinheiro Vivo';
 
-    // Oculta o formulário de pedido e mostra o painel de espera
+    // Oculta os controlos do formulário
     let formControls = document.getElementById('rideFormControls');
-    let waitingPanel = document.getElementById('waitingPanel');
-    let summaryInfo = document.getElementById('rideSummaryInfo');
+    if (formControls) {
+        formControls.style.display = 'none';
+    } else {
+        // Fallback caso o container tenha outro ID: oculta o bloco pai ou o formulário atual
+        let paiBotao = document.querySelector('.bottom-panel') || document.getElementById('waitingPanel')?.previousElementSibling;
+        if (paiBotao) paiBotao.style.display = 'none';
+    }
 
-    if (formControls) formControls.style.display = 'none';
-    if (waitingPanel) waitingPanel.style.display = 'flex'; // ou 'block'
-    
-    // Atualiza o texto do resumo se existir
+    // Mostra o painel de espera
+    let waitingPanel = document.getElementById('waitingPanel');
+    if (waitingPanel) {
+        waitingPanel.style.display = 'block';
+    }
+
+    // Atualiza o método de pagamento no resumo, se existir
     let paymentDisplay = document.getElementById('selectedPaymentMethod');
-    if (paymentDisplay) paymentDisplay.innerText = metodoPag;
+    if (paymentDisplay) {
+        paymentDisplay.innerText = metodoPag;
+    }
 
     // Inicia o cronómetro
-    secondsElapsed = 0;
-    updateTimerDisplay();
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        secondsElapsed++;
-        updateTimerDisplay();
+    if (typeof secondsElapsed !== 'undefined') secondsElapsed = 0;
+    if (typeof updateTimerDisplay === 'function') updateTimerDisplay();
+    
+    if (window.timerInterval) clearInterval(window.timerInterval);
+    window.timerInterval = setInterval(() => {
+        if (typeof secondsElapsed !== 'undefined') {
+            secondsElapsed++;
+            if (typeof updateTimerDisplay === 'function') updateTimerDisplay();
+        }
     }, 1000);
 
-    // Animação do veículo ROTA Express
-    animarCarroMapa();
-}
-
+    // Animação do veículo no mapa
+    if (typeof animarCarroMapa === 'function') {
+        animarCarroMapa();
+    }
+};
 function updateTimerDisplay() {
     let minutes = Math.floor(secondsElapsed / 60);
     let seconds = secondsElapsed % 60;
