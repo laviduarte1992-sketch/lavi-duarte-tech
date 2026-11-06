@@ -325,7 +325,7 @@
             </div>
         </div>
 
-        <!-- RECARGAS DE SALDO E INTERNET (FLUXO ANTIGO POR PROMPT) -->
+        <!-- RECARGAS DE SALDO E INTERNET (FLUXO ANTIGO COM CARTÃO DE DÉBITO, NÚMERO E CVV) -->
         <div class="sub-section-title">Recargas de Saldo e Internet em Bissau</div>
         
         <div class="card-item">
@@ -439,7 +439,7 @@
     </div>
 </div>
 
-<!-- Modal Dinâmico Geral (Restaurantes, etc.) -->
+<!-- Modal Dinâmico Geral -->
 <div id="orderModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
     <div style="background:#ffffff; width:100%; max-width:340px; padding:18px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:center; box-sizing:border-box; margin:auto;">
         <h3 id="modalTitle" style="color:#111; margin-bottom:6px; font-size:16px;">Simular Pedido</h3>
@@ -531,7 +531,7 @@
         fecharModal();
     }
 
-    /* FLUXO ANTIGO DE RECARGA POR PROMPT */
+    /* FLUXO ANTIGO DE RECARGA COM CARTÃO DE DÉBITO E CVV */
     function iniciarRecargaAntiga(operadora) {
         // Passo 1: Número de telemóvel
         let telefone = prompt("Introduzca el número de teléfono para recibir la recarga:\n(Ej: +245 95XXXXX / 96XXXXX)");
@@ -555,6 +555,17 @@
         let metodoNome = "Orange Money";
         if (opcaoPag === "2") metodoNome = "Telecel Cash";
         else if (opcaoPag === "3") metodoNome = "Cartão de Débito";
+
+        // Se escolher Cartão de Débito (Opção 3), pede o número do cartão e o código de segurança (3 dígitos)
+        if (opcaoPag === "3") {
+            let numCartao = prompt("Introduza o Número do Cartão de Débito (16 dígitos):");
+            if (!numCartao) return;
+
+            let cvvCartao = prompt("Introduza o Código de Segurança (3 dígitos / CVV):");
+            if (!cvvCartao) return;
+
+            metodoNome += ` (Cartão: ****${numCartao.slice(-4)})`;
+        }
 
         // Confirmação final
         alert(`Recarga solicitada com sucesso! 🚀\n\nOperadora: ${operadora}\nNúmero: ${telefone}\nPacote: ${pacoteNome}\nPagamento: ${metodoNome}\n\nObrigado por usar a ROTA GB em Bissau!`);
