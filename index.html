@@ -93,19 +93,16 @@
         .timer-text { font-size: 22px; font-weight: 800; color: #d84315; margin: 4px 0; }
         .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
 
-        /* Sub-abas do Motorista (Estilo exato da imagem 3) */
+        /* Sub-abas do Motorista */
         .sub-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
-        .sub-tab-btn { flex: 1; padding: 10px; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; text-align: center; border: 1px solid #ddd; }
-        /* Quando inativo fica com fundo branco e letra preta (estilo imagem 3) */
-        .sub-tab-btn { background: #ffffff; color: #111; border-color: #ddd; }
-        /* Quando ativo fica com fundo preto escuro (estilo imagem 3 e 4) */
+        .sub-tab-btn { flex: 1; padding: 10px; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; text-align: center; border: 1px solid #ddd; background: #ffffff; color: #111; }
         .sub-tab-btn.active { background: #1a1a1a; color: #ffffff; border-color: #1a1a1a; }
 
-        /* Canvas de Assinatura do Motorista (Estilo imagem 5) */
+        /* Canvas de Assinatura do Motorista */
         .signature-pad-container { border: 2px dashed #00e676; border-radius: 10px; background: #fafafa; position: relative; margin-top: 6px; }
         canvas#sigPad { width: 100%; height: 110px; touch-action: none; cursor: crosshair; display: block; }
 
-        /* Listas Visuais */
+        /* Listas Visuais Completas */
         .card-item { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .card-item img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; margin-right: 10px; }
         .card-info { flex: 1; text-align: left; }
@@ -136,7 +133,7 @@
         </div>
     </div>
 
-    <!-- Secções do Cliente -->
+    <!-- Secções do Cliente (Grid Superior) -->
     <div id="clienteSections">
         <div class="services-section">
             <h3>Go anywhere</h3>
@@ -163,11 +160,11 @@
         <div class="services-section">
             <h3>Alojamento & Estadias</h3>
             <div class="services-grid">
-                <div class="service-card" onclick="abrirServico('Hotéis em Bissau', '🏨 Hotéis Oficiais em Bissau:\n• Hotel Azalai (Centro): 65.000 XOF/noite\n• Hotel Ledger Plaza: 85.000 XOF/noite')">
+                <div class="service-card" onclick="abrirServico('Hotéis em Bissau', '🏨 Hotéis Oficiais em Bissau:\n• Azalai Hotel: 55.000 - 95.000 FCFA\n• Ledger Plaza: 65.000 - 110.000 FCFA')">
                     <span class="icon">🏨</span>
                     <span>Hotéis</span>
                 </div>
-                <div class="service-card" onclick="abrirServico('Airbnb e Aportamentos Locais', '🏡 Apartamentos & Estúdios:\n• T2 Bairro Militar: 30.000 XOF/noite')">
+                <div class="service-card" onclick="abrirServico('Airbnb e Aportamentos Locais', '🏡 Apartamentos & Estúdios:\n• T2 Bairro Militar: 30.000 FCFA/noite')">
                     <span class="badge">Novo</span>
                     <span class="icon">🏡</span>
                     <span>Airbnb</span>
@@ -178,7 +175,7 @@
         <div class="services-section">
             <h3>Get anything delivered</h3>
             <div class="services-grid">
-                <div class="service-card" onclick="abrirServico('Comida (Restaurantes)', 'Restaurantes disponíveis em Bissau (Papa Loca, etc.):')">
+                <div class="service-card" onclick="abrirServico('Comida (Restaurantes)', 'Restaurantes disponíveis em Bissau (Papa Loca, Padeira Africana, etc.):')">
                     <span class="icon">🍲</span>
                     <span>Comida</span>
                 </div>
@@ -204,7 +201,7 @@
         <canvas id="bissauMap"></canvas>
     </div>
 
-    <!-- PAINEL 1: PAINEL DO CLIENTE -->
+    <!-- PAINEL 1: PAINEL DO CLIENTE (Completíssimo) -->
     <div class="bottom-panel" id="panel-cliente">
         <div id="rideFormControls">
             <div class="form-group">
@@ -267,7 +264,9 @@
             <button type="button" class="btn-cancel" onclick="cancelarViagem()">Cancelar Viagem & Pedir Reembolso</button>
         </div>
 
+        <!-- RESTAURANTES -->
         <div class="sub-section-title">Restaurantes em Bissau</div>
+        
         <div class="card-item">
             <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=100" alt="Papa Loca">
             <div class="card-info">
@@ -277,20 +276,97 @@
                 <div class="card-phone">📞 +245 689 2222</div>
             </div>
             <div class="actions-col">
-                <button class="btn-action" onclick="abrirServico('Papa Loca', 'Menu:\n• Pizza ROTA: 6.500 XOF')">Pedir</button>
+                <button class="btn-action" onclick="abrirServico('Papa Loca', 'Menu:\n• Pizza ROTA: 6.500 XOF\n• Hambúrguer Duplo: 3.500 XOF')">Pedir</button>
                 <button class="btn-whatsapp" onclick="window.open('https://wa.me/2456892222')">💬 WhatsApp</button>
+            </div>
+        </div>
+
+        <div class="card-item">
+            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=100" alt="Padeira Africana">
+            <div class="card-info">
+                <div class="card-title">A Padeira Africana</div>
+                <div class="card-desc">Galinha Cafriela e Típica</div>
+                <div class="card-price">3.000 - 7.500 FCFA</div>
+                <div class="card-phone">📞 +245 966 131 393</div>
+            </div>
+            <div class="actions-col">
+                <button class="btn-action" onclick="abrirServico('A Padeira Africana', 'Menu:\n• Galinha Cafriela: 4.500 XOF\n• Arroz Jollof: 3.000 XOF')">Pedir</button>
+                <button class="btn-whatsapp" onclick="window.open('https://wa.me/245966131393')">💬 WhatsApp</button>
+            </div>
+        </div>
+
+        <!-- SUPERMERCADOS E LOJAS -->
+        <div class="sub-section-title">Supermercados e Lojas em Bissau</div>
+        
+        <div class="card-item">
+            <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=100" alt="Hereso">
+            <div class="card-info">
+                <div class="card-title">Supermercado Hereso</div>
+                <div class="card-desc">Alimentação Geral, Bebidas e Frescos</div>
+                <div class="card-price">Arroz, Óleo, Açúcar, Leite</div>
+                <div class="card-phone">📞 +245 955 000 004</div>
+            </div>
+            <div class="actions-col">
+                <button class="btn-action" onclick="abrirServico('Supermercado Hereso', 'Envie a sua lista de compras:')">Comprar</button>
+                <button class="btn-whatsapp" onclick="window.open('https://wa.me/245955000004')">💬 WhatsApp</button>
+            </div>
+        </div>
+
+        <!-- HOTÉIS & ESTADIAS -->
+        <div class="sub-section-title">Hotéis & Estadias em Bissau</div>
+        
+        <div class="card-item">
+            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100" alt="Azalai">
+            <div class="card-info">
+                <div class="card-title">Azalai Hotel 24 de Setembro</div>
+                <div class="card-desc">Centro de Bissau / Conforto</div>
+                <div class="card-price">55.000 - 95.000 FCFA / noite</div>
+            </div>
+            <div class="actions-col">
+                <button class="btn-action" onclick="abrirServico('Azalai Hotel', 'Reserva de quarto standard ou suíte:')" style="background:#5c6bc0;">Reservar</button>
+                <button class="btn-whatsapp" onclick="window.open('https://wa.me/245955000111')">💬 WhatsApp</button>
+            </div>
+        </div>
+
+        <!-- RECARGAS DE SALDO E INTERNET -->
+        <div class="sub-section-title">Recargas de Saldo e Internet em Bissau</div>
+        
+        <div class="card-item">
+            <div style="width:50px; height:50px; background:#ff6f00; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; margin-right:10px;">GW</div>
+            <div class="card-info">
+                <div class="card-title">Orange - Saldo e Internet</div>
+                <div class="card-desc">Recarga Instantânea Móvel</div>
+                <div class="card-price">500 - 10.000 FCFA</div>
+                <div class="card-phone">📞 +245 955 000 123</div>
+            </div>
+            <div class="actions-col">
+                <button class="btn-action" onclick="abrirServico('Recarga Orange', 'Valor da recarga (500 a 10.000 FCFA):')">Recarregar</button>
+                <button class="btn-whatsapp" onclick="window.open('https://wa.me/245955000123')">💬 WhatsApp</button>
+            </div>
+        </div>
+
+        <div class="card-item">
+            <div style="width:50px; height:50px; background:#ffeb3b; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#111; font-weight:bold; margin-right:10px;">MTN</div>
+            <div class="card-info">
+                <div class="card-title">MTN / Telecel Cash</div>
+                <div class="card-desc">Crédito e Dados Móveis</div>
+                <div class="card-price">500 - 10.000 FCFA</div>
+                <div class="card-phone">📞 +245 966 000 456</div>
+            </div>
+            <div class="actions-col">
+                <button class="btn-action" onclick="abrirServico('Recarga MTN', 'Valor da recarga (500 a 10.000 FCFA):')">Recarregar</button>
+                <button class="btn-whatsapp" onclick="window.open('https://wa.me/245966000456')">💬 WhatsApp</button>
             </div>
         </div>
     </div>
 
-    <!-- PAINEL 2: PAINEL DO MOTORISTA COMPLETO (EXATO ÀS IMAGENS 3, 4 e 5) -->
+    <!-- PAINEL 2: PAINEL DO MOTORISTA -->
     <div class="bottom-panel" id="panel-motorista" style="display: none;">
         <div class="sub-tabs">
             <button class="sub-tab-btn" id="btn-tab-condutor" onclick="alternarAbaMotorista('condutor')">Painel do Condutor</button>
             <button class="sub-tab-btn active" id="btn-tab-registar" onclick="alternarAbaMotorista('registar')">Registar Veículo</button>
         </div>
 
-        <!-- Conteúdo 1: Registo de Veículo (Imagens 3, 4 e 5) -->
         <div id="driverRegisterForm">
             <div class="sub-section-title" style="margin-top: 4px;">Registo de Veículo & Dados de Pagamento</div>
             
@@ -334,7 +410,6 @@
                 <input type="text" id="driverAccount" placeholder="Número da Carteira ou Conta Bancária">
             </div>
 
-            <!-- Caixa de Termos e Condições (Imagem 4) -->
             <div style="background:#fafafa; border:1px solid #ddd; padding:10px; border-radius:8px; display:flex; align-items:flex-start; gap:8px; margin-bottom:10px;">
                 <input type="checkbox" id="termsCheck" style="margin-top:2px; width:16px; height:16px; cursor:pointer;">
                 <label for="termsCheck" style="font-size:10px; color:#333; line-height:1.3; cursor:pointer;">
@@ -342,7 +417,6 @@
                 </label>
             </div>
 
-            <!-- Assinatura Digital do Condutor (Imagem 5) -->
             <div style="font-size:11px; font-weight:bold; color:#111; margin-bottom:4px;">ASSINATURA DIGITAL DO CONDUTOR</div>
             <div class="signature-pad-container">
                 <canvas id="sigPad"></canvas>
@@ -357,7 +431,6 @@
             </button>
         </div>
 
-        <!-- Conteúdo 2: Painel de Trabalho do Condutor (Imagem 2) -->
         <div id="driverDashboardView" style="display: none; text-align: center; padding: 20px 0;">
             <div style="font-size: 15px; font-weight: bold; color: #111; margin-bottom: 4px;">Painel de Trabalho em Bissau</div>
             <div style="font-size: 12px; color: #666; margin-bottom: 16px;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></div>
