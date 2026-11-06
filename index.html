@@ -35,29 +35,15 @@
             box-sizing: border-box;
         }
 
-        .services-section {
-            padding: 15px;
-            margin-bottom: 10px;
-        }
-
-        .services-section h3 {
-            color: #1a1a1a;
-            font-size: 16px;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
+        .services-section { padding: 15px; margin-bottom: 5px; }
+        .services-section h3 { color: #1a1a1a; font-size: 15px; margin-bottom: 10px; font-weight: 600; }
+        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 
         .service-card {
             background: #ffffff;
             border: 1px solid #e1e4e8;
             border-radius: 12px;
-            padding: 12px 8px;
+            padding: 10px 6px;
             text-align: center;
             color: #24292e;
             font-size: 11px;
@@ -67,63 +53,39 @@
             justify-content: center;
             cursor: pointer;
             position: relative;
-            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+            transition: 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.04);
             user-select: none;
         }
 
-        .service-card:hover {
-            background: #f1f8ff;
-            border-color: #00e676;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-        }
-
-        .service-card.selected {
-            border-color: #00e676;
-            background: rgba(0,230,118,0.08);
-        }
-
-        .service-card .icon {
-            font-size: 22px;
-            margin-bottom: 6px;
-        }
-
-        .service-card .badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: #f85149;
-            color: white;
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
+        .service-card:hover { background: #f1f8ff; border-color: #00e676; transform: translateY(-2px); }
+        .service-card.selected { border-color: #00e676; background: rgba(0,230,118,0.08); }
+        .service-card .icon { font-size: 20px; margin-bottom: 4px; }
+        .service-card .badge { position: absolute; top: -6px; right: -6px; background: #f85149; color: white; font-size: 8px; padding: 2px 5px; border-radius: 6px; font-weight: bold; }
         
         /* Header */
-        .header { background: #1a1a1a; color: #fff; padding: 16px; position: relative; z-index: 20; }
-        .logo { font-size: 20px; font-weight: bold; color: #00e676; display: flex; align-items: center; gap: 6px; }
+        .header { background: #1a1a1a; color: #fff; padding: 14px 16px; position: relative; z-index: 20; }
+        .logo { font-size: 18px; font-weight: bold; color: #00e676; display: flex; align-items: center; gap: 6px; }
         .badge-gb { background: #ce1126; color: #fcd116; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-        .role-switch { background: #333; padding: 4px; border-radius: 20px; display: flex; }
-        .role-btn { border: none; background: transparent; color: #aaa; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; white-space: nowrap; }
+        .role-switch { background: #333; padding: 3px; border-radius: 20px; display: flex; }
+        .role-btn { border: none; background: transparent; color: #aaa; padding: 5px 10px; border-radius: 14px; font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s; }
         .role-btn.active { background: #00e676; color: #000; }
 
         /* Área do Mapa */
-        .map-area { height: 140px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; pointer-events: none; }
+        .map-area { height: 130px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; pointer-events: none; }
         canvas#bissauMap { width: 100%; height: 100%; display: block; }
-        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); pointer-events: none; z-index: 5; }
+        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); z-index: 5; }
         .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
 
         /* Painel Inferior */
-        .bottom-panel { background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 380px; position: relative; z-index: 20; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .bottom-panel { background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 360px; position: relative; z-index: 20; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
         label { font-size: 11px; color: #666; font-weight: bold; }
-        select, input { padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; outline: none; background: #f9f9f9; width: 100%; cursor: pointer; }
+        select, input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 12px; outline: none; background: #f9f9f9; width: 100%; cursor: pointer; }
 
         .service-options { display: flex; gap: 6px; }
         .service-title { font-size: 10px; font-weight: bold; }
-        .service-price { font-size: 12px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
+        .service-price { font-size: 11px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
 
         /* Painel de Espera / Cancelamento */
         .waiting-card { background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; text-align: center; }
@@ -131,9 +93,20 @@
         .timer-text { font-size: 22px; font-weight: 800; color: #d84315; margin: 4px 0; }
         .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
 
+        /* Listas com Scroll de Lojas/Restaurantes */
+        .store-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 2px; }
+        .store-card { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; padding: 8px 10px; border-radius: 8px; background: #fafafa; }
+        .store-name { font-size: 12px; font-weight: bold; }
+        .store-desc { font-size: 10px; color: #666; margin-top: 2px; }
+        .price-tag { font-size: 10px; color: #00e676; font-weight: bold; margin-top: 2px; }
+
+        /* Canvas de Assinatura do Motorista */
+        .signature-pad-container { border: 2px dashed #00e676; border-radius: 10px; background: #fafafa; position: relative; margin-top: 6px; }
+        canvas#sigPad { width: 100%; height: 100px; touch-action: none; cursor: crosshair; display: block; }
+
         /* Botões */
-        .btn-primary { background: #00e676; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
-        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary { background: #00e676; color: #000; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
+        .btn-secondary { background: #eee; color: #333; border: none; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -154,13 +127,13 @@
     <div class="services-section">
         <h3>Go anywhere</h3>
         <div class="services-grid">
-            <div class="service-card" onclick="abrirServico('Trip (Táxi / Moto)', 'A procurar condutor próximo em Bissau...')">
+            <div class="service-card" onclick="exibirAba('transporte')">
                 <span class="icon">🚗</span>
-                <span>Trip (Táxi / Moto)</span>
+                <span>Trip / Táxi</span>
             </div>
             <div class="service-card" onclick="abrirServico('Aluguer Carros', 'Selecione a viatura (com ou sem motorista):')">
                 <span class="icon">🚙</span>
-                <span>Aluguer Carros</span>
+                <span>Aluguer</span>
             </div>
             <div class="service-card" onclick="abrirServico('Toca-toca (Interior)', 'Selecione o destino no interior (Cacheu, Bafatá, Gabú...):')">
                 <span class="icon">🚌</span>
@@ -173,18 +146,18 @@
         </div>
     </div>
 
-    <!-- Secção: Alojamento -->
+    <!-- Secção: Alojamento & Estadias -->
     <div class="services-section">
         <h3>Alojamento & Estadias</h3>
         <div class="services-grid">
-            <div class="service-card" onclick="abrirServico('Hotéis em Bissau', '🏨 Hotéis Oficiais em Bissau (Por Noite):\n• Hotel Azalai (Centro): 65.000 XOF\n• Hotel Ledger Plaza: 85.000 XOF\n• Hotel Malaika: 45.000 XOF')">
+            <div class="service-card" onclick="abrirServico('Hotéis em Bissau', '🏨 Hotéis Oficiais em Bissau:\n• Hotel Azalai (Centro): 65.000 XOF/noite\n• Hotel Ledger Plaza: 85.000 XOF/noite\n• Hotel Malaika: 45.000 XOF/noite')">
                 <span class="icon">🏨</span>
                 <span>Hotéis</span>
             </div>
-            <div class="service-card" onclick="abrirServico('Airbnb e Aportamentos Locais', '🏡 Apartamentos & Estúdios Equipados:\n• T2 Bairro Militar: 30.000 XOF/noite\n• Vivenda em Bandim: 50.000 XOF/noite')">
+            <div class="service-card" onclick="abrirServico('Airbnb e Aportamentos Locais', '🏡 Apartamentos & Estúdios:\n• T2 Bairro Militar: 30.000 XOF/noite\n• Vivenda em Bandim: 50.000 XOF/noite')">
                 <span class="badge">Novo</span>
                 <span class="icon">🏡</span>
-                <span>Airbnb / Apts</span>
+                <span>Airbnb</span>
             </div>
         </div>
     </div>
@@ -193,11 +166,11 @@
     <div class="services-section">
         <h3>Get anything delivered</h3>
         <div class="services-grid">
-            <div class="service-card" onclick="abrirServico('Comida (Restaurantes)', 'Restaurantes disponíveis em Bissau (Papa Loca, etc.):')">
+            <div class="service-card" onclick="exibirAba('restaurantes')">
                 <span class="icon">🍲</span>
                 <span>Comida</span>
             </div>
-            <div class="service-card" onclick="abrirServico('Mercado / Supermercado', 'Entregas do Mercado de Bandim ou Supermercados:')">
+            <div class="service-card" onclick="exibirAba('lojas')">
                 <span class="icon">🛒</span>
                 <span>Mercado</span>
             </div>
@@ -245,7 +218,7 @@
         <canvas id="bissauMap"></canvas>
     </div>
 
-    <!-- Panel 1: Transporte com Rotas DGVTT Completo -->
+    <!-- Painel 1: Transporte com Rotas DGVTT Completo -->
     <div class="bottom-panel" id="panel-taxi">
         <div id="rideFormControls">
             <div class="form-group">
@@ -472,11 +445,88 @@
             <button type="button" class="btn-cancel" onclick="cancelarViagem()">Cancelar Viagem & Pedir Reembolso</button>
         </div>
     </div>
+
+    <!-- PAINEL 2: Restaurantes em Bissau -->
+    <div class="bottom-panel" id="panel-restaurantes" style="display: none;">
+        <h4 style="font-size: 13px; color: #111;">Restaurantes em Bissau</h4>
+        <div class="store-list">
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Papa Loca (Centro)</div>
+                    <div class="store-desc">Grelhados, Pizzas & Hambúrgueres</div>
+                    <div class="price-tag">Entrega: 500 XOF</div>
+                </div>
+                <button class="btn-secondary" onclick="abrirServico('Papa Loca', 'Menu Papa Loca:\n• Pizza ROTA GB: 6.500 XOF\n• Hambúrguer Especial: 3.500 XOF\n• Sumo Natural: 1.000 XOF')">Pedir</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Restaurante Coimbra</div>
+                    <div class="store-desc">Pratos Tradicionais & Marisco</div>
+                    <div class="price-tag">Entrega: 600 XOF</div>
+                </div>
+                <button class="btn-secondary" onclick="abrirServico('Restaurante Coimbra', 'Menu Coimbra:\n• Caldo de Mancarra: 4.500 XOF\n• Peixe Grelhado: 5.500 XOF')">Pedir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAINEL 3: Lojas e Mercado em Bissau -->
+    <div class="bottom-panel" id="panel-lojas" style="display: none;">
+        <h4 style="font-size: 13px; color: #111;">Mercado & Supermercados</h4>
+        <div class="store-list">
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Mercado de Bandim</div>
+                    <div class="store-desc">Produtos Frescos & Frutas de Bissau</div>
+                    <div class="price-tag">Taxa de Compra: 1.000 XOF</div>
+                </div>
+                <button class="btn-secondary" onclick="abrirServico('Mercado de Bandim', 'Escreva a sua lista de compras para a nossa equipa recolher no Mercado de Bandim:')">Comprar</button>
+            </div>
+            <div class="store-card">
+                <div>
+                    <div class="store-name">Supermercado Hulsta</div>
+                    <div class="store-desc">Bebidas, Enlatados & Mercearia</div>
+                    <div class="price-tag">Entrega: 750 XOF</div>
+                </div>
+                <button class="btn-secondary" onclick="abrirServico('Supermercado Hulsta', 'Indique os produtos do Supermercado Hulsta:')">Comprar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAINEL 4: Área do Motorista (Assinatura Digital) -->
+    <div class="bottom-panel" id="panel-driver" style="display: none;">
+        <h4 style="font-size: 13px; color: #111;">Painel de Validação do Motorista</h4>
+        <p style="font-size: 11px; color: #666;">Assinatura Digital de Entrega / Viagem Concluída:</p>
+        
+        <div class="signature-pad-container">
+            <canvas id="sigPad"></canvas>
+        </div>
+        
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+            <button class="btn-secondary" style="flex: 1;" onclick="limparAssinatura()">Limpar</button>
+            <button class="btn-primary" style="flex: 2; padding: 10px; font-size: 12px;" onclick="guardarAssinatura()">Validar & Fechar Corrida</button>
+        </div>
+    </div>
 </div>
 
 <script>
     let timerInterval = null;
     let secondsElapsed = 0;
+
+    // Alternar entre painéis inferiores (Transporte, Comida, Lojas, Motorista)
+    function exibirAba(aba) {
+        document.getElementById('panel-taxi').style.display = 'none';
+        document.getElementById('panel-restaurantes').style.display = 'none';
+        document.getElementById('panel-lojas').style.display = 'none';
+        document.getElementById('panel-driver').style.display = 'none';
+
+        if (aba === 'transporte') document.getElementById('panel-taxi').style.display = 'flex';
+        if (aba === 'restaurantes') document.getElementById('panel-restaurantes').style.display = 'flex';
+        if (aba === 'lojas') document.getElementById('panel-lojas').style.display = 'flex';
+        if (aba === 'motorista') {
+            document.getElementById('panel-driver').style.display = 'flex';
+            iniciarCanvasAssinatura();
+        }
+    }
 
     // Abrir modais (Hotéis, Comidas, Entregas, etc.)
     function abrirServico(titulo, descricao) {
@@ -573,10 +623,56 @@
         if (role === 'passageiro') {
             if (btnPassageiro) btnPassageiro.classList.add('active');
             if (btnMotorista) btnMotorista.classList.remove('active');
+            exibirAba('transporte');
         } else {
             if (btnMotorista) btnMotorista.classList.add('active');
             if (btnPassageiro) btnPassageiro.classList.remove('active');
+            exibirAba('motorista');
         }
+    }
+
+    // Lógica do Canvas de Assinatura Digital do Motorista
+    let canvas, ctx, desenhando = false;
+    function iniciarCanvasAssinatura() {
+        canvas = document.getElementById('sigPad');
+        if (!canvas) return;
+        ctx = canvas.getContext('2d');
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = 100;
+        
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+
+        canvas.onmousedown = (e) => { desenhando = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+        canvas.onmousemove = (e) => { if (desenhando) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
+        canvas.onmouseup = () => { desenhando = false; };
+
+        // Suporte a Ecrãs Tácteis (Telemóveis)
+        canvas.ontouchstart = (e) => {
+            desenhando = true;
+            let rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+        };
+        canvas.ontouchmove = (e) => {
+            if (desenhando) {
+                let rect = canvas.getBoundingClientRect();
+                ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+                ctx.stroke();
+            }
+        };
+        canvas.ontouchend = () => { desenhando = false; };
+    }
+
+    function limparAssinatura() {
+        if (ctx && canvas) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    function guardarAssinatura() {
+        alert("Assinatura validada com sucesso! Corrida concluída na Super App ROTA GB 🚀");
+        limparAssinatura();
     }
 </script>
 
