@@ -272,15 +272,15 @@
             <div class="service-options" style="display: flex; gap: 6px; margin: 8px 0;">
                 <div class="service-card selected" id="card-taxi" onclick="selecionarTipoVeiculo('taxi')">
                     <div class="service-title">🚕 Táxi Oficial</div>
-                    <div class="service-price" id="priceTaxi">225 XOF</div>
+                    <div class="service-price" id="priceTaxi">500 XOF</div>
                 </div>
                 <div class="service-card" id="card-privado" onclick="selecionarTipoVeiculo('privado')">
                     <div class="service-title">🚗 Carro Privado</div>
-                    <div class="service-price" id="pricePrivado">975 XOF</div>
+                    <div class="service-price" id="pricePrivado">1.300 XOF</div>
                 </div>
                 <div class="service-card" id="card-moto" onclick="selecionarTipoVeiculo('moto')">
                     <div class="service-title">🏍️ Moto-Táxi</div>
-                    <div class="service-price" id="priceMoto">525 XOF</div>
+                    <div class="service-price" id="priceMoto">700 XOF</div>
                 </div>
             </div>
 
@@ -303,7 +303,7 @@
             <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
             <div class="timer-text" id="waitingTimer">00:00</div>
             <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
-                Preço reservado: <strong id="reservedAmount">225 XOF</strong>
+                Preço reservado: <strong id="reservedAmount">500 XOF</strong>
             </div>
             <div style="font-size: 11px; color: #333; margin-bottom: 6px;">
                 Pagamento via: <strong id="selectedPaymentMethod">Dinheiro Vivo</strong>
@@ -629,20 +629,23 @@
         fecharModal();
     }
 
-    /* ATUALIZAR PREÇOS DINAMICAMENTE CONFORME A ROTA DGVTT SELECIONADA */
+    /* ATUALIZAR PREÇOS COM MULTIPLICADOR DE CORRIDA EXCLUSIVA (IDA E REGRESSO VAZIO / COMISSÃO CEO) */
     function updatePrice() {
         let rotaSelect = document.getElementById('routeSelect');
         if (!rotaSelect) return;
 
-        let basePrice = parseInt(rotaSelect.value) || 225;
-        let privadoPrice = Math.round(basePrice * 2.6);
-        let motoPrice = Math.round(basePrice * 1.4);
+        let basePrice = parseInt(rotaSelect.value) || 250;
+        
+        // Multiplicador exclusivo para cobrir o regresso vazio e margem da empresa ROTA GB
+        let taxiPrice = basePrice * 2;       // Ex: 250 XOF vira 500 XOF
+        let privadoPrice = Math.round(basePrice * 5.2); // Ex: Carro Privado exclusivo
+        let motoPrice = Math.round(basePrice * 2.8);    // Ex: Moto-táxi exclusivo
 
         let pTaxi = document.getElementById('priceTaxi');
         let pPrivado = document.getElementById('pricePrivado');
         let pMoto = document.getElementById('priceMoto');
 
-        if (pTaxi) pTaxi.innerText = basePrice + ' XOF';
+        if (pTaxi) pTaxi.innerText = taxiPrice + ' XOF';
         if (pPrivado) pPrivado.innerText = privadoPrice + ' XOF';
         if (pMoto) pMoto.innerText = motoPrice + ' XOF';
     }
@@ -701,13 +704,13 @@
         if (waitingPanel) waitingPanel.style.display = 'flex';
 
         let rotaSelect = document.getElementById('routeSelect');
-        let basePrice = parseInt(rotaSelect.value) || 225;
-        let finalPrice = basePrice;
-        if (selectedVehicleType === 'privado') finalPrice = Math.round(basePrice * 2.6);
-        if (selectedVehicleType === 'moto') finalPrice = Math.round(basePrice * 1.4);
+        let basePrice = parseInt(rotaSelect.value) || 250;
+        let finalPrice = basePrice * 2;
+        if (selectedVehicleType === 'privado') finalPrice = Math.round(basePrice * 5.2);
+        if (selectedVehicleType === 'moto') finalPrice = Math.round(basePrice * 2.8);
 
         let resAmount = document.getElementById('reservedAmount');
-        if (resAmount) resAmount.innerText = finalPrice + ' XOF (' + selectedVehicleType.toUpperCase() + ')';
+        if (resAmount) resAmount.innerText = finalPrice + ' XOF (' + selectedVehicleType.toUpperCase() + ' - Exclusivo)';
 
         let pagSelect = document.getElementById('ridePaymentMethod');
         let metodoPag = pagSelect ? pagSelect.value : 'Dinheiro Vivo';
