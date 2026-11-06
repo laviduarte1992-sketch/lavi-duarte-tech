@@ -71,8 +71,8 @@
         .role-btn { border: none; background: transparent; color: #aaa; padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s; }
         .role-btn.active { background: #00e676; color: #000; }
 
-        /* Área do Mapa */
-        .map-area { height: 130px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; pointer-events: none; }
+        /* Área do Mapa com Carro Animado ROTA GB Express */
+        .map-area { height: 140px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; }
         canvas#bissauMap { width: 100%; height: 100%; display: block; }
         .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); z-index: 5; }
         .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
@@ -102,7 +102,7 @@
         .signature-pad-container { border: 2px dashed #00e676; border-radius: 10px; background: #fafafa; position: relative; margin-top: 6px; }
         canvas#sigPad { width: 100%; height: 110px; touch-action: none; cursor: crosshair; display: block; }
 
-        /* Listas Visuais Completas */
+        /* Listas Visuais */
         .card-item { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .card-item img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; margin-right: 10px; }
         .card-info { flex: 1; text-align: left; }
@@ -195,7 +195,7 @@
         </div>
     </div>
 
-    <!-- Map Engine -->
+    <!-- Map Engine com Carro ROTA GB Express Animado -->
     <div class="map-area">
         <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
         <canvas id="bissauMap"></canvas>
@@ -207,13 +207,60 @@
             <div class="form-group">
                 <label>ROTA OFICIAL DGVTT - BISSAU (CORRIDA EXCLUSIVA)</label>
                 <select id="routeSelect" onchange="updatePrice()">
+                    <!-- TODAS AS ZONAS E ROTAS OFICIAIS DGVTT COMPLETAS -->
                     <optgroup label="📍 Partidas: Centro / Cidade">
                         <option value="225">Cidade → Mercado de Bandim (225 XOF)</option>
                         <option value="250">Cidade → Cristo Redentor (250 XOF)</option>
                         <option value="325">Cidade → Belém / Missira (325 XOF)</option>
                         <option value="350">Cidade → Bairro d'Ajuda 1º e 2º fase (350 XOF)</option>
+                        <option value="375">Cidade → Hospital 3 de Agosto (375 XOF)</option>
+                        <option value="425">Cidade → Bairro Internacional (425 XOF)</option>
+                        <option value="200">Cidade → Hotel Emb. América (200 XOF)</option>
+                        <option value="450">Cidade → Bairro Militar / Prédio Nino (450 XOF)</option>
+                        <option value="475">Cidade → Bairro Militar Somec (475 XOF)</option>
+                        <option value="525">Cidade → B. Militar / Terminal TUB (525 XOF)</option>
+                        <option value="550">Cidade → Brá / Seminário (550 XOF)</option>
+                        <option value="475">Cidade → Paragem Central (475 XOF)</option>
+                        <option value="525">Cidade → Guimetal (525 XOF)</option>
+                        <option value="550">Cidade → São Paulo (550 XOF)</option>
+                        <option value="575">Cidade → Háfia / Cruzamento (575 XOF)</option>
+                        <option value="650">Cidade → Paragem Manjaco (650 XOF)</option>
+                        <option value="675">Cidade → Rotunda do Aeroporto (675 XOF)</option>
                         <option value="700">Cidade → Aeroporto (700 XOF)</option>
+                        <option value="750">Cidade → Base Aérea / PRAKLAS (750 XOF)</option>
+                        <option value="800">Cidade → Bissalanca Poilão (800 XOF)</option>
+                        <option value="200">Cidade → Enterramento (200 XOF)</option>
                         <option value="950">Cidade → STENACKS / Safim (950 XOF)</option>
+                        <option value="650">Cidade → ENA (CENFA) (650 XOF)</option>
+                        <option value="575">Cidade → Bairro Cupul (575 XOF)</option>
+                        <option value="700">Cidade → Av. Brasil (700 XOF)</option>
+                        <option value="775">Cidade → Paulo Barros (775 XOF)</option>
+                        <option value="175">Cidade → Caracol (175 XOF)</option>
+                        <option value="250">Cidade → Padaria Nhonho (250 XOF)</option>
+                        <option value="275">Cidade → Zona 7 (275 XOF)</option>
+                        <option value="325">Cidade → Bairro Plano (325 XOF)</option>
+                        <option value="375">Cidade → Bairro Ministro (375 XOF)</option>
+                        <option value="375">Cidade → Cuntum Madina (375 XOF)</option>
+                        <option value="425">Cidade → SHEL Quelelê (425 XOF)</option>
+                        <option value="475">Cidade → Sobrade (475 XOF)</option>
+                        <option value="500">Cidade → Quelelê (Entroncamento) (500 XOF)</option>
+                        <option value="525">Cidade → Ponta Neto (525 XOF)</option>
+                        <option value="550">Cidade → Bôr / Terminal TUB (550 XOF)</option>
+                        <option value="575">Cidade → Aldeia SOS (575 XOF)</option>
+                        <option value="600">Cidade → Cemitério de N'hala (600 XOF)</option>
+                        <option value="275">Cidade → Bairro Bissack (Ponte Cibe) (275 XOF)</option>
+                        <option value="325">Cidade → Bissack / Terminal TUB (325 XOF)</option>
+                        <option value="275">Cidade → Estado Major / QG (275 XOF)</option>
+                        <option value="450">Cidade → Igreja Católica de Antula (450 XOF)</option>
+                        <option value="475">Cidade → Pluba / Abílio Santos (475 XOF)</option>
+                        <option value="650">Cidade → Pefine (650 XOF)</option>
+                        <option value="800">Cidade → Estádio 24 de Setembro (800 XOF)</option>
+                    </optgroup>
+                    <optgroup label="📍 Partidas: Mercado de Bandim">
+                        <option value="225">Bandim → SHEL / Palmeiras (225 XOF)</option>
+                        <option value="275">Bandim → Belém / Missira (275 XOF)</option>
+                        <option value="325">Bandim → Bairro d'Ajuda (325 XOF)</option>
+                        <option value="550">Bandim → Safim (550 XOF)</option>
                     </optgroup>
                 </select>
             </div>
@@ -325,7 +372,7 @@
             </div>
         </div>
 
-        <!-- RECARGAS DE SALDO E INTERNET (FLUXO ANTIGO COM CARTÃO DE DÉBITO, NÚMERO E CVV) -->
+        <!-- RECARGAS DE SALDO E INTERNET -->
         <div class="sub-section-title">Recargas de Saldo e Internet em Bissau</div>
         
         <div class="card-item">
@@ -469,6 +516,57 @@
     let timerInterval = null;
     let secondsElapsed = 0;
 
+    // Motor de Animação do Mapa com Carro ROTA GB Express
+    window.onload = function() {
+        let canvas = document.getElementById('bissauMap');
+        if (!canvas) return;
+        let ctx = canvas.getContext('2d');
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+
+        let carX = 50;
+        let carY = canvas.height / 2;
+        let targetX = canvas.width - 60;
+
+        function animateMap() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Desenhar ruas de Bissau (Fundo cinza/branco)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 14;
+            ctx.beginPath();
+            ctx.moveTo(20, canvas.height / 2);
+            ctx.lineTo(canvas.width - 20, canvas.height / 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 10);
+            ctx.lineTo(canvas.width / 2, canvas.height - 10);
+            ctx.stroke();
+
+            // Mover o carro ROTA GB Express
+            carX += 0.8;
+            if (carX > targetX) carX = 40;
+
+            // Ícone do Carro e Rótulo ROTA GB Express
+            ctx.font = '14px sans-serif';
+            ctx.fillText('🚗', carX, carY - 6);
+            
+            ctx.fillStyle = '#111';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText('ROTA GB Express', carX + 22, carY - 2);
+
+            // Ponto indicador GPS
+            ctx.fillStyle = '#ce1126';
+            ctx.beginPath();
+            ctx.arc(carX + 10, carY + 12, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            requestAnimationFrame(animateMap);
+        }
+        animateMap();
+    };
+
     function setRole(role) {
         let btnPassageiro = document.getElementById('btn-passageiro');
         let btnMotorista = document.getElementById('btn-motorista');
@@ -531,13 +629,11 @@
         fecharModal();
     }
 
-    /* FLUXO ANTIGO DE RECARGA COM CARTÃO DE DÉBITO E CVV */
+    /* FLUXO ANTIGO DE RECARGA COM CARTÃO DE DÉBITO, NÚMERO E CVV */
     function iniciarRecargaAntiga(operadora) {
-        // Passo 1: Número de telemóvel
         let telefone = prompt("Introduzca el número de teléfono para recibir la recarga:\n(Ej: +245 95XXXXX / 96XXXXX)");
         if (!telefone) return;
 
-        // Passo 2: Escolha do pacote / valor
         let menuPacotes = `--- RECARGA: ${operadora} Guinea-Bissau ---\n\n1. 500 FCFA (Saldo)\n2. 1.000 FCFA (Saldo / Dados)\n3. 2.500 FCFA (Internet 2GB)\n4. 5.000 FCFA (Internet 5GB)\n\nSeleccione el número de la opción deseada:`;
         let opcaoPacote = prompt(menuPacotes);
         if (!opcaoPacote) return;
@@ -547,7 +643,6 @@
         else if (opcaoPacote === "3") pacoteNome = "2.500 FCFA (Internet 2GB)";
         else if (opcaoPacote === "4") pacoteNome = "5.000 FCFA (Internet 5GB)";
 
-        // Passo 3: Método de pagamento
         let menuPagamento = `Escolha o Método de Pagamento:\n\n1. Orange Money\n2. Telecel Cash\n3. Cartão de Débito\n\nDigite o número do método:`;
         let opcaoPag = prompt(menuPagamento);
         if (!opcaoPag) return;
@@ -556,7 +651,6 @@
         if (opcaoPag === "2") metodoNome = "Telecel Cash";
         else if (opcaoPag === "3") metodoNome = "Cartão de Débito";
 
-        // Se escolher Cartão de Débito (Opção 3), pede o número do cartão e o código de segurança (3 dígitos)
         if (opcaoPag === "3") {
             let numCartao = prompt("Introduza o Número do Cartão de Débito (16 dígitos):");
             if (!numCartao) return;
@@ -567,7 +661,6 @@
             metodoNome += ` (Cartão: ****${numCartao.slice(-4)})`;
         }
 
-        // Confirmação final
         alert(`Recarga solicitada com sucesso! 🚀\n\nOperadora: ${operadora}\nNúmero: ${telefone}\nPacote: ${pacoteNome}\nPagamento: ${metodoNome}\n\nObrigado por usar a ROTA GB em Bissau!`);
     }
 
@@ -636,40 +729,40 @@
     }
 
     // Canvas de Assinatura
-    let canvas, ctx, desenhando = false;
+    let canvas, ctxSig, desenhando = false;
     function iniciarCanvasAssinatura() {
         canvas = document.getElementById('sigPad');
         if (!canvas) return;
-        ctx = canvas.getContext('2d');
+        ctxSig = canvas.getContext('2d');
         canvas.width = canvas.parentElement.clientWidth;
         canvas.height = 110;
         
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
+        ctxSig.strokeStyle = '#000';
+        ctxSig.lineWidth = 2;
 
-        canvas.onmousedown = (e) => { desenhando = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
-        canvas.onmousemove = (e) => { if (desenhando) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
+        canvas.onmousedown = (e) => { desenhando = true; ctxSig.beginPath(); ctxSig.moveTo(e.offsetX, e.offsetY); };
+        canvas.onmousemove = (e) => { if (desenhando) { ctxSig.lineTo(e.offsetX, e.offsetY); ctxSig.stroke(); } };
         canvas.onmouseup = () => { desenhando = false; };
 
         canvas.ontouchstart = (e) => {
             desenhando = true;
             let rect = canvas.getBoundingClientRect();
-            ctx.beginPath();
-            ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+            ctxSig.beginPath();
+            ctxSig.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
         };
         canvas.ontouchmove = (e) => {
             if (desenhando) {
                 let rect = canvas.getBoundingClientRect();
-                ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
-                ctx.stroke();
+                ctxSig.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+                ctxSig.stroke();
             }
         };
         canvas.ontouchend = () => { desenhando = false; };
     }
 
     function limparAssinatura() {
-        if (ctx && canvas) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (ctxSig && canvas) {
+            ctxSig.clearRect(0, 0, canvas.width, canvas.height);
         }
     }
 
