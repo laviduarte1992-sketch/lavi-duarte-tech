@@ -132,7 +132,7 @@
                     <span class="icon">🚌</span>
                     <span>Toca-toca</span>
                 </div>
-                <div class="service-card" onclick="abrirServico('Voos e Bilhetes', 'Companhias a partir de Osvaldo Vieira:')">
+                <div class="service-card" onclick="abrirModalVoos()">
                     <span class="icon">✈️</span>
                     <span>Voos</span>
                 </div>
@@ -142,11 +142,11 @@
         <div class="services-section">
             <h3>Alojamento & Estadias</h3>
             <div class="services-grid">
-                <div class="service-card" onclick="abrirServico('Hoteis em Bissau', 'Hoteis Oficiais em Bissau:')">
+                <div class="service-card" onclick="abrirModalHoteis()">
                     <span class="icon">🏨</span>
                     <span>Hoteis</span>
                 </div>
-                <div class="service-card" onclick="abrirServico('Airbnb e Apartamentos', 'Apartamentos e Estudios:')">
+                <div class="service-card" onclick="abrirModalAirbnb()">
                     <span class="badge">Novo</span>
                     <span class="icon">🏡</span>
                     <span>Airbnb</span>
@@ -312,7 +312,7 @@
                 <div class="card-price">55.000 - 95.000 FCFA / noite</div>
             </div>
             <div class="actions-col">
-                <button class="btn-action" onclick="abrirServico('Azalai Hotel', 'Reserva de quarto standard ou suite:')" style="background:#5c6bc0;">Reservar</button>
+                <button class="btn-action" onclick="abrirModalHoteis()" style="background:#5c6bc0;">Reservar</button>
                 <button class="btn-whatsapp" onclick="window.open('https://wa.me/245955000111')">WhatsApp</button>
             </div>
         </div>
@@ -428,6 +428,7 @@
     </div>
 </div>
 
+<!-- Modal Dinâmico Geral -->
 <div id="orderModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
     <div style="background:#ffffff; width:100%; max-width:340px; padding:18px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:center; box-sizing:border-box; margin:auto;">
         <h3 id="modalTitle" style="color:#111; margin-bottom:6px; font-size:16px;">Simular Pedido</h3>
@@ -453,10 +454,126 @@
     </div>
 </div>
 
+<!-- Modal Interativo Estilo Cartão (Hotéis, Airbnb e Voos) -->
+<div id="mediaModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+    <div style="background:#ffffff; width:100%; max-width:350px; padding:16px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:center; box-sizing:border-box; margin:auto;">
+        <h3 id="mediaModalTitle" style="color:#111; margin-bottom:8px; font-size:16px;">Título</h3>
+        
+        <div id="mediaContainer" style="margin-bottom:10px;">
+            <img id="mediaImage" src="" alt="Imagem" style="width:100%; height:160px; border-radius:10px; object-fit:cover; margin-bottom:6px;">
+            <div id="mediaCaption" style="font-size:11px; font-weight:bold; color:#111; margin-bottom:2px;">Legenda</div>
+            <div id="mediaPhone" style="font-size:11px; color:#00b0ff; font-weight:bold; margin-bottom:8px;">Contacto</div>
+            
+            <div style="display:flex; gap:6px; justify-content:center;">
+                <button type="button" onclick="mudarMediaItem(-1)" style="background:#333; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">◀ Anterior</button>
+                <button type="button" onclick="mudarMediaItem(1)" style="background:#333; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">Seguinte ▶</button>
+            </div>
+        </div>
+
+        <input type="text" id="mediaInput" placeholder="Escreva o destino / detalhe..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px; margin-bottom:8px; font-size:12px; box-sizing:border-box;">
+
+        <div style="margin-bottom:10px; text-align:left;">
+            <label style="font-size:11px; font-weight:bold; color:#333; display:block; margin-bottom:2px;">Método de Pagamento:</label>
+            <select id="mediaPayment" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px; font-size:12px;">
+                <option value="Mobile Money (Orange/MTN)">Mobile Money (Orange / MTN)</option>
+                <option value="Dinheiro (Cash)">Dinheiro (Cash)</option>
+            </select>
+        </div>
+        
+        <button onclick="confirmarMediaModal()" style="width:100%; background:#00e676; color:#000; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:6px; font-size:13px;">Confirmar Reserva</button>
+        <button onclick="fecharMediaModal()" style="width:100%; background:#f1f1f1; color:#333; border:none; padding:8px; border-radius:6px; cursor:pointer; font-size:12px;">Cancelar</button>
+
+        <div style="margin-top: 10px; padding-top: 6px; border-top: 1px solid #eee; text-align: center; font-size: 9px; color: #777;">
+            ROTA GB — Bissau, Guiné-Bissau<br>
+            Powered by Engenheiro Lavi Duarte Indeque 🚀 GW
+        </div>
+    </div>
+</div>
+
 <script>
     let timerInterval = null;
     let secondsElapsed = 0;
     let selectedVehicleType = 'taxi';
+
+    // Dados para os Carrosséis Modais (Hoteis, Airbnb, Voos)
+    let currentModalType = '';
+    let currentIndex = 0;
+
+    const hoteisData = [
+        { img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400", text: "Hotel Ledger Plaza — 85.000 XOF/noite", phone: "📞 Recepção Ledger: +245 966 789 012" },
+        { img: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400", text: "Azalai Hotel 24 de Setembro — 65.000 XOF/noite", phone: "📞 Recepção Azalai: +245 955 000 111" },
+        { img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400", text: "Hotel Coimbra (Centro) — 35.000 XOF/noite", phone: "📞 Recepção Coimbra: +245 966 333 444" }
+    ];
+
+    const airbnbData = [
+        { img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400", text: "Vivenda c/ Quintal (Bandim) — 50.000 XOF/noite", phone: "📞 Anfitrião (Dra. Cátia): +245 966 112 233" },
+        { img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400", text: "Apartamento T2 Moderno (Bairro Militar) — 30.000 XOF/noite", phone: "📞 Anfitrião (Sr. Mário): +245 955 444 555" },
+        { img: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400", text: "Estúdio Mobilado (Antula) — 20.000 XOF/noite", phone: "📞 Anfitrião (Ana Paula): +245 966 777 888" }
+    ];
+
+    const voosData = [
+        { img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400", text: "TAP Air Portugal (Bissau ⇄ Lisboa) — 550.000 XOF", phone: "📞 Guichê Osvaldo Vieira: +245 955 100 200" },
+        { img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", text: "Air Sénégal (Bissau ⇄ Dakar) — 120.000 XOF", phone: "📞 Balcão Aeroporto: +245 966 200 300" },
+        { img: "https://images.unsplash.com/photo-1500835556837-99ac94a94552?w=400", text: "Royal Air Maroc (Bissau ⇄ Casablanca) — 380.000 XOF", phone: "📞 Agência Oficial: +245 955 300 400" }
+    ];
+
+    function abrirModalHoteis() {
+        currentModalType = 'hoteis';
+        currentIndex = 0;
+        document.getElementById('mediaModalTitle').innerText = "Hotéis em Bissau";
+        document.getElementById('mediaInput').placeholder = "Escreva o hotel desejado...";
+        atualizarModalMedia();
+        document.getElementById('mediaModal').style.display = 'flex';
+    }
+
+    function abrirModalAirbnb() {
+        currentModalType = 'airbnb';
+        currentIndex = 0;
+        document.getElementById('mediaModalTitle').innerText = "Airbnb e Apartamentos Locais";
+        document.getElementById('mediaInput').placeholder = "Escreva a zona (ex: Bandim, Militar)...";
+        atualizarModalMedia();
+        document.getElementById('mediaModal').style.display = 'flex';
+    }
+
+    function abrirModalVoos() {
+        currentModalType = 'voos';
+        currentIndex = 0;
+        document.getElementById('mediaModalTitle').innerText = "Voos e Bilhetes (Aeroporto Osvaldo Vieira)";
+        document.getElementById('mediaInput').placeholder = "Indique o destino (ex: Lisboa, Dakar...)";
+        atualizarModalMedia();
+        document.getElementById('mediaModal').style.display = 'flex';
+    }
+
+    function atualizarModalMedia() {
+        let dataset = hoteisData;
+        if (currentModalType === 'airbnb') dataset = airbnbData;
+        if (currentModalType === 'voos') dataset = voosData;
+
+        let item = dataset[currentIndex];
+        document.getElementById('mediaImage').src = item.img;
+        document.getElementById('mediaCaption').innerText = item.text;
+        document.getElementById('mediaPhone').innerText = item.phone;
+    }
+
+    function mudarMediaItem(direcao) {
+        let dataset = hoteisData;
+        if (currentModalType === 'airbnb') dataset = airbnbData;
+        if (currentModalType === 'voos') dataset = voosData;
+
+        currentIndex += direcao;
+        if (currentIndex < 0) currentIndex = dataset.length - 1;
+        if (currentIndex >= dataset.length) currentIndex = 0;
+        atualizarModalMedia();
+    }
+
+    function fecharMediaModal() {
+        document.getElementById('mediaModal').style.display = 'none';
+    }
+
+    function confirmarMediaModal() {
+        alert("Reserva efetuada com sucesso na ROTA GB, Bissau! 🚀");
+        fecharMediaModal();
+    }
 
     window.onload = function() {
         let canvas = document.getElementById('bissauMap');
@@ -488,7 +605,7 @@
                 if (carX > targetX) carX = 40;
 
                 ctx.font = '14px sans-serif';
-                ctx.fillText('CAR', carX, carY - 6);
+                ctx.fillText('🚗', carX, carY - 6);
                 
                 ctx.fillStyle = '#111';
                 ctx.font = 'bold 11px sans-serif';
@@ -584,7 +701,7 @@
     }
 
     function confirmarPedidoModal() {
-        alert("Pedido efetuado com sucesso na rede ROTA GB, Bissau!");
+        alert("Pedido efetuado com sucesso na rede ROTA GB, Bissau! 🚀");
         fecharModal();
     }
 
