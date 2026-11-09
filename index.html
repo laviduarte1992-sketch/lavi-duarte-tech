@@ -544,49 +544,68 @@
     const datasets = {
         'taxi': [
             { img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400", text: "Táxi Oficial ROTA GB (Centro -> Aeroporto) — 700 XOF", phone: "Central Táxis Bissau: +245 955 111 222" },
-            { img: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=400", text: "Moto-Táxi ROTA GB (Viagem Rápida Urbana) — 280 XOF", phone: "Central Motos: +245 966 333 444" }
+            { img: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=400", text: "Moto-Táxi ROTA GB (Viagem Rápida Urbana) — 280 XOF", phone: "Central Motos: +245 966 333 444" },
+            { img: "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400", text: "Táxi Expresso Bissau Centro — 400 XOF", phone: "Táxi Bissau: +245 955 333 111" }
         ],
         'aluguer': [
             { img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400", text: "Toyota Hilux 4x4 (Com Motorista) — 45.000 XOF/dia", phone: "Frota Aluguer Bissau: +245 955 888 999" },
-            { img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400", text: "Carro Urbano Económico (Sem Motorista) — 25.000 XOF/dia", phone: "Reservas: +245 966 777 888" }
+            { img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400", text: "Carro Urbano Económico (Sem Motorista) — 25.000 XOF/dia", phone: "Reservas: +245 966 777 888" },
+            { img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400", text: "SUV Executivo Prateado — 55.000 XOF/dia", phone: "VIP Aluguer: +245 955 123 456" }
         ],
         'tocatoca': [
             { img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=400", text: "Toca-toca Linha Bissau -> Safim — 350 XOF", phone: "Terminal TUB: +245 955 444 333" },
-            { img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400", text: "Minibus Expresso Bissau -> Antula — 250 XOF", phone: "Coordenador: +245 966 222 111" }
+            { img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400", text: "Minibus Expresso Bissau -> Antula — 250 XOF", phone: "Coordenador: +245 966 222 111" },
+            { img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400", text: "Toca-toca Rota Bissau -> Prabis — 400 XOF", phone: "Paragem Prabis: +245 955 777 666" }
         ],
         'voos': [
             { img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400", text: "TAP Air Portugal (Bissau -> Lisboa) — 350.000 XOF", phone: "Guichê Osvaldo Vieira: +245 955 100 200" },
-            { img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", text: "Air Senegal (Bissau -> Dakar) — 120.000 XOF", phone: "Balcão Aeroporto: +245 966 200 300" }
+            { img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", text: "Air Senegal (Bissau -> Dakar) — 120.000 XOF", phone: "Balcão Aeroporto: +245 966 200 300" },
+            { img: "https://images.unsplash.com/photo-1500835556837-99ac94a94552?w=400", text: "Royal Air Maroc (Bissau -> Casablanca) — 280.000 XOF", phone: "Balcão RAM Bissau: +245 955 444 555" }
         ],
-      'hoteis': [
-            { img: "https://images.unsplash.com/photo-1541971875076-8f970d573be6?sig=ceiba1", text: "Hotel Ceiba Bissau 5★ (Avenida dos Combatentes) — 95.000 XOF/noite", phone: "Receção Ceiba: +245 956 000 000 / +245 969 000 000" },
-            { img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?sig=royal2", text: "Bissau Royal Hotel (Avenida Principal) — 75.000 XOF/noite", phone: "Receção Royal: +245 966 555 444" },
-            { img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?sig=imperio3", text: "Hotel Império (Praça dos Heróis Nacionais) — 60.000 XOF/noite", phone: "Receção Império: +245 955 808 080" },
-            { img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?sig=azalai4", text: "Hotel Azalai 24 de Setembro — 65.000 XOF/noite", phone: "Receção Azalai: +245 955 000 111" },
-            { img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?sig=coimbra5", text: "Hotel Coimbra & Spa (Centro da Cidade) — 45.000 XOF/noite", phone: "Receção Coimbra: +245 955 102 030" },
-            { img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?sig=ledger6", text: "Hotel Ledger Plaza Bissau — 85.000 XOF/noite", phone: "Receção Ledger: +245 966 789 012" }
+        'hoteis': [
+            { img: "https://images.unsplash.com/photo-1541971875076-8f970d573be6?sig=ceiba1&w=400", text: "Hotel Ceiba Bissau 5★ (Avenida dos Combatentes) — 95.000 XOF/noite", phone: "Receção Ceiba: +245 956 000 000 / +245 969 000 000" },
+            { img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?sig=royal2&w=400", text: "Bissau Royal Hotel (Avenida Principal) — 75.000 XOF/noite", phone: "Receção Royal: +245 966 555 444" },
+            { img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?sig=imperio3&w=400", text: "Hotel Império (Praça dos Heróis Nacionais) — 60.000 XOF/noite", phone: "Receção Império: +245 955 808 080" },
+            { img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?sig=azalai4&w=400", text: "Hotel Azalai 24 de Setembro — 65.000 XOF/noite", phone: "Receção Azalai: +245 955 000 111" },
+            { img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?sig=coimbra5&w=400", text: "Hotel Coimbra & Spa (Centro da Cidade) — 45.000 XOF/noite", phone: "Receção Coimbra: +245 955 102 030" },
+            { img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?sig=ledger6&w=400", text: "Hotel Ledger Plaza Bissau — 85.000 XOF/noite", phone: "Receção Ledger: +245 966 789 012" }
         ],
         'airbnb': [
-            { img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400", text: "Vivenda de Luxo c/ Quintal & Piscina (Bairro d'Ajuda 1ª Fase) — 55.000 XOF/noite", phone: "Proprietário Sr. Bacar: +245 955 221 144" },
-            { img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400", text: "Apartamento T2 Moderno & Climatizado (Alto Bandim) — 35.000 XOF/noite", phone: "Proprietária Sra. Fatumata: +245 966 332 211" },
-            { img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400", text: "Apartamento T1 Executivo c/ Gerador (Centro da Cidade) — 30.000 XOF/noite", phone: "Anfitrião Eng. Mamadu: +245 955 778 899" },
-            { img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400", text: "Casa Privada T3 Mobilada (Missira / Belém) — 40.000 XOF/noite", phone: "Proprietário Sr. Domingos: +245 966 887 766" },
-            { img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400", text: "Vivenda de Férias c/ Segurança 24h (Bissau Sul) — 50.000 XOF/noite", phone: "Gestão Airbnb Bissau: +245 955 990 011" }
+            { img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400", text: "Vivenda de Luxo c/ Quintal & Piscina (Bairro d'Ajuda) — 55.000 XOF/noite", phone: "Sr. Bacar: +245 955 221 144" },
+            { img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400", text: "Apartamento T2 Climatizado (Alto Bandim) — 35.000 XOF/noite", phone: "Sra. Fatumata: +245 966 332 211" },
+            { img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400", text: "Apartamento T1 Executivo c/ Gerador (Centro) — 30.000 XOF/noite", phone: "Eng. Mamadu: +245 955 778 899" },
+            { img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400", text: "Casa Privada T3 Mobilada (Missira / Belém) — 40.000 XOF/noite", phone: "Sr. Domingos: +245 966 887 766" },
+            { img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400", text: "Vivenda de Férias c/ Segurança 24h (Bissau Sul) — 50.000 XOF/noite", phone: "Gestão Airbnb: +245 955 990 011" },
+            { img: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400", text: "Estúdio Moderno Amílcar Cabral — 25.000 XOF/noite", phone: "Anfitriã Aissatu: +245 966 111 999" }
         ],
         'comida': [
-            { img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400", text: "A Padeira Africana — Galinha Cafriela (4.500 XOF)", phone: "Pedidos: +245 966 131 393" },
-            { img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400", text: "Papa Loca Bissau — Hambúrguer & Pizza (3.500 XOF)", phone: "Entregas: +245 689 2222" }
+            { img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400", text: "A Padeira Africana — Galinha Cafriela e Pratos Locais — 4.500 XOF", phone: "Reservas / Pedidos: +245 966 131 393" },
+            { img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400", text: "Papa Loca Bissau — Hambúrgueres Artesanais & Pizzas — 3.500 XOF", phone: "Entregas Papa Loca: +245 955 689 222" },
+            { img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400", text: "Restaurante Coqueiros — Peixe Grelhado & Frutos do Mar — 6.000 XOF", phone: "Mesa Coqueiros: +245 955 400 300" },
+            { img: "https://images.unsplash.com/photo-1551782450-17144efb9c50?w=400", text: "Le Bled Bissau — Gastronomia Internacional & Snacks — 5.000 XOF", phone: "Le Bled: +245 966 210 100" },
+            { img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400", text: "Pizzaria Bella Italia Bissau — Pizzas no Forno a Lenha — 4.000 XOF", phone: "Bella Italia: +245 955 987 654" },
+            { img: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400", text: "Café Pão de Açúcar — Pequeno-almoço & Pastelaria — 2.000 XOF", phone: "Balcão: +245 966 123 789" }
         ],
         'mercado': [
-            { img: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=400", text: "Supermercado Hereso — Sacos de Arroz e Óleo", phone: "Atendimento: +245 955 000 004" },
-            { img: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400", text: "Mercado de Bandim — Frescos e Frutas Locais", phone: "Entrega ROTA GB: +245 966 000 789" }
+            { img: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=400", text: "Supermercado Hereso — Sacos de Arroz, Óleo e Mercearia", phone: "Atendimento Hereso: +245 955 000 004" },
+            { img: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400", text: "Mercado de Bandim — Frescos, Legumes e Frutas Locais", phone: "Entrega ROTA GB: +245 966 000 789" },
+            { img: "https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=400", text: "Supermercado Le Super — Produtos Importados & Bebidas", phone: "Loja Central: +245 955 334 455" },
+            { img: "https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=400", text: "Loja China Bissau — Utilidades, Arroz e Produtos Diversos", phone: "Atendimento: +245 966 443 322" },
+            { img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400", text: "Mercado de Ajuda — Produtos Agrícolas Frescos Diários", phone: "Coordenador: +245 955 889 900" }
         ],
         'farmacia': [
-            { img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400", text: "Farmácia Central Bissau — Kits & Medicamentos", phone: "Urgência: +245 955 555 112" },
-            { img: "https://images.unsplash.com/photo-1576602976047-174e57a47881?w=400", text: "Farmácia Bandim — Entregas 24 Horas", phone: "Contacto: +245 966 888 999" }
+            { img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400", text: "Farmácia Central Bissau — Kits de Saúde & Medicamentos", phone: "Urgência 24h: +245 955 555 112" },
+            { img: "https://images.unsplash.com/photo-1576602976047-174e57a47881?w=400", text: "Farmácia Bandim — Medicamentos e Primeiros Socorros", phone: "Balcão Bandim: +245 966 888 999" },
+            { img: "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400", text: "Farmácia Popular Bissau — Produtos Farmacêuticos Gerais", phone: "Atendimento: +245 955 120 340" },
+            { img: "https://images.unsplash.com/photo-1579165466941-2f91e6ef57f9?w=400", text: "Farmácia Do Povo (Antula) — Medicamentos e Cuidados Infantis", phone: "Farmácia Antula: +245 966 776 554" },
+            { img: "https://images.unsplash.com/photo-1563213126-a4273aed2016?w=400", text: "Farmácia Alvalade — Produtos Médicos & Higiene", phone: "Alvalade: +245 955 998 877" }
         ],
         'conveniencia': [
-            { img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400", text: "Convenience Store Bissau — Bebidas & Artigos", phone: "Apoio: +245 955 333 222" }
+            { img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400", text: "Convenience Store Bissau — Bebidas Gelo & Artigos Rápidos", phone: "Apoio: +245 955 333 222" },
+            { img: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400", text: "Loja Express Bissau — Cartões, Carregamentos & Snacks", phone: "Express: +245 966 444 555" },
+            { img: "https://images.unsplash.com/photo-1556742049-0a67d553c295?w=400", text: "Mini-Market ROTA GB — Utilidades e Gelados", phone: "Central: +245 955 112 233" },
+            { img: "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=400", text: "Kiosk 24 Horas Bissau — Tabaco, Bebidas e Guloseimas", phone: "Kiosk: +245 966 998 811" },
+            { img: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400", text: "Bissau Corner Shop — Snacks, Sumos e Recargas", phone: "Corner: +245 955 776 655" }
         ],
         'recarregar_orange': [
             { img: "https://images.unsplash.com/photo-1556742049-0a67d553c295?w=400", text: "Recarga Orange Saldo & Internet 1.000 FCFA", phone: "Agente Orange: +245 955 000 123" }
