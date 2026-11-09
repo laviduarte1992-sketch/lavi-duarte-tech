@@ -335,19 +335,19 @@
                 <input type="tel" id="recargaTelemovel" placeholder="Insira o seu número de telemóvel (+245...)">
             </div>
 
-            <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-                <select id="recargaMontante" style="flex: 1;">
+           <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                <select id="recargaMontante" style="flex: 1; padding: 9px; border: 1px solid #ddd; border-radius: 8px; font-size: 11px; background: #f9f9f9;">
                     <option value="500">500 FCFA</option>
                     <option value="1000" selected>1.000 FCFA</option>
                     <option value="2000">2.000 FCFA</option>
                     <option value="5000">5.000 FCFA</option>
                     <option value="10000">10.000 FCFA</option>
-                <select id="recargaMetodo" style="flex: 1;" onchange="alternarCamposRecargaCartao()">
+                </select>
+                <select id="recargaMetodo" style="flex: 1; padding: 9px; border: 1px solid #ddd; border-radius: 8px; font-size: 11px; background: #f9f9f9;" onchange="alternarCamposRecargaCartao()">
                     <option value="Orange Money">Orange Money</option>
                     <option value="Telecel Cash">Telecel Cash</option>
                     <option value="Cartão de Débito / Crédito">Cartão de Débito / Crédito</option>
                 </select>
-               
             </div>
 
             <div id="camposCartaoRecarga" style="display: none; margin-bottom: 6px;">
