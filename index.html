@@ -204,15 +204,13 @@
         <div class="user-pin"></div>
     </div>
 
-    <!-- PAINEL CLIENTE (CORRIDAS E PAGAMENTO PRÉVIO) -->
+    <!-- PAINEL CLIENTE -->
     <div class="bottom-panel" id="panel-cliente">
-        <!-- ABAS DE NAVEGAÇÃO DO CLIENTE (PEDIR VIAGEM / REGISTO DE CLIENTE) -->
         <div style="display:flex; gap:6px; margin-bottom:4px;">
             <button type="button" id="tabBtnPedir" style="flex:1; padding:7px; border-radius:8px; border:none; background:#111; color:#00e676; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaCliente('pedir')">Pedir Viagem</button>
             <button type="button" id="tabBtnRegisto" style="flex:1; padding:7px; border-radius:8px; border:1px solid #ddd; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaCliente('registo')">Registo / Conta Cliente</button>
         </div>
 
-        <!-- FORMULÁRIO DE PEDIR VIAGEM -->
         <div id="conteudoPedirViagem">
             <div id="rideFormControls">
                 <div class="form-group">
@@ -286,7 +284,6 @@
             </div>
         </div>
 
-        <!-- FORMULÁRIO DE REGISTO DE CLIENTE (COM DADOS E PAGAMENTO PARA COMISSÃO) -->
         <div id="conteudoRegistoCliente" style="display:none;">
             <div class="sub-section-title" style="margin-top: 2px;">Registo de Conta & Pagamento do Cliente</div>
             
@@ -332,7 +329,6 @@
             </button>
         </div>
 
-        <!-- RECARGAS DE SALDO E INTERNET -->
         <div class="sub-section-title">Recargas de Saldo e Internet em Bissau</div>
         <div class="card-item">
             <div style="background:#ff6f00; color:white; width:50px; height:50px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px; margin-right:10px;">GW</div>
@@ -563,12 +559,19 @@
             { img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", text: "Air Senegal (Bissau -> Dakar) — 120.000 XOF", phone: "Balcão Aeroporto: +245 966 200 300" }
         ],
         'hoteis': [
-            { img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400", text: "Hotel Ledger Plaza Bissau — 85.000 XOF/noite", phone: "Receção Ledger: +245 966 789 012" },
-            { img: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400", text: "Azalai Hotel 24 de Setembro — 65.000 XOF/noite", phone: "Receção Azalai: +245 955 000 111" }
+            { img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400", text: "Hotel Ceiba Bissau 5★ (Avenida dos Combatentes) — 95.000 XOF/noite", phone: "Receção Ceiba: +245 956 000 000 / +245 969 000 000" },
+            { img: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400", text: "Hotel Império (Praça dos Heróis Nacionais) — 60.000 XOF/noite", phone: "Receção Império: +245 955 808 080" },
+            { img: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400", text: "Hotel Coimbra (Centro da Cidade - Amílcar Cabral) — 45.000 XOF/noite", phone: "Receção Coimbra: +245 955 102 030" },
+            { img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400", text: "Royal Hotel Bissau — 75.000 XOF/noite", phone: "Receção Royal: +245 966 555 444" },
+            { img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400", text: "Hotel Ledger Plaza Bissau — 85.000 XOF/noite", phone: "Receção Ledger: +245 966 789 012" },
+            { img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400", text: "Azalai Hotel 24 de Setembro — 65.000 XOF/noite", phone: "Receção Azalai: +245 955 000 111" }
         ],
         'airbnb': [
-            { img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400", text: "Vivenda c/ Quintal (Bandim) — 50.000 XOF/noite", phone: "Anfitrião: +245 966 112 233" },
-            { img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400", text: "Apartamento T2 Moderno — 30.000 XOF/noite", phone: "Anfitrião: +245 955 444 555" }
+            { img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400", text: "Vivenda de Luxo c/ Quintal & Piscina (Bairro d'Ajuda 1ª Fase) — 55.000 XOF/noite", phone: "Proprietário Sr. Bacar: +245 955 221 144" },
+            { img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400", text: "Apartamento T2 Moderno & Climatizado (Alto Bandim) — 35.000 XOF/noite", phone: "Proprietária Sra. Fatumata: +245 966 332 211" },
+            { img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400", text: "Apartamento T1 Executivo c/ Gerador (Centro da Cidade) — 30.000 XOF/noite", phone: "Anfitrião Eng. Mamadu: +245 955 778 899" },
+            { img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400", text: "Casa Privada T3 Mobilada (Missira / Belém) — 40.000 XOF/noite", phone: "Proprietário Sr. Domingos: +245 966 887 766" },
+            { img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400", text: "Vivenda de Férias c/ Segurança 24h (Bissau Sul) — 50.000 XOF/noite", phone: "Gestão Airbnb Bissau: +245 955 990 011" }
         ],
         'comida': [
             { img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400", text: "A Padeira Africana — Galinha Cafriela (4.500 XOF)", phone: "Pedidos: +245 966 131 393" },
