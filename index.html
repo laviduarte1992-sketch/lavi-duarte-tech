@@ -320,50 +320,40 @@
             </button>
         </div>
 
-        <!-- RECARGAS DE SALDO E INTERNET COM ORANGE MONEY E TELECEL CASH -->
+      <!-- RECARGAS DE SALDO E INTERNET EM BISSAU -->
         <div class="sub-section-title">Recargas de Saldo e Internet em Bissau</div>
-        <div style="background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+        
+        <div style="background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center;">
                 <div style="background:#ff6f00; color:white; width:45px; height:45px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:13px; margin-right:10px;">GW</div>
                 <div>
-                    <div class="card-title">Orange / Telecel - Recarga Instantânea</div>
-                    <div class="card-desc">Saldo, Dados Móveis & Internet em Bissau</div>
+                    <div class="card-title">Orange - Saldo e Internet</div>
+                    <div class="card-desc">Recarga Instantânea Móvel</div>
+                    <div style="font-size: 11px; font-weight: bold; color: #ff6f00; margin-top: 2px;">500 - 10.000 FCFA</div>
+                    <div style="font-size: 10px; color: #d32f2f; font-weight: bold;">+245 955 000 123</div>
                 </div>
             </div>
-
-            <div class="form-group" style="margin-bottom: 6px;">
-                <input type="tel" id="recargaTelemovel" placeholder="Insira o seu número de telemóvel (+245...)">
-            </div>
-
-           <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-                <select id="recargaMontante" style="flex: 1; padding: 9px; border: 1px solid #ddd; border-radius: 8px; font-size: 11px; background: #f9f9f9;">
-                    <option value="500">500 FCFA</option>
-                    <option value="1000" selected>1.000 FCFA</option>
-                    <option value="2000">2.000 FCFA</option>
-                    <option value="5000">5.000 FCFA</option>
-                    <option value="10000">10.000 FCFA</option>
-                </select>
-                <select id="recargaMetodo" style="flex: 1; padding: 9px; border: 1px solid #ddd; border-radius: 8px; font-size: 11px; background: #f9f9f9;" onchange="alternarCamposRecargaCartao()">
-                    <option value="Orange Money">Orange Money</option>
-                    <option value="Telecel Cash">Telecel Cash</option>
-                    <option value="Cartão de Débito / Crédito">Cartão de Débito / Crédito</option>
-                </select>
-            </div>
-
-            <div id="camposCartaoRecarga" style="display: none; margin-bottom: 6px;">
-                <div style="display: flex; gap: 6px;">
-                    <input type="text" id="numCartaoRecarga" maxlength="16" placeholder="Nº Cartão (16 dígitos)" style="flex: 2;">
-                    <input type="password" id="cvvRecarga" maxlength="3" placeholder="CVV" style="flex: 1;">
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 6px;">
-                <button type="button" class="btn-primary" style="flex: 2; padding: 9px; font-size: 12px; background: #ff6f00; color: #fff;" onclick="processarRecargaApp()">Efetuar Recarga</button>
-                <button type="button" class="btn-whatsapp" style="flex: 1; justify-content: center; font-size: 11px; background: #25d366; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer;" onclick="window.open('https://wa.me/245955000123')">WhatsApp</button>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <button type="button" class="btn-action" style="background:#ff6f00; padding:6px 12px; font-size:10px;" onclick="alert('Iniciando recarga Orange...')">Recarregar</button>
+                <button type="button" class="btn-whatsapp" style="background:#25d366; color:white; border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;" onclick="window.open('https://wa.me/245955000123')">WhatsApp</button>
             </div>
         </div>
-    </div>
 
+        <div style="background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center;">
+                <div style="background:#ffeb3b; color:#333; width:45px; height:45px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; margin-right:10px;">MTN</div>
+                <div>
+                    <div class="card-title">MTN / Telecel Cash</div>
+                    <div class="card-desc">Crédito e Dados Móveis</div>
+                    <div style="font-size: 11px; font-weight: bold; color: #ff6f00; margin-top: 2px;">500 - 10.000 FCFA</div>
+                    <div style="font-size: 10px; color: #d32f2f; font-weight: bold;">+245 966 000 456</div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <button type="button" class="btn-action" style="background:#ff6f00; padding:6px 12px; font-size:10px;" onclick="alert('Iniciando recarga MTN/Telecel...')">Recarregar</button>
+                <button type="button" class="btn-whatsapp" style="background:#25d366; color:white; border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;" onclick="window.open('https://wa.me/245966000456')">WhatsApp</button>
+            </div>
+        </div>
     <!-- SEÇÃO COMPLETA DO MOTORISTA -->
     <div class="bottom-panel" id="panel-motorista" style="display: none;">
         <div style="display:flex; gap:6px; margin-bottom:6px;">
