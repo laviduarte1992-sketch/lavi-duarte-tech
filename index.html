@@ -126,12 +126,29 @@
 
     <!-- SECÇÃO DO CLIENTE -->
     <div id="clienteSections">
-     <div class="services-section">
-            <h3>Go anywhere</h3>
-            <div class="services-grid">
-                <!-- TÁXI OFICIAL: MERCEDES 190 (AZUL E BRANCO DE BISSAU) -->
+   <!-- TÁXI OFICIAL: MERCEDES 190 CLÁSSICO (AZUL E BRANCO DE BISSAU) -->
                 <div class="service-card" onclick="abrirModalVisual('taxi')">
-                    <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=300" class="img-thumb" alt="Mercedes 190 Táxi Bissau">
+                    <svg class="img-thumb" viewBox="0 0 120 70" style="background: #e0f2fe; border-radius: 8px;">
+                        <rect x="0" y="0" width="120" height="70" fill="#e0f2fe"/>
+                        <!-- Chassis Inferior e Guarda-lamas -->
+                        <path d="M 15 42 L 28 26 L 92 26 L 105 42 L 112 42 L 112 52 L 8 52 L 8 42 Z" fill="#0284c7"/>
+                        <!-- Linha / Faixa Branca Central Clássica -->
+                        <rect x="8" y="42" width="104" height="4" fill="#ffffff"/>
+                        <!-- Capota / Teto Quadrado Clássico do Mercedes 190 -->
+                        <path d="M 32 26 L 40 14 L 80 14 L 88 26 Z" fill="#ffffff"/>
+                        <!-- Vidros Laterais -->
+                        <path d="M 34 25 L 41 15 L 57 15 L 57 25 Z" fill="#bae6fd"/>
+                        <path d="M 63 25 L 63 15 L 79 15 L 86 25 Z" fill="#bae6fd"/>
+                        <!-- Grelha Frontal Mercedes e Faróis -->
+                        <rect x="8" y="44" width="7" height="6" fill="#fbbf24"/>
+                        <rect x="105" y="44" width="7" height="6" fill="#ef4444"/>
+                        <rect x="12" y="32" width="3" height="10" fill="#ffffff"/>
+                        <!-- Rodas Clássicas -->
+                        <circle cx="32" cy="52" r="8" fill="#1e293b"/>
+                        <circle cx="32" cy="52" r="3.5" fill="#94a3b8"/>
+                        <circle cx="88" cy="52" r="8" fill="#1e293b"/>
+                        <circle cx="88" cy="52" r="3.5" fill="#94a3b8"/>
+                    </svg>
                     <span>Trip / Táxi</span>
                 </div>
                 <div class="service-card" onclick="abrirModalVisual('aluguer')">
