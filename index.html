@@ -75,10 +75,15 @@
         .role-btn { border: none; background: transparent; color: #aaa; padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s; }
         .role-btn.active { background: #00e676; color: #000; }
 
-        .map-area { height: 130px; background: #e5e3df; position: relative; overflow: hidden; z-index: 1; }
-        canvas#bissauMap { width: 100%; height: 100%; display: block; }
-        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); z-index: 5; }
+        /* MAPA COM O CARRO ROTA GB EXPRESS EM MOVIMENTO */
+        .map-area { height: 140px; background: #eae6df; position: relative; overflow: hidden; z-index: 1; }
+        .status-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); z-index: 5; }
         .dot-green { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
+
+        .map-road-h { position: absolute; top: 70px; left: 0; width: 100%; height: 18px; background: #ffffff; }
+        .map-road-v { position: absolute; top: 20px; left: 52%; width: 18px; height: 120px; background: #ffffff; transform: translateX(-50%); }
+        .map-car-tag { position: absolute; top: 58px; left: 42%; background: rgba(255,255,255,0.95); padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: bold; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 4; transition: 0.5s linear; }
+        .user-pin { position: absolute; top: 88px; left: 47%; width: 10px; height: 10px; background: #d32f2f; border-radius: 50%; border: 2px solid #fff; z-index: 4; }
 
         .bottom-panel { background: #fff; padding: 14px; display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 20; }
         .form-group { display: flex; flex-direction: column; gap: 4px; }
@@ -191,9 +196,13 @@
         </div>
     </div>
 
+    <!-- MAPA COM CARRO ROTA GB EXPRESS EM MOVIMENTO[cite: 14, 15] -->
     <div class="map-area">
         <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
-        <canvas id="bissauMap"></canvas>
+        <div class="map-road-h"></div>
+        <div class="map-road-v"></div>
+        <div class="map-car-tag" id="movingCar">🚗 ROTA GB Express</div>
+        <div class="user-pin"></div>
     </div>
 
     <!-- PAINEL CLIENTE (CORRIDAS) -->
@@ -249,13 +258,10 @@
             <div class="waiting-title">A procurar condutor ROTA GB mais próximo...</div>
             <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
             <div class="timer-text" id="waitingTimer">00:00</div>
-            <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
-                Preço reservado: <strong id="reservedAmount">400 XOF</strong>
-            </div>
             <button type="button" class="btn-cancel" onclick="cancelarViagem()">Cancelar Viagem & Pedir Reembolso</button>
         </div>
 
-        <!-- RECARGAS DE SALDO E INTERNET (COMO NO ANTIGO) -->
+        <!-- RECARGAS DE SALDO E INTERNET -->
         <div class="sub-section-title">Recargas de Saldo e Internet em Bissau</div>
         <div class="card-item">
             <div style="background:#ff6f00; color:white; width:50px; height:50px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px; margin-right:10px;">GW</div>
@@ -286,7 +292,7 @@
         </div>
     </div>
 
-    <!-- SEÇÃO DO MOTORISTA (EXATO AO CÓDIGO ANTIGO SOLICITADO) -->
+    <!-- SEÇÃO DO MOTORISTA -->
     <div class="bottom-panel" id="panel-motorista" style="display: none;">
         <div style="display:flex; gap:6px; margin-bottom:6px;">
             <button type="button" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; font-weight:bold; cursor:pointer;" onclick="mudarAbaMotorista('painel')">Painel do Condutor</button>
@@ -351,7 +357,7 @@
         </div>
     </div>
 
-    <!-- RODAPÉ DE EMERGÊNCIA E ASSINATURA -->
+    <!-- RODAPÉ -->
     <div class="app-footer">
         <div class="emergency-bar">
             <a href="tel:112" class="btn-emergency">🚨 Polícia (112)</a>
@@ -365,7 +371,7 @@
     </div>
 </div>
 
-<!-- MODAL VISUAL UNIFICADO (COM IMAGENS REAIS E ESTILO UBER) -->
+<!-- MODAL VISUAL UNIFICADO -->
 <div id="mediaModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
     <div style="background:#ffffff; width:100%; max-width:380px; padding:18px; border-radius:20px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:left; box-sizing:border-box; margin:auto; max-height:92vh; overflow-y:auto;">
         
@@ -444,6 +450,16 @@
     let secondsElapsed = 0;
     let currentModalType = '';
     let currentIndex = 0;
+
+    // Animação contínua do carro ROTA GB Express no mapa
+    setInterval(() => {
+        let car = document.getElementById('movingCar');
+        if(car) {
+            let pos = parseInt(car.style.left || '42');
+            pos = (pos > 65) ? 30 : pos + 1;
+            car.style.left = pos + '%';
+        }
+    }, 300);
 
     const datasets = {
         'taxi': [
