@@ -329,43 +329,58 @@
             </button>
         </div>
 
+        <!-- RECARGAS DE SALDO E INTERNET COM FLUXO INTERATIVO -->
         <div class="sub-section-title">Recargas de Saldo e Internet em Bissau</div>
-        <div class="card-item">
-            <div style="background:#ff6f00; color:white; width:50px; height:50px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px; margin-right:10px;">GW</div>
-            <div class="card-info">
-                <div class="card-title">Orange - Saldo e Internet</div>
-                <div class="card-desc">Recarga Instantânea Móvel</div>
-                <div class="card-price">500 - 10.000 FCFA</div>
-                <div class="card-phone">+245 955 000 123</div>
+        <div style="background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <div style="background:#ff6f00; color:white; width:45px; height:45px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:13px; margin-right:10px;">GW</div>
+                <div>
+                    <div class="card-title">Orange / MTN - Recarga Instantânea</div>
+                    <div class="card-desc">Saldo, Dados Móveis & Internet em Bissau</div>
+                </div>
             </div>
-            <div class="actions-col">
-                <button class="btn-action" onclick="abrirModalVisual('recarregar_orange')">Recarregar</button>
-                <button class="btn-whatsapp" onclick="window.open('https://wa.me/245955000123')">WhatsApp</button>
-            </div>
-        </div>
 
-        <div class="card-item">
-            <div style="background:#ffeb3b; color:#333; width:50px; height:50px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:13px; margin-right:10px;">MTN</div>
-            <div class="card-info">
-                <div class="card-title">MTN / Telecel Cash</div>
-                <div class="card-desc">Crédito e Dados Móveis</div>
-                <div class="card-price">500 - 10.000 FCFA</div>
-                <div class="card-phone">+245 966 000 456</div>
+            <div class="form-group" style="margin-bottom: 6px;">
+                <input type="tel" id="recargaTelemovel" placeholder="Insira o seu número de telemóvel (+245...)">
             </div>
-            <div class="actions-col">
-                <button class="btn-action" onclick="abrirModalVisual('recarregar_mtn')">Recarregar</button>
-                <button class="btn-whatsapp" onclick="window.open('https://wa.me/245966000456')">WhatsApp</button>
+
+            <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                <select id="recargaMontante" style="flex: 1;">
+                    <option value="500">500 FCFA</option>
+                    <option value="1000" selected>1.000 FCFA</option>
+                    <option value="2000">2.000 FCFA</option>
+                    <option value="5000">5.000 FCFA</option>
+                    <option value="10000">10.000 FCFA</option>
+                </select>
+                <select id="recargaMetodo" style="flex: 1;" onchange="alternarCamposRecargaCartao()">
+                    <option value="Orange Money">Orange Money</option>
+                    <option value="Telecel Cash">Telecel Cash</option>
+                    <option value="Cartão de Débito / Crédito">Cartão de Débito</option>
+                </select>
+            </div>
+
+            <div id="camposCartaoRecarga" style="display: none; margin-bottom: 6px;">
+                <div style="display: flex; gap: 6px;">
+                    <input type="text" id="numCartaoRecarga" maxlength="16" placeholder="Nº Cartão (16 dígitos)" style="flex: 2;">
+                    <input type="password" id="cvvRecarga" maxlength="3" placeholder="CVV" style="flex: 1;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 6px;">
+                <button type="button" class="btn-primary" style="flex: 2; padding: 9px; font-size: 12px; background: #ff6f00; color: #fff;" onclick="processarRecargaApp()">Efetuar Recarga</button>
+                <button type="button" class="btn-whatsapp" style="flex: 1; justify-content: center; font-size: 11px;" onclick="window.open('https://wa.me/245955000123')">WhatsApp</button>
             </div>
         </div>
     </div>
 
-    <!-- SEÇÃO DO MOTORISTA -->
+    <!-- SEÇÃO COMPLETA DO MOTORISTA -->
     <div class="bottom-panel" id="panel-motorista" style="display: none;">
         <div style="display:flex; gap:6px; margin-bottom:6px;">
-            <button type="button" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; font-weight:bold; cursor:pointer;" onclick="mudarAbaMotorista('painel')">Painel do Condutor</button>
-            <button type="button" style="flex:1; padding:8px; border-radius:8px; border:none; background:#111; color:#fff; font-weight:bold; cursor:pointer;" onclick="mudarAbaMotorista('registo')">Registar Veículo</button>
+            <button type="button" id="tabBtnMotoristaPainel" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaMotorista('painel')">Painel do Condutor</button>
+            <button type="button" id="tabBtnMotoristaRegisto" style="flex:1; padding:8px; border-radius:8px; border:none; background:#111; color:#00e676; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaMotorista('registo')">Registar Veículo</button>
         </div>
 
+        <!-- FORMULÁRIO DE REGISTO DO CONDUTOR / VEÍCULO -->
         <div id="conteudoRegistoCondutor">
             <div class="sub-section-title" style="margin-top: 2px;">Registo de Condutor & Comissão / Pagamento</div>
             
@@ -430,10 +445,16 @@
             </button>
         </div>
 
-        <div id="conteudoPainelCondutor" style="display:none; text-align:center; padding: 20px 0;">
+        <!-- PAINEL DE TRABALHO DO CONDUTOR -->
+        <div id="conteudoPainelCondutor" style="display:none; text-align:center; padding: 15px 0;">
             <div class="sub-section-title">Painel de Trabalho em Bissau</div>
             <div style="font-size: 11px; color: #666; margin-bottom: 12px;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></div>
-            <button type="button" class="btn-primary" style="background:#111; color:#fff;">Aguardar Chamadas</button>
+            <div style="background:#f9f9f9; border:1px solid #eee; padding:12px; border-radius:10px; margin-bottom:12px; text-align:left;">
+                <div style="font-size:11px; font-weight:bold; color:#111;">Resumo de Ganhos Hoje</div>
+                <div style="font-size:18px; font-weight:bold; color:#00e676; margin-top:2px;">12.500 XOF</div>
+                <div style="font-size:10px; color:#777; margin-top:2px;">Comissão Retida (15%): 2.205 XOF</div>
+            </div>
+            <button type="button" class="btn-primary" style="background:#111; color:#fff;">Aguardar Chamadas de Viagem</button>
         </div>
     </div>
 
@@ -606,12 +627,6 @@
             { img: "https://images.unsplash.com/photo-1556742049-0a67d553c295?w=400", text: "Mini-Market ROTA GB — Utilidades e Gelados", phone: "Central: +245 955 112 233" },
             { img: "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=400", text: "Kiosk 24 Horas Bissau — Tabaco, Bebidas e Guloseimas", phone: "Kiosk: +245 966 998 811" },
             { img: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400", text: "Bissau Corner Shop — Snacks, Sumos e Recargas", phone: "Corner: +245 955 776 655" }
-        ],
-        'recarregar_orange': [
-            { img: "https://images.unsplash.com/photo-1556742049-0a67d553c295?w=400", text: "Recarga Orange Saldo & Internet 1.000 FCFA", phone: "Agente Orange: +245 955 000 123" }
-        ],
-        'recarregar_mtn': [
-            { img: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400", text: "Recarga MTN / Telecel Cash 1.000 FCFA", phone: "Agente MTN: +245 966 000 456" }
         ]
     };
 
@@ -628,9 +643,7 @@
             'comida': 'Comida & Restaurantes',
             'mercado': 'Mercados & Supermercados',
             'farmacia': 'Farmácia & Saúde',
-            'conveniencia': 'Lojas de Conveniência',
-            'recarregar_orange': 'Recarga Orange - Saldo & Internet',
-            'recarregar_mtn': 'Recarga MTN / Telecel Cash'
+            'conveniencia': 'Lojas de Conveniência'
         };
 
         document.getElementById('mediaModalTitle').innerText = titles[tipo] || 'ROTA GB Service';
@@ -728,12 +741,27 @@
     function mudarAbaMotorista(aba) {
         let reg = document.getElementById('conteudoRegistoCondutor');
         let pan = document.getElementById('conteudoPainelCondutor');
+        let btnPan = document.getElementById('tabBtnMotoristaPainel');
+        let btnReg = document.getElementById('tabBtnMotoristaRegisto');
+
         if(aba === 'registo') {
             reg.style.display = 'block';
             pan.style.display = 'none';
+            btnReg.style.background = '#111';
+            btnReg.style.color = '#00e676';
+            btnReg.style.border = 'none';
+            btnPan.style.background = '#fff';
+            btnPan.style.color = '#333';
+            btnPan.style.border = '1px solid #ddd';
         } else {
             reg.style.display = 'none';
             pan.style.display = 'block';
+            btnPan.style.background = '#111';
+            btnPan.style.color = '#00e676';
+            btnPan.style.border = 'none';
+            btnReg.style.background = '#fff';
+            btnReg.style.color = '#333';
+            btnReg.style.border = '1px solid #ddd';
         }
     }
 
@@ -780,6 +808,36 @@
             campoConta.style.display = 'block';
             camposCartao.style.display = 'none';
         }
+    }
+
+    function alternarCamposRecargaCartao() {
+        let metodo = document.getElementById('recargaMetodo').value;
+        let camposCartao = document.getElementById('camposCartaoRecarga');
+        if(camposCartao) {
+            camposCartao.style.display = (metodo === 'Cartão de Débito / Crédito') ? 'block' : 'none';
+        }
+    }
+
+    function processarRecargaApp() {
+        let telemovel = document.getElementById('recargaTelemovel').value;
+        let montante = document.getElementById('recargaMontante').value;
+        let metodo = document.getElementById('recargaMetodo').value;
+
+        if (!telemovel) {
+            alert("Por favor, insira o seu número de telemóvel para receber a recarga.");
+            return;
+        }
+
+        if (metodo === 'Cartão de Débito / Crédito') {
+            let numCartao = document.getElementById('numCartaoRecarga').value;
+            let cvv = document.getElementById('cvvRecarga').value;
+            if (!numCartao || numCartao.length < 16 || !cvv || cvv.length < 3) {
+                alert("Insira os dados válidos do cartão de débito (16 dígitos e CVV).");
+                return;
+            }
+        }
+
+        alert("Recarga de " + montante + " FCFA solicitada com sucesso para o número " + telemovel + " via " + metodo + "!");
     }
 
     function pedirViagemComPagamentoPrevio() {
@@ -864,8 +922,10 @@
 
     function limparAssinatura() {
         let canvas = document.getElementById('sigPad');
-        let ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if(canvas) {
+            let ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
     }
 
     function abrirModalVoos() { abrirModalVisual('voos'); }
