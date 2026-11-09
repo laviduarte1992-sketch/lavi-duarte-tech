@@ -206,78 +206,130 @@
 
     <!-- PAINEL CLIENTE (CORRIDAS E PAGAMENTO PRÉVIO) -->
     <div class="bottom-panel" id="panel-cliente">
-        <div id="rideFormControls">
-            <div class="form-group">
-                <label>ROTA OFICIAL DGVTT - BISSAU (CORRIDA EXCLUSIVA)</label>
-                <select id="routeSelect" onchange="updatePrice()">
-                    <optgroup label="Partidas: Centro / Cidade">
-                        <option value="225">Cidade → Mercado de Bandim (225 XOF)</option>
-                        <option value="250">Cidade → Cristo Redentor (250 XOF)</option>
-                        <option value="325">Cidade → Belém / Missira (325 XOF)</option>
-                        <option value="350">Cidade → Bairro d'Ajuda 1º e 2º fase (350 XOF)</option>
-                        <option value="700" selected>Cidade → Aeroporto (700 XOF)</option>
-                    </optgroup>
-                </select>
-            </div>
-
-            <div class="form-group" style="margin-top: 6px;">
-                <input type="text" id="pontoReferencia" placeholder="Ponto de Referência (Ex: Perto do Mercado, portão...)">
-            </div>
-
-            <div class="service-options" style="display: flex; gap: 6px; margin: 8px 0;">
-                <div class="service-card selected" id="card-taxi" style="height:auto; padding:8px;" onclick="selecionarTipoVeiculo('taxi')">
-                    <div class="service-title">🚕 Táxi Oficial</div>
-                    <div class="service-price" id="priceTaxi">400 XOF</div>
-                </div>
-                <div class="service-card" id="card-privado" style="height:auto; padding:8px;" onclick="selecionarTipoVeiculo('privado')">
-                    <div class="service-title">🚗 Carro Privado</div>
-                    <div class="service-price" id="pricePrivado">520 XOF</div>
-                </div>
-                <div class="service-card" id="card-moto" style="height:auto; padding:8px;" onclick="selecionarTipoVeiculo('moto')">
-                    <div class="service-title">🏍️ Moto-Táxi</div>
-                    <div class="service-price" id="priceMoto">280 XOF</div>
-                </div>
-            </div>
-
-            <!-- FORMA DE PAGAMENTO PRÉVIO DA VIAGEM (OBRIGATÓRIO PAGAR ANTES DE PEDIR) -->
-            <div class="form-group" style="margin-top: 6px;">
-                <label>FORMA DE PAGAMENTO DA VIAGEM (PAGO ANTES DE PEDIR)</label>
-                <select id="ridePaymentMethod" onchange="alternarCamposPagamentoCorrida()">
-                    <option value="Orange Money">Orange Money</option>
-                    <option value="Telecel Cash">Telecel Cash</option>
-                    <option value="Cartão de Débito / Crédito">Cartão de Débito / Crédito</option>
-                    <option value="Dinheiro Vivo (Ao Condutor)">Dinheiro Vivo (Ao Condutor)</option>
-                </select>
-            </div>
-
-            <!-- CAMPO MOBILE MONEY DA CORRIDA -->
-            <div id="campoMobileCorrida" style="margin-top: 6px;">
-                <input type="text" id="numMobileCorrida" placeholder="Número da Conta Orange / Telecel (+245...)">
-            </div>
-
-            <!-- CAMPOS DE CARTÃO DE DÉBITO DA CORRIDA -->
-            <div id="camposCartaoCorrida" style="display:none; margin-top: 6px;">
-                <div class="form-group" style="margin-bottom:6px;">
-                    <input type="text" id="numCartaoCorrida" maxlength="16" placeholder="Número do Cartão (16 dígitos)">
-                </div>
-                <div class="form-group">
-                    <input type="password" id="cvvCartaoCorrida" maxlength="3" placeholder="CVV (3 dígitos)">
-                </div>
-            </div>
-
-            <button type="button" onclick="pedirViagemComPagamentoPrevio()" class="btn-primary" style="background:#00e676; color:#000; margin-top:10px; width:100%; padding:12px; border-radius:10px; border:none; font-weight:bold; cursor:pointer;">
-                Pagar & Pedir Viagem Agora
-            </button>
+        <!-- ABAS DE NAVEGAÇÃO DO CLIENTE (PEDIR VIAGEM / REGISTO DE CLIENTE) -->
+        <div style="display:flex; gap:6px; margin-bottom:4px;">
+            <button type="button" id="tabBtnPedir" style="flex:1; padding:7px; border-radius:8px; border:none; background:#111; color:#00e676; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaCliente('pedir')">Pedir Viagem</button>
+            <button type="button" id="tabBtnRegisto" style="flex:1; padding:7px; border-radius:8px; border:1px solid #ddd; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaCliente('registo')">Registo / Conta Cliente</button>
         </div>
 
-        <div class="waiting-card" id="waitingPanel">
-            <div class="waiting-title">Pagamento Efetuado! A procurar condutor ROTA GB...</div>
-            <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
-            <div class="timer-text" id="waitingTimer">00:00</div>
-            <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
-                Valor Debitado: <strong id="reservedAmount">400 XOF</strong>
+        <!-- FORMULÁRIO DE PEDIR VIAGEM -->
+        <div id="conteudoPedirViagem">
+            <div id="rideFormControls">
+                <div class="form-group">
+                    <label>ROTA OFICIAL DGVTT - BISSAU (CORRIDA EXCLUSIVA)</label>
+                    <select id="routeSelect" onchange="updatePrice()">
+                        <optgroup label="Partidas: Centro / Cidade">
+                            <option value="225">Cidade → Mercado de Bandim (225 XOF)</option>
+                            <option value="250">Cidade → Cristo Redentor (250 XOF)</option>
+                            <option value="325">Cidade → Belém / Missira (325 XOF)</option>
+                            <option value="350">Cidade → Bairro d'Ajuda 1º e 2º fase (350 XOF)</option>
+                            <option value="700" selected>Cidade → Aeroporto (700 XOF)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-top: 6px;">
+                    <input type="text" id="pontoReferencia" placeholder="Ponto de Referência (Ex: Perto do Mercado, portão...)">
+                </div>
+
+                <div class="service-options" style="display: flex; gap: 6px; margin: 8px 0;">
+                    <div class="service-card selected" id="card-taxi" style="height:auto; padding:8px;" onclick="selecionarTipoVeiculo('taxi')">
+                        <div class="service-title">🚕 Táxi Oficial</div>
+                        <div class="service-price" id="priceTaxi">400 XOF</div>
+                    </div>
+                    <div class="service-card" id="card-privado" style="height:auto; padding:8px;" onclick="selecionarTipoVeiculo('privado')">
+                        <div class="service-title">🚗 Carro Privado</div>
+                        <div class="service-price" id="pricePrivado">520 XOF</div>
+                    </div>
+                    <div class="service-card" id="card-moto" style="height:auto; padding:8px;" onclick="selecionarTipoVeiculo('moto')">
+                        <div class="service-title">🏍️ Moto-Táxi</div>
+                        <div class="service-price" id="priceMoto">280 XOF</div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 6px;">
+                    <label>FORMA DE PAGAMENTO DA VIAGEM (PAGO ANTES DE PEDIR)</label>
+                    <select id="ridePaymentMethod" onchange="alternarCamposPagamentoCorrida()">
+                        <option value="Orange Money">Orange Money</option>
+                        <option value="Telecel Cash">Telecel Cash</option>
+                        <option value="Cartão de Débito / Crédito">Cartão de Débito / Crédito</option>
+                        <option value="Dinheiro Vivo (Ao Condutor)">Dinheiro Vivo (Ao Condutor)</option>
+                    </select>
+                </div>
+
+                <div id="campoMobileCorrida" style="margin-top: 6px;">
+                    <input type="text" id="numMobileCorrida" placeholder="Número da Conta Orange / Telecel (+245...)">
+                </div>
+
+                <div id="camposCartaoCorrida" style="display:none; margin-top: 6px;">
+                    <div class="form-group" style="margin-bottom:6px;">
+                        <input type="text" id="numCartaoCorrida" maxlength="16" placeholder="Número do Cartão (16 dígitos)">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="cvvCartaoCorrida" maxlength="3" placeholder="CVV (3 dígitos)">
+                    </div>
+                </div>
+
+                <button type="button" onclick="pedirViagemComPagamentoPrevio()" class="btn-primary" style="background:#00e676; color:#000; margin-top:10px; width:100%; padding:12px; border-radius:10px; border:none; font-weight:bold; cursor:pointer;">
+                    Pagar & Pedir Viagem Agora
+                </button>
             </div>
-            <button type="button" class="btn-cancel" onclick="cancelarViagem()">Cancelar Viagem & Pedir Reembolso</button>
+
+            <div class="waiting-card" id="waitingPanel">
+                <div class="waiting-title">Pagamento Efetuado! A procurar condutor ROTA GB...</div>
+                <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
+                <div class="timer-text" id="waitingTimer">00:00</div>
+                <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
+                    Valor Debitado: <strong id="reservedAmount">400 XOF</strong>
+                </div>
+                <button type="button" class="btn-cancel" onclick="cancelarViagem()">Cancelar Viagem & Pedir Reembolso</button>
+            </div>
+        </div>
+
+        <!-- FORMULÁRIO DE REGISTO DE CLIENTE (COM DADOS E PAGAMENTO PARA COMISSÃO) -->
+        <div id="conteudoRegistoCliente" style="display:none;">
+            <div class="sub-section-title" style="margin-top: 2px;">Registo de Conta & Pagamento do Cliente</div>
+            
+            <div class="form-group" style="margin-bottom: 6px;">
+                <input type="text" id="clientName" placeholder="Nome Completo do Cliente">
+            </div>
+            <div class="form-group" style="margin-bottom: 6px;">
+                <input type="email" id="clientEmail" placeholder="E-mail">
+            </div>
+            <div class="form-group" style="margin-bottom: 6px;">
+                <input type="tel" id="clientPhone" placeholder="Telefone de Contacto (+245)">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 6px;">
+                <label>MÉTODO DE PAGAMENTO / COMISSÃO ROTA GB</label>
+                <select id="clientPayoutMethod" onchange="alternarCamposMetodoCliente()">
+                    <option value="Orange Money (+245)">Orange Money (+245)</option>
+                    <option value="Telecel Cash (+245)">Telecel Cash (+245)</option>
+                    <option value="Cartão de Débito / Crédito">Cartão de Débito / Crédito</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 6px;" id="campoContaClienteRegisto">
+                <input type="text" id="clientAccount" placeholder="Número da Carteira Orange / Telecel (+245...)">
+            </div>
+
+            <div id="camposCartaoClienteRegisto" style="display:none; margin-bottom: 6px;">
+                <div class="form-group" style="margin-bottom:6px;">
+                    <input type="text" id="numCartaoClientReg" maxlength="16" placeholder="Número do Cartão (16 dígitos)">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="cvvCartaoClientReg" maxlength="3" placeholder="CVV (3 dígitos)">
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:6px; margin:6px 0;">
+                <input type="checkbox" id="termsCheckClient" style="width:16px; height:16px;">
+                <label for="termsCheckClient" style="font-size:10px; color:#444; font-weight:normal;">Li e aceito os termos e condições da ROTA GB.</label>
+            </div>
+
+            <button type="button" class="btn-primary" onclick="guardarClienteSupabase()" style="background:#00e676; color:#000; margin-top:6px;">
+                Registar Conta de Cliente
+            </button>
         </div>
 
         <!-- RECARGAS DE SALDO E INTERNET -->
@@ -311,7 +363,7 @@
         </div>
     </div>
 
-    <!-- SEÇÃO DO MOTORISTA / GESTÃO DE UTILIZADORES -->
+    <!-- SEÇÃO DO MOTORISTA -->
     <div class="bottom-panel" id="panel-motorista" style="display: none;">
         <div style="display:flex; gap:6px; margin-bottom:6px;">
             <button type="button" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; font-weight:bold; cursor:pointer;" onclick="mudarAbaMotorista('painel')">Painel do Condutor</button>
@@ -319,10 +371,10 @@
         </div>
 
         <div id="conteudoRegistoCondutor">
-            <div class="sub-section-title" style="margin-top: 2px;">Registo de Utilizador & Dados de Pagamento / Comissão</div>
+            <div class="sub-section-title" style="margin-top: 2px;">Registo de Condutor & Comissão / Pagamento</div>
             
             <div class="form-group" style="margin-bottom: 6px;">
-                <input type="text" id="driverName" placeholder="Nome Completo">
+                <input type="text" id="driverName" placeholder="Nome Completo do Condutor">
             </div>
             <div class="form-group" style="margin-bottom: 6px;">
                 <input type="email" id="driverEmail" placeholder="E-mail">
@@ -344,7 +396,6 @@
                 <input type="text" id="driverPlate" placeholder="Número de Matrícula (Placa)">
             </div>
             
-            <!-- MÉTODO DE DESCONTO DE COMISSÃO E PAGAMENTO SISTEMA ROTA GB -->
             <div class="form-group" style="margin-bottom: 6px;">
                 <label>MÉTODO DE DESCONTO / COMISSÃO ROTA GB (15%)</label>
                 <select id="driverPayoutMethod" onchange="alternarCamposMetodoRegisto()">
@@ -625,6 +676,33 @@
         document.getElementById('panel-motorista').style.display = role === 'motorista' ? 'flex' : 'none';
     }
 
+    function mudarAbaCliente(aba) {
+        let pedir = document.getElementById('conteudoPedirViagem');
+        let registo = document.getElementById('conteudoRegistoCliente');
+        let btnPedir = document.getElementById('tabBtnPedir');
+        let btnRegisto = document.getElementById('tabBtnRegisto');
+
+        if(aba === 'pedir') {
+            pedir.style.display = 'block';
+            registo.style.display = 'none';
+            btnPedir.style.background = '#111';
+            btnPedir.style.color = '#00e676';
+            btnPedir.style.border = 'none';
+            btnRegisto.style.background = '#fff';
+            btnRegisto.style.color = '#333';
+            btnRegisto.style.border = '1px solid #ddd';
+        } else {
+            pedir.style.display = 'none';
+            registo.style.display = 'block';
+            btnRegisto.style.background = '#111';
+            btnRegisto.style.color = '#00e676';
+            btnRegisto.style.border = 'none';
+            btnPedir.style.background = '#fff';
+            btnPedir.style.color = '#333';
+            btnPedir.style.border = '1px solid #ddd';
+        }
+    }
+
     function mudarAbaMotorista(aba) {
         let reg = document.getElementById('conteudoRegistoCondutor');
         let pan = document.getElementById('conteudoPainelCondutor');
@@ -658,6 +736,20 @@
         let metodo = document.getElementById('driverPayoutMethod').value;
         let campoConta = document.getElementById('campoContaRegisto');
         let camposCartao = document.getElementById('camposCartaoRegisto');
+
+        if (metodo === 'Cartão de Débito / Crédito') {
+            campoConta.style.display = 'none';
+            camposCartao.style.display = 'block';
+        } else {
+            campoConta.style.display = 'block';
+            camposCartao.style.display = 'none';
+        }
+    }
+
+    function alternarCamposMetodoCliente() {
+        let metodo = document.getElementById('clientPayoutMethod').value;
+        let campoConta = document.getElementById('campoContaClienteRegisto');
+        let camposCartao = document.getElementById('camposCartaoClienteRegisto');
 
         if (metodo === 'Cartão de Débito / Crédito') {
             campoConta.style.display = 'none';
@@ -733,10 +825,19 @@
     function guardarCondutorSupabase() {
         let nome = document.getElementById('driverName').value;
         if(!nome) {
-            alert("Por favor, preencha o nome completo.");
+            alert("Por favor, preencha o nome completo do condutor.");
             return;
         }
-        alert("Dados e método de cobrança do utilizador (" + nome + ") registrados com sucesso na ROTA GB!");
+        alert("Condutor " + nome + " registado e assinado com sucesso na ROTA GB!");
+    }
+
+    function guardarClienteSupabase() {
+        let nome = document.getElementById('clientName').value;
+        if(!nome) {
+            alert("Por favor, preencha o nome completo do cliente.");
+            return;
+        }
+        alert("Cliente " + nome + " registado com sucesso na ROTA GB!");
     }
 
     function limparAssinatura() {
