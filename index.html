@@ -1002,23 +1002,59 @@
         }
     }
 
-    function pedirViagemComPagamentoPrevio() {
+   function alternarCamposPagamentoCorrida() {
         let metodo = document.getElementById('ridePaymentMethod').value;
+        let campoMobile = document.getElementById('campoMobileCorrida');
+        let camposCartao = document.getElementById('camposCartaoCorrida');
 
         if (metodo === 'Cartão de Débito / Crédito') {
-            let num = document.getElementById('numCartaoCorrida').value;
-            let cvv = document.getElementById('cvvCartaoCorrida').value;
-            if (!num || num.length < 16 || !cvv || cvv.length < 3) {
-                alert("Insira os 16 dígitos do cartão de débito e o CVV de 3 dígitos para efetuar o pagamento da corrida.");
-                return;
-            }
-        } else if (metodo.includes('Orange') || metodo.includes('Telecel')) {
-            let numMobile = document.getElementById('numMobileCorrida').value;
-            if (!numMobile) {
-                alert("Insira o número da conta Orange / Telecel (+245) para autorizar o débito automático da corrida.");
-                return;
+            if(campoMobile) campoMobile.style.display = 'none';
+            if(camposCartao) camposCartao.style.display = 'block';
+        } else if (metodo === 'Dinheiro Vivo (Ao Condutor)') {
+            if(campoMobile) campoMobile.style.display = 'none';
+            if(camposCartao) camposCartao.style.display = 'none';
+        } else {
+            if(campoMobile) campoMobile.style.display = 'block';
+            if(camposCartao) camposCartao.style.display = 'none';
+        }
+    }
+
+    function pedirViagemComPagamentoPrevio() {
+        let metodo = document.getElementById('ridePaymentMethod').value;
+        let routeSelect = document.getElementById('routeSelect');
+        let valorCorrida = routeSelect ? routeSelect.value : "500";
+
+        let statusTitle = document.querySelector('#waitingPanel .waiting-title');
+        let reservedAmount = document.getElementById('reservedAmount');
+
+        if (reservedAmount) {
+            reservedAmount.innerText = valorCorrida + " XOF (" + metodo + ")";
+        }
+
+        if (statusTitle) {
+            if (metodo === 'Dinheiro Vivo (Ao Condutor)') {
+                statusTitle.innerText = "Pedido Enviado! A procurar condutor (Pagamento em Dinheiro Vivo ao chegar)...";
+            } else {
+                statusTitle.innerText = "Pagamento Efetuado (" + metodo + ")! A procurar condutor ROTA GB...";
             }
         }
+
+        let rideForm = document.getElementById('rideFormControls');
+        let waiting = document.getElementById('waitingPanel');
+        
+        if (rideForm) rideForm.style.display = 'none';
+        if (waiting) waiting.style.display = 'flex';
+        
+        if (timerInterval) clearInterval(timerInterval);
+        secondsElapsed = 0;
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            let mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            let secs = String(secondsElapsed % 60).padStart(2, '0');
+            let timerEl = document.getElementById('waitingTimer');
+            if (timerEl) timerEl.innerText = mins + ":" + secs;
+        }, 1000);
+    }
 
         let rideForm = document.getElementById('rideFormControls');
         let waiting = document.getElementById('waitingPanel');
