@@ -6,6 +6,7 @@
     <title>ROTA GB - Super App de Bissau</title>
     
     <meta name="theme-color" content="#00e676">
+    <link rel="manifest" href="manifest.json">
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -319,7 +320,7 @@
                     </div>
 
                     <div class="form-group" style="margin-top: 6px;">
-                        <label>FORMA DE PAGAMENTO DA VIAGEM</label>
+                        <label>FORMA DE PAGAMENTO DA VIAGEM (PAGO ANTES DE PEDIR)</label>
                         <select id="ridePaymentMethod" onchange="alternarCamposPagamentoCorrida()">
                             <option value="Orange Money">Orange Money</option>
                             <option value="Telecel Cash">Telecel Cash</option>
@@ -354,87 +355,108 @@
                 </div>
             </div>
 
-            <!-- REGISTO / CONTA CLIENTE (AUTOMÁTICO DÉBITO) -->
+            <!-- REGISTO / CONTA CLIENTE (ORIGINAL EXACTO) -->
             <div id="conteudoRegistoConta" style="display:none;">
-                <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #111;">Registo & Conta de Cliente ROTA GB</div>
+                <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #111;">Registo de Conta & Pagamento do Cliente</div>
                 
                 <div class="form-group" style="margin-bottom:6px;">
-                    <label>Nome Completo:</label>
-                    <input type="text" id="clientName" placeholder="Ex: Lavi Duarte">
+                    <input type="text" id="clientName" placeholder="Nome Completo do Cliente">
                 </div>
                 
                 <div class="form-group" style="margin-bottom:6px;">
-                    <label>Telemóvel Principal:</label>
-                    <input type="text" id="clientPhone" placeholder="+245 955...">
+                    <input type="text" id="clientEmail" placeholder="E-mail">
                 </div>
 
                 <div class="form-group" style="margin-bottom:6px;">
-                    <label>Método Padrão de Débito Automático:</label>
-                    <select id="clientDefaultPayment" onchange="alternarRegistoClientePagamento()">
-                        <option value="Orange Money">Orange Money</option>
-                        <option value="Telecel Cash">Telecel Cash</option>
+                    <input type="text" id="clientPhone" placeholder="Telefone de Contacto (+245)">
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <label>MÉTODO DE PAGAMENTO / COMISSÃO ROTA GB</label>
+                    <select id="clientDefaultPayment">
+                        <option value="Orange Money (+245)">Orange Money (+245)</option>
+                        <option value="Telecel Cash (+245)">Telecel Cash (+245)</option>
                         <option value="Cartão de Débito / Crédito">Cartão de Débito / Crédito</option>
                     </select>
                 </div>
 
-                <div id="registoMobileContainer" class="form-group" style="margin-bottom:6px;">
-                    <label>Número Conta Orange / Telecel:</label>
-                    <input type="text" id="clientPayAccount" placeholder="+245 955...">
+                <div class="form-group" style="margin-bottom:6px;">
+                    <input type="text" id="clientPayAccount" placeholder="Número da Carteira Orange / Telecel (+245...)">
                 </div>
 
-                <div id="registoCartaoContainer" style="display:none; margin-bottom:6px;">
-                    <div class="form-group" style="margin-bottom:4px;">
-                        <label>Número do Cartão (Débito):</label>
-                        <input type="text" id="clientCardNumber" maxlength="16" placeholder="16 dígitos do cartão">
-                    </div>
-                    <div class="form-group">
-                        <label>CVV:</label>
-                        <input type="password" id="clientCardCvv" maxlength="3" placeholder="CVV">
-                    </div>
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                    <input type="checkbox" id="clientTerms" style="width: 14px; height: 14px; cursor: pointer;">
+                    <label for="clientTerms" style="font-size: 10px; color: #444; font-weight: normal; cursor: pointer;">Li e aceito os termos e condições da ROTA GB.</label>
                 </div>
 
-                <button type="button" onclick="guardarContaCliente()" class="btn-primary" style="background:#111; color:#00e676; margin-top:6px;">Guardar Perfil & Ativar Débito Automático</button>
+                <button type="button" onclick="guardarContaCliente()" class="btn-primary" style="background:#00e676; color:#000; margin-top:4px;">Registar Conta de Cliente</button>
             </div>
         </div>
 
-        <!-- PAINEL MOTORISTA (CADASTRO E ASSINATURA DIGITAL) -->
+        <!-- PAINEL MOTORISTA (CADASTRO, COMISSÃO 15% E ASSINATURA DIGITAL) -->
         <div id="viewMotorista" style="display:none;">
-            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #111;">🚗 Cadastro & Assinatura Digital do Condutor</div>
+            <div style="display:flex; gap:6px; margin-bottom:6px;">
+                <button type="button" style="flex:1; padding:7px; border-radius:8px; border:1px solid #ddd; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:11px;">Painel do Condutor</button>
+                <button type="button" style="flex:1; padding:7px; border-radius:8px; border:none; background:#111; color:#00e676; font-weight:bold; cursor:pointer; font-size:11px;">Registar Veículo</button>
+            </div>
+
+            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #111;">Registo de Condutor & Comissão / Pagamento</div>
             
             <div class="form-group" style="margin-bottom:6px;">
-                <label>Nome Completo do Motorista:</label>
-                <input type="text" id="driverName" placeholder="Ex: Armando Silva">
+                <input type="text" id="driverName" placeholder="Nome Completo do Condutor">
             </div>
 
             <div class="form-group" style="margin-bottom:6px;">
-                <label>Contacto Telefónico:</label>
-                <input type="text" id="driverPhone" placeholder="+245 966...">
+                <input type="text" id="driverEmail" placeholder="E-mail">
             </div>
 
             <div class="form-group" style="margin-bottom:6px;">
-                <label>Tipo de Veículo:</label>
+                <input type="text" id="driverPhone" placeholder="Telefone de Contacto (+245)">
+            </div>
+
+            <div class="form-group" style="margin-bottom:6px;">
                 <select id="driverVehicleType">
-                    <option value="Táxi Oficial (Mercedes 190)">Táxi Oficial (Mercedes 190)</option>
                     <option value="Carro Privado">Carro Privado</option>
+                    <option value="Táxi Oficial (Mercedes 190)">Táxi Oficial (Mercedes 190)</option>
                     <option value="Moto-Táxi">Moto-Táxi</option>
                     <option value="Toca-toca">Toca-toca</option>
                 </select>
             </div>
 
             <div class="form-group" style="margin-bottom:6px;">
-                <label>Matrícula / Placa do Veículo:</label>
-                <input type="text" id="driverPlate" placeholder="Ex: GW-01-A">
+                <input type="text" id="driverModel" placeholder="Marca e Modelo do Veículo">
             </div>
 
             <div class="form-group" style="margin-bottom:6px;">
-                <label>Assinatura Digital (Desenhe no quadro abaixo):</label>
-                <div style="border: 1px solid #ccc; background: #fff; border-radius: 8px; position: relative;">
-                    <canvas id="sigPad" width="350" height="90" style="display: block; cursor: crosshair;"></canvas>
+                <input type="text" id="driverPlate" placeholder="Número de Matrícula (Placa)">
+            </div>
+
+            <div class="form-group" style="margin-bottom:6px;">
+                <label>MÉTODO DE DESCONTO / COMISSÃO ROTA GB (15%)</label>
+                <select id="driverPaymentMethod">
+                    <option value="Orange Money (+245)">Orange Money (+245)</option>
+                    <option value="Telecel Cash (+245)">Telecel Cash (+245)</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:6px;">
+                <input type="text" id="driverPayAccount" placeholder="Número da Carteira Orange / Telecel (+245...)">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                <input type="checkbox" id="driverTerms" style="width: 14px; height: 14px; cursor: pointer;">
+                <label for="driverTerms" style="font-size: 10px; color: #444; font-weight: normal; cursor: pointer;">Li e aceito os termos e condições da ROTA GB, incluindo a taxa de comissão de 15% aplicável sobre os serviços em Bissau.</label>
+            </div>
+
+            <div class="form-group" style="margin-bottom:6px;">
+                <label>ASSINATURA DIGITAL DO CONDUTOR</label>
+                <div style="border: 2px dashed #00e676; background: #fff; border-radius: 8px; position: relative;">
+                    <canvas id="sigPad" width="350" height="100" style="display: block; cursor: crosshair;"></canvas>
                 </div>
                 <button type="button" onclick="limparAssinatura()" style="background: none; border: none; color: #d32f2f; font-size: 10px; font-weight: bold; cursor: pointer; text-align: right; margin-top: 2px;">Limpar Assinatura</button>
             </div>
 
-            <button type="button" onclick="guardarCondutorSupabase()" class="btn-primary" style="background:#00e676; color:#000; margin-top:4px;">Registar Condutor & Submeter Assinatura</button>
+            <button type="button" onclick="guardarCondutorSupabase()" class="btn-primary" style="background:#00e676; color:#000; margin-top:4px;">Aceitar e Assinar</button>
         </div>
 
         <!-- RECARGAS DE SALDO, INTERNET E LUZ (EAGB) -->
@@ -730,37 +752,35 @@
         let phone = document.getElementById('driverPhone').value;
         let plate = document.getElementById('driverPlate').value;
         let vehicle = document.getElementById('driverVehicleType').value;
+        let terms = document.getElementById('driverTerms').checked;
 
         if (!nome || !phone || !plate) {
             alert("Por favor, preencha todos os campos do registo do motorista.");
             return;
         }
 
-        alert("Motorista " + nome + " (" + vehicle + " - " + plate + ") registrado e assinatura digital salva com sucesso na ROTA GB!");
-        setRole('passageiro');
-    }
-
-    function alternarRegistoClientePagamento() {
-        let metodo = document.getElementById('clientDefaultPayment').value;
-        let cMobile = document.getElementById('registoMobileContainer');
-        let cCartao = document.getElementById('registoCartaoContainer');
-
-        if (metodo === 'Cartão de Débito / Crédito') {
-            cMobile.style.display = 'none';
-            cCartao.style.display = 'block';
-        } else {
-            cMobile.style.display = 'block';
-            cCartao.style.display = 'none';
+        if (!terms) {
+            alert("Deve aceitar os termos e condições da ROTA GB e a comissão de 15%.");
+            return;
         }
+
+        alert("Condutor " + nome + " (" + vehicle + " - " + plate + ") registado com sucesso!\nAssinatura digital e comissão de 15% aceites.");
+        setRole('passageiro');
     }
 
     function guardarContaCliente() {
         let nome = document.getElementById('clientName').value;
         let phone = document.getElementById('clientPhone').value;
         let metodo = document.getElementById('clientDefaultPayment').value;
+        let terms = document.getElementById('clientTerms').checked;
 
         if (!nome || !phone) {
-            alert("Por favor, preencha o seu nome e telemóvel.");
+            alert("Por favor, preencha o seu nome e telefone de contacto.");
+            return;
+        }
+
+        if (!terms) {
+            alert("Deve aceitar os termos e condições da ROTA GB.");
             return;
         }
 
