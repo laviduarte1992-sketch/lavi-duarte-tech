@@ -129,6 +129,7 @@
        <div class="services-section">
             <h3>Go anywhere</h3>
             <div class="services-grid">
+                <!-- 1. Táxi (Com ícone vetorial original) -->
                 <div class="service-card" onclick="abrirModalVisual('taxi')">
                     <svg class="img-thumb" viewBox="0 0 120 70" style="background: #f0f9ff; border-radius: 8px;">
                         <rect x="0" y="0" width="120" height="70" fill="#f0f9ff"/>
@@ -147,11 +148,13 @@
                     <span>Trip / Táxi</span>
                 </div>
 
+                <!-- 2. Aluguer (Com imagem de carro desportivo azul original) -->
                 <div class="service-card" onclick="abrirModalVisual('aluguer')">
                     <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=150" class="img-thumb" alt="Aluguer">
                     <span>Aluguer</span>
                 </div>
 
+                <!-- 3. Toca-toca (Com autocarro/carrinha amarela e azul original) -->
                 <div class="service-card" onclick="abrirModalVisual('tocatoca')">
                     <svg class="img-thumb" viewBox="0 0 100 60" style="background: #fef08a; border-radius: 8px;">
                         <rect x="0" y="0" width="100" height="60" fill="#fef9c3"/>
@@ -169,6 +172,7 @@
                     <span>Toca-toca</span>
                 </div>
 
+                <!-- 4. Voos (Com avião e nuvens original) -->
                 <div class="service-card" onclick="abrirModalVisual('voos')">
                     <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=150" class="img-thumb" alt="Voos">
                     <span>Voos</span>
@@ -393,14 +397,13 @@
             </div>
         </div>
 
-        <!-- PAINEL MOTORISTA (COM ABAS: PAINEL DO CONDUTOR & REGISTAR VEÍCULO) -->
+        <!-- PAINEL MOTORISTA -->
         <div id="viewMotorista" style="display:none;">
             <div style="display:flex; gap:6px; margin-bottom:10px;">
                 <button type="button" id="tabDriverPainel" style="flex:1; padding:7px; border-radius:8px; border:none; background:#111; color:#00e676; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaMotorista('painel')">Painel do Condutor</button>
                 <button type="button" id="tabDriverRegistar" style="flex:1; padding:7px; border-radius:8px; border:1px solid #ddd; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaMotorista('registar')">Registar Veículo</button>
             </div>
 
-            <!-- ABA 1: PAINEL DO CONDUTOR (RESUMO E DADOS PARA O CLIENTE VER) -->
             <div id="driverPainelContent">
                 <div style="text-align:center; padding: 10px 0;">
                     <div style="font-size: 14px; font-weight: bold; color: #111;">Painel de Trabalho em Bissau</div>
@@ -425,7 +428,6 @@
                 <button type="button" class="btn-primary" style="background:#111; color:#00e676;">Aguardar Chamadas de Viagem</button>
             </div>
 
-            <!-- ABA 2: REGISTAR VEÍCULO & CONDUTOR -->
             <div id="driverRegistarContent" style="display:none;">
                 <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #111;">Registo de Condutor & Comissão / Pagamento</div>
                 
@@ -697,6 +699,15 @@
         ],
         'conveniencia': [
             { img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400", text: "Convenience Store Bissau — Bebidas, Gelo & Artigos Rápidos", phone: "+245 955 333 222" }
+        ],
+        'aluguer': [
+            { img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400", text: "Aluguer de Carros Bissau — Viagens Confortáveis", phone: "+245 955 112 233" }
+        ],
+        'voos': [
+            { img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400", text: "Voos Internacionais & Regionais — Aeroporto Osvaldo Vieira", phone: "+245 955 999 888" }
+        ],
+        'tocatoca': [
+            { img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400", text: "Toca-toca Rota Urbana — Transporte Coletivo Bissau", phone: "+245 966 777 888" }
         ]
     };
 
@@ -751,7 +762,6 @@
         }
     }
 
-    // Configuração do Canvas de Assinatura Digital do Motorista
     let isDrawing = false;
     let canvas, ctx;
 
@@ -776,7 +786,6 @@
             canvas.onmouseup = () => { isDrawing = false; };
             canvas.onmouseleave = () => { isDrawing = false; };
 
-            // Suporte tátil mobile
             canvas.ontouchstart = (e) => {
                 isDrawing = true;
                 let rect = canvas.getBoundingClientRect();
@@ -821,7 +830,6 @@
             return;
         }
 
-        // Atualizar os dados visíveis no Painel do Condutor
         document.getElementById('lblDriverName').innerText = nome;
         document.getElementById('lblDriverPhone').innerText = phone;
         document.getElementById('lblDriverVehicle').innerText = vehicle;
@@ -1060,7 +1068,7 @@
             if(camposCartao) campoMobile.style.display = 'none';
         } else {
             if(campoMobile) campoMobile.style.display = 'block';
-            if(camposCartao) camposCartao.style.display = 'none';
+            if(camposCartao) campoMobile.style.display = 'none';
         }
     }
 
@@ -1114,7 +1122,6 @@
         if (waiting) waiting.style.display = 'none';
     }
 
-    // Animação contínua do carro no mapa
     setInterval(() => {
         let car = document.getElementById('movingCar');
         if(car) {
