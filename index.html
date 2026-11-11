@@ -355,7 +355,7 @@
                 </div>
             </div>
 
-            <!-- REGISTO / CONTA CLIENTE (ORIGINAL EXACTO) -->
+            <!-- REGISTO / CONTA CLIENTE -->
             <div id="conteudoRegistoConta" style="display:none;">
                 <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #111;">Registo de Conta & Pagamento do Cliente</div>
                 
@@ -393,70 +393,98 @@
             </div>
         </div>
 
-        <!-- PAINEL MOTORISTA (CADASTRO, COMISSÃO 15% E ASSINATURA DIGITAL) -->
+        <!-- PAINEL MOTORISTA (COM ABAS: PAINEL DO CONDUTOR & REGISTAR VEÍCULO) -->
         <div id="viewMotorista" style="display:none;">
-            <div style="display:flex; gap:6px; margin-bottom:6px;">
-                <button type="button" style="flex:1; padding:7px; border-radius:8px; border:1px solid #ddd; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:11px;">Painel do Condutor</button>
-                <button type="button" style="flex:1; padding:7px; border-radius:8px; border:none; background:#111; color:#00e676; font-weight:bold; cursor:pointer; font-size:11px;">Registar Veículo</button>
+            <div style="display:flex; gap:6px; margin-bottom:10px;">
+                <button type="button" id="tabDriverPainel" style="flex:1; padding:7px; border-radius:8px; border:none; background:#111; color:#00e676; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaMotorista('painel')">Painel do Condutor</button>
+                <button type="button" id="tabDriverRegistar" style="flex:1; padding:7px; border-radius:8px; border:1px solid #ddd; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:11px;" onclick="mudarAbaMotorista('registar')">Registar Veículo</button>
             </div>
 
-            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #111;">Registo de Condutor & Comissão / Pagamento</div>
-            
-            <div class="form-group" style="margin-bottom:6px;">
-                <input type="text" id="driverName" placeholder="Nome Completo do Condutor">
-            </div>
-
-            <div class="form-group" style="margin-bottom:6px;">
-                <input type="text" id="driverEmail" placeholder="E-mail">
-            </div>
-
-            <div class="form-group" style="margin-bottom:6px;">
-                <input type="text" id="driverPhone" placeholder="Telefone de Contacto (+245)">
-            </div>
-
-            <div class="form-group" style="margin-bottom:6px;">
-                <select id="driverVehicleType">
-                    <option value="Carro Privado">Carro Privado</option>
-                    <option value="Táxi Oficial (Mercedes 190)">Táxi Oficial (Mercedes 190)</option>
-                    <option value="Moto-Táxi">Moto-Táxi</option>
-                    <option value="Toca-toca">Toca-toca</option>
-                </select>
-            </div>
-
-            <div class="form-group" style="margin-bottom:6px;">
-                <input type="text" id="driverModel" placeholder="Marca e Modelo do Veículo">
-            </div>
-
-            <div class="form-group" style="margin-bottom:6px;">
-                <input type="text" id="driverPlate" placeholder="Número de Matrícula (Placa)">
-            </div>
-
-            <div class="form-group" style="margin-bottom:6px;">
-                <label>MÉTODO DE DESCONTO / COMISSÃO ROTA GB (15%)</label>
-                <select id="driverPaymentMethod">
-                    <option value="Orange Money (+245)">Orange Money (+245)</option>
-                    <option value="Telecel Cash (+245)">Telecel Cash (+245)</option>
-                </select>
-            </div>
-
-            <div class="form-group" style="margin-bottom:6px;">
-                <input type="text" id="driverPayAccount" placeholder="Número da Carteira Orange / Telecel (+245...)">
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                <input type="checkbox" id="driverTerms" style="width: 14px; height: 14px; cursor: pointer;">
-                <label for="driverTerms" style="font-size: 10px; color: #444; font-weight: normal; cursor: pointer;">Li e aceito os termos e condições da ROTA GB, incluindo a taxa de comissão de 15% aplicável sobre os serviços em Bissau.</label>
-            </div>
-
-            <div class="form-group" style="margin-bottom:6px;">
-                <label>ASSINATURA DIGITAL DO CONDUTOR</label>
-                <div style="border: 2px dashed #00e676; background: #fff; border-radius: 8px; position: relative;">
-                    <canvas id="sigPad" width="350" height="100" style="display: block; cursor: crosshair;"></canvas>
+            <!-- ABA 1: PAINEL DO CONDUTOR (RESUMO E DADOS PARA O CLIENTE VER) -->
+            <div id="driverPainelContent">
+                <div style="text-align:center; padding: 10px 0;">
+                    <div style="font-size: 14px; font-weight: bold; color: #111;">Painel de Trabalho em Bissau</div>
+                    <div style="font-size: 11px; color: #666; margin-top: 2px;">Estado: <strong style="color: #00e676;">Online / Disponível</strong></div>
                 </div>
-                <button type="button" onclick="limparAssinatura()" style="background: none; border: none; color: #d32f2f; font-size: 10px; font-weight: bold; cursor: pointer; text-align: right; margin-top: 2px;">Limpar Assinatura</button>
+
+                <div style="background: #fdfdfd; border: 1px solid #e1e4e8; border-radius: 12px; padding: 12px; margin-bottom: 10px;">
+                    <div style="font-size: 11px; color: #555; font-weight: bold; margin-bottom: 6px;">🚗 Dados do Veículo & Condutor Ativo:</div>
+                    <div style="font-size: 11px; color: #333; margin-bottom: 3px;"><strong>Nome:</strong> <span id="lblDriverName">Armando Silva</span></div>
+                    <div style="font-size: 11px; color: #333; margin-bottom: 3px;"><strong>Telemóvel:</strong> <span id="lblDriverPhone">+245 966 123 456</span></div>
+                    <div style="font-size: 11px; color: #333; margin-bottom: 3px;"><strong>Veículo:</strong> <span id="lblDriverVehicle">Táxi Oficial (Mercedes 190)</span></div>
+                    <div style="font-size: 11px; color: #333; margin-bottom: 3px;"><strong>Modelo / Marca:</strong> <span id="lblDriverModel">Mercedes-Benz W201</span></div>
+                    <div style="font-size: 11px; color: #333;"><strong>Matrícula (Placa):</strong> <span id="lblDriverPlate">GW-01-A</span></div>
+                </div>
+
+                <div style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                    <div style="font-size: 11px; color: #666; font-weight: bold;">Resumo de Ganhos Hoje</div>
+                    <div style="font-size: 20px; font-weight: 800; color: #00e676; margin: 2px 0;">12.500 XOF</div>
+                    <div style="font-size: 10px; color: #777;">Comissão Retida (15%): 2.205 XOF</div>
+                </div>
+
+                <button type="button" class="btn-primary" style="background:#111; color:#00e676;">Aguardar Chamadas de Viagem</button>
             </div>
 
-            <button type="button" onclick="guardarCondutorSupabase()" class="btn-primary" style="background:#00e676; color:#000; margin-top:4px;">Aceitar e Assinar</button>
+            <!-- ABA 2: REGISTAR VEÍCULO & CONDUTOR -->
+            <div id="driverRegistarContent" style="display:none;">
+                <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #111;">Registo de Condutor & Comissão / Pagamento</div>
+                
+                <div class="form-group" style="margin-bottom:6px;">
+                    <input type="text" id="driverName" placeholder="Nome Completo do Condutor">
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <input type="text" id="driverEmail" placeholder="E-mail">
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <input type="text" id="driverPhone" placeholder="Telefone de Contacto (+245)">
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <select id="driverVehicleType">
+                        <option value="Táxi Oficial (Mercedes 190)">Táxi Oficial (Mercedes 190)</option>
+                        <option value="Carro Privado">Carro Privado</option>
+                        <option value="Moto-Táxi">Moto-Táxi</option>
+                        <option value="Toca-toca">Toca-toca</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <input type="text" id="driverModel" placeholder="Marca e Modelo do Veículo">
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <input type="text" id="driverPlate" placeholder="Número de Matrícula (Placa)">
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <label>MÉTODO DE DESCONTO / COMISSÃO ROTA GB (15%)</label>
+                    <select id="driverPaymentMethod">
+                        <option value="Orange Money (+245)">Orange Money (+245)</option>
+                        <option value="Telecel Cash (+245)">Telecel Cash (+245)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <input type="text" id="driverPayAccount" placeholder="Número da Carteira Orange / Telecel (+245...)">
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <input type="checkbox" id="driverTerms" style="width: 14px; height: 14px; cursor: pointer;">
+                    <label for="driverTerms" style="font-size: 10px; color: #444; font-weight: normal; cursor: pointer;">Li e aceito os termos e condições da ROTA GB, incluindo a taxa de comissão de 15% aplicável sobre os serviços em Bissau.</label>
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <label>ASSINATURA DIGITAL DO CONDUTOR</label>
+                    <div style="border: 2px dashed #00e676; background: #fff; border-radius: 8px; position: relative;">
+                        <canvas id="sigPad" width="350" height="100" style="display: block; cursor: crosshair;"></canvas>
+                    </div>
+                    <button type="button" onclick="limparAssinatura()" style="background: none; border: none; color: #d32f2f; font-size: 10px; font-weight: bold; cursor: pointer; text-align: right; margin-top: 2px;">Limpar Assinatura</button>
+                </div>
+
+                <button type="button" onclick="guardarCondutorSupabase()" class="btn-primary" style="background:#00e676; color:#000; margin-top:4px;">Aceitar e Assinar</button>
+            </div>
         </div>
 
         <!-- RECARGAS DE SALDO, INTERNET E LUZ (EAGB) -->
@@ -691,6 +719,34 @@
             vMot.style.display = 'block';
             vCli.style.display = 'none';
             if(mapSec) mapSec.style.display = 'none';
+            mudarAbaMotorista('painel');
+        }
+    }
+
+    function mudarAbaMotorista(aba) {
+        let btnPainel = document.getElementById('tabDriverPainel');
+        let btnRegistar = document.getElementById('tabDriverRegistar');
+        let contentPainel = document.getElementById('driverPainelContent');
+        let contentRegistar = document.getElementById('driverRegistarContent');
+
+        if (aba === 'painel') {
+            btnPainel.style.background = '#111';
+            btnPainel.style.color = '#00e676';
+            btnPainel.style.border = 'none';
+            btnRegistar.style.background = '#fff';
+            btnRegistar.style.color = '#333';
+            btnRegistar.style.border = '1px solid #ddd';
+            contentPainel.style.display = 'block';
+            contentRegistar.style.display = 'none';
+        } else {
+            btnRegistar.style.background = '#111';
+            btnRegistar.style.color = '#00e676';
+            btnRegistar.style.border = 'none';
+            btnPainel.style.background = '#fff';
+            btnPainel.style.color = '#333';
+            btnPainel.style.border = '1px solid #ddd';
+            contentRegistar.style.display = 'block';
+            contentPainel.style.display = 'none';
             initSignaturePad();
         }
     }
@@ -750,12 +806,13 @@
     function guardarCondutorSupabase() {
         let nome = document.getElementById('driverName').value;
         let phone = document.getElementById('driverPhone').value;
-        let plate = document.getElementById('driverPlate').value;
         let vehicle = document.getElementById('driverVehicleType').value;
+        let model = document.getElementById('driverModel').value;
+        let plate = document.getElementById('driverPlate').value;
         let terms = document.getElementById('driverTerms').checked;
 
-        if (!nome || !phone || !plate) {
-            alert("Por favor, preencha todos os campos do registo do motorista.");
+        if (!nome || !phone || !plate || !model) {
+            alert("Por favor, preencha todos os campos do registo do veículo e condutor.");
             return;
         }
 
@@ -764,8 +821,15 @@
             return;
         }
 
-        alert("Condutor " + nome + " (" + vehicle + " - " + plate + ") registado com sucesso!\nAssinatura digital e comissão de 15% aceites.");
-        setRole('passageiro');
+        // Atualizar os dados visíveis no Painel do Condutor
+        document.getElementById('lblDriverName').innerText = nome;
+        document.getElementById('lblDriverPhone').innerText = phone;
+        document.getElementById('lblDriverVehicle').innerText = vehicle;
+        document.getElementById('lblDriverModel').innerText = model;
+        document.getElementById('lblDriverPlate').innerText = plate;
+
+        alert("Condutor " + nome + " (" + model + " - " + plate + ") registado e verificado com sucesso!");
+        mudarAbaMotorista('painel');
     }
 
     function guardarContaCliente() {
@@ -996,7 +1060,7 @@
             if(camposCartao) campoMobile.style.display = 'none';
         } else {
             if(campoMobile) campoMobile.style.display = 'block';
-            if(camposCartao) campoMobile.style.display = 'none';
+            if(camposCartao) camposCartao.style.display = 'none';
         }
     }
 
