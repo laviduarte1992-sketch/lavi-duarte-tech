@@ -97,9 +97,6 @@
         .waiting-title { font-size: 13px; font-weight: bold; color: #e65100; }
         .timer-text { font-size: 22px; font-weight: 800; color: #d84315; margin: 4px 0; }
         .btn-cancel { background: #d32f2f; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
-
-        .card-title { font-size: 12px; font-weight: bold; color: #111; }
-        .card-desc { font-size: 10px; color: #666; margin-top: 1px; }
         
         .btn-primary { background: #00e676; color: #000; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; width: 100%; }
         .sub-section-title { font-size: 14px; font-weight: bold; color: #1a1a1a; margin: 10px 0 6px 0; }
@@ -129,51 +126,26 @@
        <div class="services-section">
             <h3>Go anywhere</h3>
             <div class="services-grid">
-                <!-- 1. Táxi (Com ícone vetorial original) -->
+                <!-- 1. Táxi (Com imagem real clássica) -->
                 <div class="service-card" onclick="abrirModalVisual('taxi')">
-                    <svg class="img-thumb" viewBox="0 0 120 70" style="background: #f0f9ff; border-radius: 8px;">
-                        <rect x="0" y="0" width="120" height="70" fill="#f0f9ff"/>
-                        <path d="M 18 42 L 32 24 L 88 24 L 102 42 L 110 42 L 110 52 L 10 52 L 10 42 Z" fill="#0284c7"/>
-                        <path d="M 35 24 L 43 14 L 77 14 L 85 24 Z" fill="#ffffff"/>
-                        <path d="M 37 23 L 44 15 L 58 15 L 58 23 Z" fill="#bae6fd"/>
-                        <path d="M 62 23 L 62 15 L 76 15 L 83 23 Z" fill="#bae6fd"/>
-                        <rect x="10" y="43" width="100" height="3" fill="#ffffff"/>
-                        <rect x="10" y="46" width="6" height="4" fill="#fbbf24"/>
-                        <rect x="104" y="46" width="6" height="4" fill="#f87171"/>
-                        <circle cx="32" cy="52" r="8" fill="#1e293b"/>
-                        <circle cx="32" cy="52" r="3.5" fill="#cbd5e1"/>
-                        <circle cx="88" cy="52" r="8" fill="#1e293b"/>
-                        <circle cx="88" cy="52" r="3.5" fill="#cbd5e1"/>
-                    </svg>
+                    <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=150" class="img-thumb" alt="Táxi">
                     <span>Trip / Táxi</span>
                 </div>
 
-                <!-- 2. Aluguer (Com imagem de carro desportivo azul original) -->
+                <!-- 2. Aluguer (Com imagem real clássica) -->
                 <div class="service-card" onclick="abrirModalVisual('aluguer')">
                     <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=150" class="img-thumb" alt="Aluguer">
                     <span>Aluguer</span>
                 </div>
 
-                <!-- 3. Toca-toca (Com autocarro/carrinha amarela e azul original) -->
+                <!-- 3. Toca-toca (Com imagem real clássica) -->
                 <div class="service-card" onclick="abrirModalVisual('tocatoca')">
-                    <svg class="img-thumb" viewBox="0 0 100 60" style="background: #fef08a; border-radius: 8px;">
-                        <rect x="0" y="0" width="100" height="60" fill="#fef9c3"/>
-                        <rect x="10" y="15" width="80" height="30" rx="4" fill="#eab308"/>
-                        <rect x="10" y="32" width="80" height="13" rx="2" fill="#1d4ed8"/>
-                        <rect x="16" y="19" width="14" height="10" rx="1" fill="#93c5fd"/>
-                        <rect x="34" y="19" width="14" height="10" rx="1" fill="#93c5fd"/>
-                        <rect x="52" y="19" width="14" height="10" rx="1" fill="#93c5fd"/>
-                        <rect x="70" y="19" width="14" height="10" rx="1" fill="#93c5fd"/>
-                        <circle cx="26" cy="45" r="7" fill="#1e293b"/>
-                        <circle cx="26" cy="45" r="3" fill="#cbd5e1"/>
-                        <circle cx="74" cy="45" r="7" fill="#1e293b"/>
-                        <circle cx="74" cy="45" r="3" fill="#cbd5e1"/>
-                    </svg>
+                    <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=150" class="img-thumb" alt="Toca-toca">
                     <span>Toca-toca</span>
                 </div>
 
-                <!-- 4. Voos (Com avião e nuvens original) -->
-                <div class="service-card" onclick="abrirModalVisual('voos')">
+                <!-- 4. Voos (Com imagem real clássica) -->
+                <div class="service-card" onclick="abrirModalVoos()">
                     <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=150" class="img-thumb" alt="Voos">
                     <span>Voos</span>
                 </div>
@@ -634,7 +606,7 @@
     </div>
 </div>
 
-<!-- MODAL VISUAL DE SERVIÇOS -->
+<!-- MODAL VISUAL DE SERVIÇOS GERAIS (TÁXI, ALUGUER, TOCA-TOCA, ETC.) -->
 <div id="mediaModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
     <div style="background:#ffffff; width:100%; max-width:380px; padding:18px; border-radius:20px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:left; box-sizing:border-box; margin:auto; max-height:92vh; overflow-y:auto;">
         
@@ -660,15 +632,89 @@
 
         <div style="margin-bottom:8px;">
             <label style="font-size:10px; font-weight:bold; color:#333; display:block; margin-bottom:2px;">Método de Pagamento:</label>
-            <select id="mediaPayment" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+            <select id="mediaPayment" onchange="alternarCamposMediaModal()" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
                 <option value="Mobile Money (Orange/Telecel)">Mobile Money (Orange / Telecel)</option>
                 <option value="Cartão de Débito / Crédito">Cartão de Débito / Crédito</option>
                 <option value="Dinheiro (Cash)">Dinheiro (Cash)</option>
             </select>
         </div>
 
+        <div id="campoMobileMedia" style="margin-bottom:8px;">
+            <input type="text" id="mediaPayPhone" placeholder="Número da Conta Orange / Telecel (+245...)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+        </div>
+
+        <div id="camposCartaoMedia" style="display:none; margin-bottom:8px;">
+            <input type="text" id="mediaCardNum" maxlength="16" placeholder="Número do Cartão (16 dígitos)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9; margin-bottom:4px;">
+            <input type="password" id="mediaCardCvv" maxlength="3" placeholder="CVV (3 dígitos)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+        </div>
+
         <button onclick="confirmarMediaModal()" style="width:100%; background:#111; color:#00e676; border:none; padding:11px; border-radius:10px; font-weight:bold; cursor:pointer; font-size:13px; margin-bottom:6px;">Confirmar & Pagar</button>
         <button onclick="fecharMediaModal()" style="width:100%; background:#f1f1f1; color:#333; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:11px;">Cancelar</button>
+    </div>
+</div>
+
+<!-- MODAL DE VOOS (COMPLETO COM IDA/VOLTA, COMPANHIA E GUICHÊ AEROPORTO) -->
+<div id="voosModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+    <div style="background:#ffffff; width:100%; max-width:380px; padding:18px; border-radius:20px; box-shadow:0 10px 25px rgba(0,0,0,0.3); text-align:left; box-sizing:border-box; margin:auto; max-height:92vh; overflow-y:auto;">
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:8px;">
+            <h3 style="color:#111; font-size:15px; font-weight:bold;">Voos Internacionais & Regionais</h3>
+            <button onclick="fecharModalVoos()" style="background:none; border:none; font-size:18px; cursor:pointer; font-weight:bold; color:#666;">✕</button>
+        </div>
+
+        <div style="margin-bottom:10px; text-align:center;">
+            <img id="voosImage" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400" alt="Voo" style="width:100%; height:130px; border-radius:10px; object-fit:cover; margin-bottom:6px;">
+            <div id="voosCaption" style="font-size:11px; font-weight:bold; color:#111; margin-bottom:2px;">TAP Air Portugal (Bissau -> Lisboa) — 350.000 XOF</div>
+            <div id="voosPhone" style="font-size:11px; color:#00b0ff; font-weight:bold; margin-bottom:6px;">Guichê Osvaldo Vieira: +245 955 100 200</div>
+            
+            <div style="display:flex; gap:6px; justify-content:center; margin-bottom:8px;">
+                <button type="button" onclick="mudarVooItem(-1)" style="background:#333; color:#fff; border:none; padding:5px 12px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">◀ Anterior</button>
+                <button type="button" onclick="mudarVooItem(1)" style="background:#333; color:#fff; border:none; padding:5px 12px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">Seguinte ▶</button>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <select id="vooTipo" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+                <option value="Ida e Volta">Ida e Volta</option>
+                <option value="Só Ida">Só Ida</option>
+            </select>
+            <select id="vooPassageiros" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+                <option value="1 Pass.">1 Passageiro</option>
+                <option value="2 Pass.">2 Passageiros</option>
+                <option value="3 Pass.">3 Passageiros</option>
+                <option value="4+ Pass.">4+ Passageiros</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom:8px;">
+            <input type="text" value="Bissau (OXB)" readonly style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#eaeaea; color:#333; margin-bottom:4px;">
+            <input type="text" id="vooDestinoInput" placeholder="Destino (Ex: Lisboa, Dakar, Casablanca...)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+        </div>
+
+        <div style="margin-bottom:8px;">
+            <input type="text" id="vooDetalhes" placeholder="Detalhes adicionais do bilhete ou passageiro..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+        </div>
+
+        <div style="margin-bottom:8px;">
+            <label style="font-size:10px; font-weight:bold; color:#333; display:block; margin-bottom:2px;">Método de Pagamento:</label>
+            <select id="vooPayment" onchange="alternarCamposVoo()" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+                <option value="Mobile Money (Orange/Telecel)">Mobile Money (Orange / Telecel)</option>
+                <option value="Cartão de Débito / Crédito">Cartão de Débito / Crédito</option>
+                <option value="Dinheiro (Cash)">Dinheiro (Cash)</option>
+            </select>
+        </div>
+
+        <div id="campoMobileVoo" style="margin-bottom:8px;">
+            <input type="text" id="vooPayPhone" placeholder="Número da Conta Orange / Telecel (+245...)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+        </div>
+
+        <div id="camposCartaoVoo" style="display:none; margin-bottom:8px;">
+            <input type="text" id="vooCardNum" maxlength="16" placeholder="Número do Cartão (16 dígitos)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9; margin-bottom:4px;">
+            <input type="password" id="vooCardCvv" maxlength="3" placeholder="CVV (3 dígitos)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; font-size:11px; background:#f9f9f9;">
+        </div>
+
+        <button onclick="confirmarReservaVoo()" style="width:100%; background:#111; color:#00e676; border:none; padding:11px; border-radius:10px; font-weight:bold; cursor:pointer; font-size:13px; margin-bottom:6px;">Confirmar & Pagar Bilhete</button>
+        <button onclick="fecharModalVoos()" style="width:100%; background:#f1f1f1; color:#333; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:11px;">Cancelar</button>
     </div>
 </div>
 
@@ -681,35 +727,40 @@
     let currentRecargaOperadora = '';
 
     const datasets = {
+        'taxi': [
+            { img: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400", text: "Táxi Oficial ROTA GB (Centro -> Aeroporto) — 700 XOF", phone: "Central Táxis Bissau: +245 955 111 222" },
+            { img: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=400", text: "Mercedes 190 (Táxi Urbano Bissau) — 225 XOF", phone: "Central Táxis Bissau: +245 955 111 222" }
+        ],
+        'aluguer': [
+            { img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400", text: "Carro Urbano Económico (Sem Motorista) — 25.000 XOF/dia", phone: "Reservas: +245 966 777 888" },
+            { img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400", text: "Jeep 4x4 Todo-o-Terreno (Com Motorista) — 45.000 XOF/dia", phone: "Reservas: +245 966 777 888" }
+        ],
+        'tocatoca': [
+            { img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400", text: "Toca-toca Linha Bissau -> Safim — 350 XOF", phone: "Terminal TUB: +245 955 444 333" },
+            { img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=400", text: "Autocarro Expresso Bissau -> Gabu — 5.000 XOF", phone: "Terminal TUB: +245 955 444 333" }
+        ],
         'mercado': [
             { img: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=400", text: "Mercado Santy Comercial — Produtos Diversos & Mercearia Geral", phone: "+245 955 100 200" },
-            { img: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400", text: "Supermercado Darling — Alimentação, Bebidas e Utilidades", phone: "+245 966 200 300" },
-            { img: "https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=400", text: "Supermercado Alvalade — Produtos Frescos, Congelados e Mercearia", phone: "+245 955 444 555" },
-            { img: "https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=400", text: "Supermercado Hereso — Arroz, Óleo e Bens de Primeira Necessidade", phone: "+245 955 000 004" }
+            { img: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400", text: "Supermercado Darling — Alimentação, Bebidas e Utilidades", phone: "+245 966 200 300" }
         ],
         'comida': [
             { img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400", text: "A Padeira Africana — Galinha Cafriela e Pratos Locais", phone: "+245 966 131 393" },
-            { img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400", text: "Papa Loca Bissau — Hambúrgueres Artesanais & Pizzas", phone: "+245 955 689 222" },
-            { img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400", text: "Restaurante Coqueiros — Peixe Grelhado & Frutos do Mar", phone: "+245 955 400 300" },
-            { img: "https://images.unsplash.com/photo-1551782450-17144efb9c50?w=400", text: "Le Bled Bissau — Gastronomia Internacional & Snacks", phone: "+245 966 210 100" }
+            { img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400", text: "Papa Loca Bissau — Hambúrgueres Artesanais & Pizzas", phone: "+245 955 689 222" }
         ],
         'farmacia': [
-            { img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400", text: "Farmácia Central Bissau — Urgência 24h & Medicamentos", phone: "+245 955 555 112" },
-            { img: "https://images.unsplash.com/photo-1576602976047-174e57a47881?w=400", text: "Farmácia Bandim — Medicamentos e Primeiros Socorros", phone: "+245 966 888 999" }
+            { img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400", text: "Farmácia Central Bissau — Urgência 24h & Medicamentos", phone: "+245 955 555 112" }
         ],
         'conveniencia': [
             { img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400", text: "Convenience Store Bissau — Bebidas, Gelo & Artigos Rápidos", phone: "+245 955 333 222" }
-        ],
-        'aluguer': [
-            { img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400", text: "Aluguer de Carros Bissau — Viagens Confortáveis", phone: "+245 955 112 233" }
-        ],
-        'voos': [
-            { img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400", text: "Voos Internacionais & Regionais — Aeroporto Osvaldo Vieira", phone: "+245 955 999 888" }
-        ],
-        'tocatoca': [
-            { img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400", text: "Toca-toca Rota Urbana — Transporte Coletivo Bissau", phone: "+245 966 777 888" }
         ]
     };
+
+    const voosDatasets = [
+        { img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400", text: "TAP Air Portugal (Bissau -> Lisboa) — 350.000 XOF", phone: "Guichê Osvaldo Vieira: +245 955 100 200" },
+        { img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", text: "Royal Air Maroc (Bissau -> Casablanca) — 280.000 XOF", phone: "Guichê Osvaldo Vieira: +245 955 100 200" },
+        { img: "https://images.unsplash.com/photo-1500835556837-99ac94a94552?w=400", text: "ASKY Airlines (Bissau -> Dakar / Lome) — 195.000 XOF", phone: "Guichê Osvaldo Vieira: +245 955 100 200" }
+    ];
+    let currentVooIndex = 0;
 
     function setRole(role) {
         let btnP = document.getElementById('btn-passageiro');
@@ -993,13 +1044,13 @@
         currentModalType = tipo;
         currentIndex = 0;
         let titles = {
+            'taxi': 'Trip / Táxi & Moto ROTA GB',
+            'aluguer': 'Aluguer de Carros em Bissau',
+            'tocatoca': 'Toca-toca & Transportes do Interior',
             'mercado': 'Mercados & Lojas em Bissau',
             'comida': 'Restaurantes & Comida em Bissau',
             'farmacia': 'Farmácias em Bissau',
-            'conveniencia': 'Lojas de Conveniência',
-            'aluguer': 'Aluguer de Carros',
-            'tocatoca': 'Toca-toca & Transportes',
-            'voos': 'Voos'
+            'conveniencia': 'Lojas de Conveniência'
         };
 
         document.getElementById('mediaModalTitle').innerText = titles[tipo] || 'ROTA GB Service';
@@ -1031,15 +1082,15 @@
     }
 
     function atualizarModalMedia() {
-        let dataset = datasets[currentModalType] || datasets['mercado'];
+        let dataset = datasets[currentModalType] || datasets['taxi'];
         let item = dataset[currentIndex];
         document.getElementById('mediaImage').src = item.img;
         document.getElementById('mediaCaption').innerText = item.text;
-        document.getElementById('mediaPhone').innerText = "Contacto: " + item.phone;
+        document.getElementById('mediaPhone').innerText = item.phone;
     }
 
     function mudarMediaItem(dir) {
-        let dataset = datasets[currentModalType] || datasets['mercado'];
+        let dataset = datasets[currentModalType] || datasets['taxi'];
         currentIndex += dir;
         if (currentIndex < 0) currentIndex = dataset.length - 1;
         if (currentIndex >= dataset.length) currentIndex = 0;
@@ -1050,9 +1101,83 @@
         document.getElementById('mediaModal').style.display = 'none';
     }
 
+    function alternarCamposMediaModal() {
+        let metodo = document.getElementById('mediaPayment').value;
+        let campoMobile = document.getElementById('campoMobileMedia');
+        let camposCartao = document.getElementById('camposCartaoMedia');
+
+        if (metodo === 'Cartão de Débito / Crédito') {
+            campoMobile.style.display = 'none';
+            camposCartao.style.display = 'block';
+        } else if (metodo === 'Dinheiro (Cash)') {
+            campoMobile.style.display = 'none';
+            camposCartao.style.display = 'none';
+        } else {
+            campoMobile.style.display = 'block';
+            camposCartao.style.display = 'none';
+        }
+    }
+
     function confirmarMediaModal() {
-        alert("Pedido efetuado com sucesso!");
+        alert("Serviço confirmado e pago com sucesso!");
         fecharMediaModal();
+    }
+
+    // Funções para o Modal de Voos
+    function abrirModalVoos() {
+        currentVooIndex = 0;
+        atualizarModalVoos();
+        document.getElementById('voosModal').style.display = 'flex';
+    }
+
+    function fecharModalVoos() {
+        document.getElementById('voosModal').style.display = 'none';
+    }
+
+    function atualizarModalVoos() {
+        let item = voosDatasets[currentVooIndex];
+        document.getElementById('voosImage').src = item.img;
+        document.getElementById('voosCaption').innerText = item.text;
+        document.getElementById('voosPhone').innerText = item.phone;
+    }
+
+    function mudarVooItem(dir) {
+        currentVooIndex += dir;
+        if (currentVooIndex < 0) currentVooIndex = voosDatasets.length - 1;
+        if (currentVooIndex >= voosDatasets.length) currentVooIndex = 0;
+        atualizarModalVoos();
+    }
+
+    function alternarCamposVoo() {
+        let metodo = document.getElementById('vooPayment').value;
+        let campoMobile = document.getElementById('campoMobileVoo');
+        let camposCartao = document.getElementById('camposCartaoVoo');
+
+        if (metodo === 'Cartão de Débito / Crédito') {
+            campoMobile.style.display = 'none';
+            camposCartao.style.display = 'block';
+        } else if (metodo === 'Dinheiro (Cash)') {
+            campoMobile.style.display = 'none';
+            camposCartao.style.display = 'none';
+        } else {
+            campoMobile.style.display = 'block';
+            camposCartao.style.display = 'none';
+        }
+    }
+
+    function confirmarReservaVoo() {
+        let destino = document.getElementById('vooDestinoInput').value;
+        let tipo = document.getElementById('vooTipo').value;
+        let pass = document.getElementById('vooPassageiros').value;
+        let pagamento = document.getElementById('vooPayment').value;
+
+        if (!destino) {
+            alert("Por favor, indique o destino do voo.");
+            return;
+        }
+
+        alert("Reserva de Voo (" + tipo + " - " + pass + ") para " + destino + " confirmada com sucesso via " + pagamento + "!\nPode levantar o seu bilhete físico no Guichê ROTA GB no Aeroporto Osvaldo Vieira.");
+        fecharModalVoos();
     }
 
     function alternarCamposPagamentoCorrida() {
