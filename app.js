@@ -105,43 +105,52 @@ async function confirmarLocalizacao(event) {
         alert(`Localização registada com sucesso: ${lat}, ${lng}`);
     }
 }
-let markerCarro;
+let markerCarro = null;
 
-// Função para iniciar o carro em movimento no mapa
+// Função para iniciar e mover o carro da ROTA GB Express em tempo real
 function iniciarCarroRotaGB() {
     if (!mapa) return;
 
-    // Criar um ícone personalizado com o carro e emoji
+    // Remove o carro antigo se já existir para evitar duplicados estáticos
+    if (markerCarro) {
+        mapa.removeLayer(markerCarro);
+    }
+
+    // Criar o ícone personalizado do carro
     const carroIcon = L.divIcon({
         className: 'carro-animado',
-        html: '<div style="background-color: white; padding: 6px 10px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 5px;">🚗 <span>ROTA GB Express</span></div>',
-        iconSize: [140, 40],
-        iconAnchor: [70, 20]
+        html: '<div style="background-color: white; padding: 6px 12px; border-radius: 20px; box-shadow: 0 3px 8px rgba(0,0,0,0.3); font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px; border: 1px solid #ddd;">🚗 <span>ROTA GB Express</span></div>',
+        iconSize: [150, 40],
+        iconAnchor: [75, 20]
     });
 
-    // Ponto de partida (Ex: Centro / Bairro Militar) e destino (Ex: Aeroporto)
-    let latAtual = 11.8631;
-    let lngAtual = -15.5984;
+    // Ponto de partida inicial (perto da Estrada N1A / Centro)
+    let latBase = 11.8631;
+    let lngBase = -15.5984;
 
-    markerCarro = L.marker([latAtual, lngAtual], { icon: carroIcon }).addTo(mapa);
+    markerCarro = L.marker([latBase, lngBase], { icon: carroIcon }).addTo(mapa);
 
-    // Simulação de movimento suave pelas ruas de Bissau a cada 2 segundos
-    let passos = 0;
+    // Variável de movimento contínuo
+    let t = 0;
+    
+    // Atualiza a posição do carro a cada 2 segundos de forma fluida
     setInterval(() => {
-        passos += 0.0005;
-        // Move o carro ligeiramente em direção ao aeroporto / periferia
-        let novaLat = 11.8631 + (Math.sin(passos) * 0.005);
-        let novaLng = -15.5984 + (Math.cos(passos) * 0.005);
+        t += 0.08;
+        // Calcula uma rota dinâmica em círculo/elipse pelas ruas de Bissau
+        let novaLat = latBase + (Math.sin(t) * 0.0035);
+        let novaLng = lngBase + (Math.cos(t) * 0.0035);
 
-        markerCarro.setLatLng([novaLat, novaLng]);
-    }, 2500);
+        if (markerCarro) {
+            markerCarro.setLatLng([novaLat, novaLng]);
+        }
+    }, 2000);
 }
 
-// Chamar esta função logo após o mapa carregar com sucesso
+// Inicia o carro assim que o mapa estiver totalmente pronto
 window.addEventListener("load", function() {
     setTimeout(() => {
-        if (mapa) {
+        if (typeof mapa !== "undefined" && mapa) {
             iniciarCarroRotaGB();
         }
-    }, 1000);
+    }, 1200);
 });
