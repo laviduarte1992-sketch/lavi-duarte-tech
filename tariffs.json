@@ -1,0 +1,54 @@
+{
+  "version": "2023.1-DGVTT",
+  "currency": "XOF",
+  "tariffs": [
+    {
+      "route_id": "CID-BAN",
+      "origin": "Cidade",
+      "destination": "Mercado de Bandim",
+      "price": 225
+    },
+    {
+      "route_id": "CID-STL",
+      "origin": "Cidade",
+      "destination": "Santa Luzia (Igreja Catolica)",
+      "price": 250
+    },
+    {
+      "route_id": "CID-MIL",
+      "origin": "Cidade",
+      "destination": "Bairro Militar (Predio Nino)",
+      "price": 375
+    },
+    {
+      "route_id": "CID-AIR",
+      "origin": "Cidade",
+      "destination": "Aeroporto",
+      "price": 650
+    },
+    {
+      "route_id": "CID-SAF",
+      "origin": "Cidade",
+      "destination": "Safim",
+      "price": 800
+    },
+    {
+      "route_id": "BAN-SOB",
+      "origin": "Mercado Bandim",
+      "destination": "Sobrade",
+      "price": 300
+    },
+    {
+      "route_id": "SAF-CID",
+      "origin": "Safim",
+      "destination": "Centro Cidade",
+      "price": 950
+    },
+    {
+      "route_id": "ANT-GUI",
+      "origin": "Antula (P. Ant. Combatentes)",
+      "destination": "Guimetal",
+      "price": 350
+    }
+  ]
+}
