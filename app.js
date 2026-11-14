@@ -90,7 +90,7 @@ async function confirmarLocalizacao(event) {
         return;
     }
 
-    const centroAtual = mapa.getCenter();
+    const centroAtual = mapa.getCenter(); 
     const lat = centroAtual.lat.toFixed(5);
     const lng = centroAtual.lng.toFixed(5);
 
