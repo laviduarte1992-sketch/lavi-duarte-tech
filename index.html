@@ -215,14 +215,21 @@
         </div>
     </div>
 
-    <!-- MAPA COM CARRO ROTA GB EXPRESS EM MOVIMENTO -->
-    <div class="map-area" id="mapSection">
-        <div class="status-pill"><div class="dot-green"></div> GPS Bissau Ativo</div>
-        <div class="map-road-h"></div>
-        <div class="map-road-v"></div>
-        <div class="map-car-tag" id="movingCar">🚗 ROTA GB Express</div>
-        <div class="user-pin"></div>
+  <!-- MAPA COM CARRO ROTA GB EXPRESS EM MOVIMENTO -->
+<div class="map-area" id="mapSection" style="position: relative; width: 100%; height: 500px;">
+    <!-- Onde o Google Maps será carregado -->
+    <div id="map" style="width: 100%; height: 100%;"></div>
+    
+    <!-- O Marcador (Pin) Fixo no Centro do Ecrã -->
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -100%); pointer-events: none; z-index: 10;">
+        <span style="font-size: 40px; color: red;">📍</span>
     </div>
+
+    <!-- Botão de Confirmação de Destino -->
+    <button onclick="confirmarLocalizacao()" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; z-index: 10;">
+        Confirmar Esta Localização
+    </button>
+</div>
 
     <!-- PAINEL PRINCIPAL DINÂMICO (CLIENTE / MOTORISTA) -->
     <div class="bottom-panel" id="panel-cliente">
