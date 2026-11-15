@@ -56,6 +56,48 @@ async function consultarPrecoOficial(origem, destino) {
         return null;
     }
 }
+// Função unificada para atualizar os preços de todas as categorias para QUALQUER zona
+async function atualizarPrecosParaTodasAsZonas(origem, destino) {
+    // Consulta o preço base oficial do tariffs.json através da função que já existe
+    const precoBase = await consultarPrecoOficial(origem, destino);
+
+    if (!precoBase) return; // Se não encontrar, sai para evitar erros
+
+    // Aplica as fórmulas de cálculo automático e comissão para cada tipo de transporte
+    const valorTaxi = Math.round(precoBase * 2);       // Ex: Base x 2
+    const valorPrivado = Math.round(precoBase * 2.6);  // Ex: Base x 2.6
+    const valorMoto = Math.round(precoBase * 1.4);     // Ex: Base x 1.4
+
+    // Atualiza os cartões visuais em baixo na interface do cliente
+    const elTaxi = document.getElementById("precoTaxi");
+    const elPrivado = document.getElementById("precoPrivado");
+    const elMoto = document.getElementById("precoMoto");
+
+    if (elTaxi) elTaxi.innerText = `${valorTaxi} XOF`;
+    if (elPrivado) elPrivado.innerText = `${valorPrivado} XOF`;
+    if (elMoto) elMoto.innerText = `${valorMoto} XOF`;
+}
+
+// Liga automaticamente ao evento de mudança de zona no menu
+document.addEventListener("DOMContentLoaded", function() {
+    const selectRota = document.getElementById("rotaSelect");
+    
+    if (selectRota) {
+        selectRota.addEventListener("change", async function() {
+            const valorSelecionado = this.value; // ou o texto, dependendo de como estruturou as options
+            
+            // Exemplo assumindo que o valor ou texto contém a rota (ex: "Cidade" e o destino)
+            // Se o seu select tiver o formato "Origem -> Destino", podemos extrair assim:
+            const partes = this.options[this.selectedIndex].text.split("→");
+            if (partes.length === 2) {
+                const origem = partes[0].trim();
+                const destinoLimpo = partes[1].split("(")[0].trim(); // Remove o "(250 XOF)" do texto
+                
+                await atualizarPrecosParaTodasAsZonas(origem, destinoLimpo);
+            }
+        });
+    }
+});
 
 // Inicializa o mapa e ativa o botão de forma garantida
 document.addEventListener("DOMContentLoaded", function() {
