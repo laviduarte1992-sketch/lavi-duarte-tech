@@ -197,36 +197,30 @@ window.addEventListener("load", function() {
         }
     }, 1200);
 });
-// --- ROTA GB EXPRESS: ATUALIZAÇÃO AUTOMÁTICA DE PREÇOS COM COMISSÃO ---
 function updatePrice() {
     const select = document.getElementById("routeSelect");
     if (!select) return;
 
-    // Obtém o valor base diretamente da opção selecionada (ex: 250, 575, etc.)
+    // Obtém o valor numérico exato do value da option selecionada (ex: 225, 250, 425, 575...)
     const base = parseFloat(select.value) || 225;
 
-    // Fórmulas de cálculo automático (Tarifa base + retenção proporcional da comissão)
-    const valorTaxi = Math.round(base * 2);       // Táxi Oficial: O dobro exato (ex: 250 -> 500 | 575 -> 1150)
+    // Fórmulas de cálculo automático (Inclui o preço base + comissão ROTA GB Express)
+    const valorTaxi = Math.round(base * 2);       // Táxi Oficial: O dobro exato (ex: 250 -> 500, 425 -> 850)
     const valorPrivado = Math.round(base * 2.6);  // Carro Privado
     const valorMoto = Math.round(base * 1.4);     // Moto-Táxi
 
-    // Atualiza os cartões visuais em baixo (com suporte para múltiplos IDs possíveis)
-    const elTaxi = document.getElementById("precoTaxi") || document.getElementById("taxiPrice");
-    const elPrivado = document.getElementById("precoPrivado") || document.getElementById("privatePrice");
-    const elMoto = document.getElementById("precoMoto") || document.getElementById("motoPrice");
+    // Atualiza os elementos visuais nos cartões inferiores
+    // (Procura pelos IDs mais comuns para garantir que acerta no seu HTML)
+    const elTaxi = document.getElementById("precoTaxi") || document.getElementById("taxiPrice") || document.querySelector(".taxi-price");
+    const elPrivado = document.getElementById("precoPrivado") || document.getElementById("privatePrice") || document.querySelector(".private-price");
+    const elMoto = document.getElementById("precoMoto") || document.getElementById("motoPrice") || document.querySelector(".moto-price");
 
     if (elTaxi) elTaxi.innerText = `${valorTaxi} XOF`;
     if (elPrivado) elPrivado.innerText = `${valorPrivado} XOF`;
     if (elMoto) elMoto.innerText = `${valorMoto} XOF`;
 }
 
-// Garante que os preços são calculados logo ao abrir a página
+// Executa assim que a página carrega para preencher os preços iniciais
 document.addEventListener("DOMContentLoaded", function() {
     updatePrice();
-    
-    // Vincula também por segurança caso o onchange do HTML falhe
-    const select = document.getElementById("routeSelect");
-    if (select) {
-        select.addEventListener("change", updatePrice);
-    }
 });
