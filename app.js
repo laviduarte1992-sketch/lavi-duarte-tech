@@ -197,3 +197,36 @@ window.addEventListener("load", function() {
         }
     }, 1200);
 });
+// --- ROTA GB EXPRESS: ATUALIZAÇÃO AUTOMÁTICA DE PREÇOS COM COMISSÃO ---
+function updatePrice() {
+    const select = document.getElementById("routeSelect");
+    if (!select) return;
+
+    // Obtém o valor base diretamente da opção selecionada (ex: 250, 575, etc.)
+    const base = parseFloat(select.value) || 225;
+
+    // Fórmulas de cálculo automático (Tarifa base + retenção proporcional da comissão)
+    const valorTaxi = Math.round(base * 2);       // Táxi Oficial: O dobro exato (ex: 250 -> 500 | 575 -> 1150)
+    const valorPrivado = Math.round(base * 2.6);  // Carro Privado
+    const valorMoto = Math.round(base * 1.4);     // Moto-Táxi
+
+    // Atualiza os cartões visuais em baixo (com suporte para múltiplos IDs possíveis)
+    const elTaxi = document.getElementById("precoTaxi") || document.getElementById("taxiPrice");
+    const elPrivado = document.getElementById("precoPrivado") || document.getElementById("privatePrice");
+    const elMoto = document.getElementById("precoMoto") || document.getElementById("motoPrice");
+
+    if (elTaxi) elTaxi.innerText = `${valorTaxi} XOF`;
+    if (elPrivado) elPrivado.innerText = `${valorPrivado} XOF`;
+    if (elMoto) elMoto.innerText = `${valorMoto} XOF`;
+}
+
+// Garante que os preços são calculados logo ao abrir a página
+document.addEventListener("DOMContentLoaded", function() {
+    updatePrice();
+    
+    // Vincula também por segurança caso o onchange do HTML falhe
+    const select = document.getElementById("routeSelect");
+    if (select) {
+        select.addEventListener("change", updatePrice);
+    }
+});
