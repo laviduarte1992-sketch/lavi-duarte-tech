@@ -201,26 +201,32 @@ function updatePrice() {
     const select = document.getElementById("routeSelect");
     if (!select) return;
 
-    // Obtém o valor numérico exato do value da option selecionada (ex: 225, 250, 425, 575...)
+    // Obtém o valor numérico exato da zona selecionada no menu superior
     const base = parseFloat(select.value) || 225;
 
-    // Fórmulas de cálculo automático (Inclui o preço base + comissão ROTA GB Express)
-    const valorTaxi = Math.round(base * 2);       // Táxi Oficial: O dobro exato (ex: 250 -> 500, 425 -> 850)
+    // Fórmulas de cálculo automático (Tarifa base + comissão ROTA GB Express)
+    const valorTaxi = Math.round(base * 2);       // Táxi Oficial: O dobro exato
     const valorPrivado = Math.round(base * 2.6);  // Carro Privado
     const valorMoto = Math.round(base * 1.4);     // Moto-Táxi
 
-    // Atualiza os elementos visuais nos cartões inferiores
-    // (Procura pelos IDs mais comuns para garantir que acerta no seu HTML)
-    const elTaxi = document.getElementById("precoTaxi") || document.getElementById("taxiPrice") || document.querySelector(".taxi-price");
-    const elPrivado = document.getElementById("precoPrivado") || document.getElementById("privatePrice") || document.querySelector(".private-price");
-    const elMoto = document.getElementById("precoMoto") || document.getElementById("motoPrice") || document.querySelector(".moto-price");
+    // Procura os elementos por ID (se existirem) ou apanha automaticamente 
+    // os três primeiros blocos de preço na página
+    const todosOsPrecos = document.querySelectorAll(".price, span[id*='preco'], div[id*='preco']");
+    
+    const elTaxi = document.getElementById("precoTaxi") || todosOsPrecos[0];
+    const elPrivado = document.getElementById("precoPrivado") || todosOsPrecos[1];
+    const elMoto = document.getElementById("precoMoto") || todosOsPrecos[2];
 
     if (elTaxi) elTaxi.innerText = `${valorTaxi} XOF`;
     if (elPrivado) elPrivado.innerText = `${valorPrivado} XOF`;
     if (elMoto) elMoto.innerText = `${valorMoto} XOF`;
 }
 
-// Executa assim que a página carrega para preencher os preços iniciais
+// Garante que os preços calculam ao carregar e ao mudar de zona
 document.addEventListener("DOMContentLoaded", function() {
     updatePrice();
+    const select = document.getElementById("routeSelect");
+    if (select) {
+        select.addEventListener("change", updatePrice);
+    }
 });
