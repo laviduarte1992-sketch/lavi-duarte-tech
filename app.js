@@ -56,19 +56,21 @@ async function consultarPrecoOficial(origem, destino) {
         return null;
     }
 }
-// Função unificada para atualizar os preços de todas as categorias para QUALQUER zona
-async function atualizarPrecosParaTodasAsZonas(origem, destino) {
-    // Consulta o preço base oficial do tariffs.json através da função que já existe
-    const precoBase = await consultarPrecoOficial(origem, destino);
+// Função definitiva de cálculo automático para todas as zonas de Bissau
+function atualizarPrecosViagemAutomatico(precoBase) {
+    const base = parseFloat(precoBase) || 225;
 
-    if (!precoBase) return; // Se não encontrar, sai para evitar erros
+    // Regras exatas solicitadas:
+    // 1. Táxi Oficial: O dobro da tarifa base (ex: 750 * 2 = 1500 XOF, ou o valor pretendido)
+    const valorTaxi = Math.round(base * 2);       
+    
+    // 2. Carro Privado: Ajuste proporcional com comissão (ex: base * 1.3 ou conforme a sua tabela)
+    const valorPrivado = Math.round(base * 1.3);  
+    
+    // 3. Moto-Táxi: Ajuste económico proporcional (ex: base * 0.7 ou conforme a sua tabela)
+    const valorMoto = Math.round(base * 0.7);     
 
-    // Aplica as fórmulas de cálculo automático e comissão para cada tipo de transporte
-    const valorTaxi = Math.round(precoBase * 2);       // Ex: Base x 2
-    const valorPrivado = Math.round(precoBase * 2.6);  // Ex: Base x 2.6
-    const valorMoto = Math.round(precoBase * 1.4);     // Ex: Base x 1.4
-
-    // Atualiza os cartões visuais em baixo na interface do cliente
+    // Atualiza os elementos visuais nos cartões inferiores
     const elTaxi = document.getElementById("precoTaxi");
     const elPrivado = document.getElementById("precoPrivado");
     const elMoto = document.getElementById("precoMoto");
@@ -78,22 +80,17 @@ async function atualizarPrecosParaTodasAsZonas(origem, destino) {
     if (elMoto) elMoto.innerText = `${valorMoto} XOF`;
 }
 
-// Liga automaticamente ao evento de mudança de zona no menu
+// Escuta a mudança de qualquer zona no menu superior
 document.addEventListener("DOMContentLoaded", function() {
     const selectRota = document.getElementById("rotaSelect");
     
     if (selectRota) {
-        selectRota.addEventListener("change", async function() {
-            const valorSelecionado = this.value; // ou o texto, dependendo de como estruturou as options
+        selectRota.addEventListener("change", function() {
+            const textoOpcao = this.options[this.selectedIndex].text;
+            const match = textoOpcao.match(/\((\d+)\s*XOF\)/i);
             
-            // Exemplo assumindo que o valor ou texto contém a rota (ex: "Cidade" e o destino)
-            // Se o seu select tiver o formato "Origem -> Destino", podemos extrair assim:
-            const partes = this.options[this.selectedIndex].text.split("→");
-            if (partes.length === 2) {
-                const origem = partes[0].trim();
-                const destinoLimpo = partes[1].split("(")[0].trim(); // Remove o "(250 XOF)" do texto
-                
-                await atualizarPrecosParaTodasAsZonas(origem, destinoLimpo);
+            if (match && match[1]) {
+                atualizarPrecosViagemAutomatico(match[1]);
             }
         });
     }
