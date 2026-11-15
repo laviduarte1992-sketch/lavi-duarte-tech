@@ -56,21 +56,17 @@ async function consultarPrecoOficial(origem, destino) {
         return null;
     }
 }
-// Função definitiva de cálculo automático para todas as zonas de Bissau
+// Função definitiva e corrigida para atualizar os preços em todas as zonas de Bissau
 function atualizarPrecosViagemAutomatico(precoBase) {
     const base = parseFloat(precoBase) || 225;
 
-    // Regras exatas solicitadas:
-    // 1. Táxi Oficial: O dobro da tarifa base (ex: 750 * 2 = 1500 XOF, ou o valor pretendido)
-    const valorTaxi = Math.round(base * 2);       
-    
-    // 2. Carro Privado: Ajuste proporcional com comissão (ex: base * 1.3 ou conforme a sua tabela)
-    const valorPrivado = Math.round(base * 1.3);  
-    
-    // 3. Moto-Táxi: Ajuste económico proporcional (ex: base * 0.7 ou conforme a sua tabela)
-    const valorMoto = Math.round(base * 0.7);     
+    // Fórmulas exatas de cálculo:
+    const valorTaxi = base * 2;        // Ex: 250 -> 500 XOF (O dobro exato)
+    const valorPrivado = base * 2.6;   // Carro Privado
+    const valorMoto = base * 1.4;      // Moto-Táxi
 
-    // Atualiza os elementos visuais nos cartões inferiores
+    // Vamos procurar os elementos pelos IDs exatos. 
+    // Se o ID no seu HTML for diferente, atualizamos a seguir.
     const elTaxi = document.getElementById("precoTaxi");
     const elPrivado = document.getElementById("precoPrivado");
     const elMoto = document.getElementById("precoMoto");
@@ -80,11 +76,19 @@ function atualizarPrecosViagemAutomatico(precoBase) {
     if (elMoto) elMoto.innerText = `${valorMoto} XOF`;
 }
 
-// Escuta a mudança de qualquer zona no menu superior
+// Executa a leitura sempre que o cliente muda a zona no menu superior
 document.addEventListener("DOMContentLoaded", function() {
     const selectRota = document.getElementById("rotaSelect");
     
     if (selectRota) {
+        // Atualiza logo ao carregar a página com a primeira opção
+        const textoInicial = selectRota.options[selectRota.selectedIndex].text;
+        const matchInicial = textoInicial.match(/\((\d+)\s*XOF\)/i);
+        if (matchInicial && matchInicial[1]) {
+            atualizarPrecosViagemAutomatico(matchInicial[1]);
+        }
+
+        // Atualiza sempre que o cliente mudar de zona
         selectRota.addEventListener("change", function() {
             const textoOpcao = this.options[this.selectedIndex].text;
             const match = textoOpcao.match(/\((\d+)\s*XOF\)/i);
