@@ -317,19 +317,24 @@
                     </div>
 
                     <div class="service-options" style="display: flex; gap: 6px; margin: 8px 0;">
-                        <div class="service-card selected" id="card-taxi" style="height:auto; padding:8px;" onclick="selecionarTipoVeiculo('taxi')">
-                            <div class="service-title">🚕 Táxi Oficial</div>
-                            <div class="service-price" id="priceTaxi">225 XOF</div>
-                        </div>
-                        <div class="service-card" id="card-privado" style="height:auto; padding:8px;" onclick="selecionarTipoVeiculo('privado')">
-                            <div class="service-title">🚗 Carro Privado</div>
-                            <div class="service-price" id="pricePrivado">290 XOF</div>
-                        </div>
-                        <div class="service-card" id="card-moto" style="height:auto; padding:8px;" onclick="selecionarTipoVeiculo('moto')">
-                            <div class="service-title">🏍️ Moto-Táxi</div>
-                            <div class="service-price" id="priceMoto">160 XOF</div>
-                        </div>
-                    </div>
+    <!-- Cartão 1: Táxi Oficial (O dobro exato da base) -->
+    <div class="service-card" style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center;">
+        <div>🚕 Táxi Oficial</div>
+        <div id="precoTaxi" style="font-weight: bold; font-size: 16px;">225 XOF</div>
+    </div>
+
+    <!-- Cartão 2: Carro Privado -->
+    <div class="service-card" style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center;">
+        <div>🚗 Carro Privado</div>
+        <div id="precoPrivado" style="font-weight: bold; font-size: 16px;">293 XOF</div>
+    </div>
+
+    <!-- Cartão 3: Moto-Táxi -->
+    <div class="service-card" style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center;">
+        <div>🏍️ Moto-Táxi</div>
+        <div id="precoMoto" style="font-weight: bold; font-size: 16px;">158 XOF</div>
+    </div>
+</div>
 
                     <div class="form-group" style="margin-top: 6px;">
                         <label>FORMA DE PAGAMENTO DA VIAGEM (PAGO ANTES DE PEDIR)</label>
