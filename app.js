@@ -231,92 +231,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-let hotelAtual = null;
-let quartoAtual = null;
-
-// 1. Desenha a lista de todos os hotéis de Bissau
-function renderizarHoteis() {
-    const container = document.getElementById("listaHoteisContainer");
-    if (!container) return;
-
-    container.innerHTML = hoteisBissau.map(hotel => `
-        <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-            <img src="${hotel.imagemPrincipal}" alt="${hotel.nome}" style="width: 100%; height: 150px; object-fit: cover;">
-            <div style="padding: 12px;">
-                <h4 style="margin: 0 0 4px 0;">${hotel.nome}</h4>
-                <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">📍 ${hotel.zona}</p>
-                <button onclick="abrirQuartosHotel('${hotel.id}')" style="width: 100%; background: #111; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    Ver Quartos e Preços
-                </button>
-            </div>
-        </div>
-    `).join("");
-}
-
-// 2. Abre os quartos do hotel selecionado
-function abrirQuartosHotel(hotelId) {
-    hotelAtual = hoteisBissau.find(h => h.id === hotelId);
-    if (!hotelAtual) return;
-
-    quartoAtual = null;
-    document.getElementById("listaHoteisContainer").style.display = "none";
-    document.getElementById("detalhesHotelContainer").style.display = "block";
-    document.getElementById("btnVoltarHoteis").style.display = "inline-block";
-
-    document.getElementById("detalheHotelNome").innerText = hotelAtual.nome;
-    document.getElementById("detalheHotelZona").innerText = `📍 ${hotelAtual.zona} | 📞 ${hotelAtual.telefone}`;
-    document.getElementById("resumoQuartoEscolhido").innerText = "Selecione um quarto acima para continuar";
-
-    const quartosContainer = document.getElementById("listaQuartosContainer");
-    quartosContainer.innerHTML = hotelAtual.quartos.map((q, index) => `
-        <div class="cartao-quarto" onclick="escolherQuarto(${index}, this)" style="border: 2px solid #ddd; border-radius: 8px; padding: 10px; display: flex; gap: 10px; cursor: pointer; align-items: center;">
-            <img src="${q.img}" alt="${q.tipo}" style="width: 90px; height: 75px; object-fit: cover; border-radius: 6px;">
-            <div style="flex: 1;">
-                <h5 style="margin: 0 0 4px 0; font-size: 15px;">${q.tipo}</h5>
-                <p style="margin: 0 0 4px 0; font-size: 12px; color: #555;">${q.desc}</p>
-                <span style="font-weight: bold; color: #008751; font-size: 14px;">${q.preco.toLocaleString()} XOF / noite</span>
-            </div>
-        </div>
-    `).join("");
-}
-
-// 3. Seleciona o quarto e calcula o total
-function escolherQuarto(index, elemento) {
-    quartoAtual = hotelAtual.quartos[index];
-    document.querySelectorAll(".cartao-quarto").forEach(el => el.style.borderColor = "#ddd");
-    elemento.style.borderColor = "#008751";
-    atualizarTotalHotel();
-}
-
-function atualizarTotalHotel() {
-    if (!quartoAtual) return;
-    const noites = parseInt(document.getElementById("numNoites").value) || 1;
-    const total = quartoAtual.preco * noites;
-    document.getElementById("resumoQuartoEscolhido").innerText = `${quartoAtual.tipo} (${noites} noite(s)) — Total: ${total.toLocaleString()} XOF`;
-}
-
-// 4. Volta à lista principal de hotéis
-function voltarListaHoteis() {
-    document.getElementById("detalhesHotelContainer").style.display = "none";
-    document.getElementById("btnVoltarHoteis").style.display = "none";
-    document.getElementById("listaHoteisContainer").style.display = "flex";
-}
-
-// 5. Simula a confirmação e pagamento da reserva
-function finalizarReservaHotel() {
-    if (!quartoAtual) {
-        alert("Por favor, clique num quarto para o selecionar antes de pagar.");
-        return;
-    }
-    const noites = parseInt(document.getElementById("numNoites").value) || 1;
-    const total = quartoAtual.preco * noites;
-    const metodo = document.getElementById("pagamentoHotelMetodo").value;
-    alert(`Reserva efetuada com sucesso no ${hotelAtual.nome}!\nQuarto: ${quartoAtual.tipo}\nTotal Pago: ${total.toLocaleString()} XOF via ${metodo}`);
-    voltarListaHoteis();
-}
-
-// Inicia a lista de hotéis assim que a página carrega
-document.addEventListener("DOMContentLoaded", renderizarHoteis);
+// ==========================================
+// 1. BASE DE DADOS DOS HOTÉIS DE BISSAU
+// ==========================================
 const hoteisBissau = [
     {
         id: "ceiba",
@@ -384,3 +301,250 @@ const hoteisBissau = [
         ]
     }
 ];
+
+let mapa;
+let centroBissau = [11.8631, -15.5984];
+let hotelAtual = null;
+let quartoAtual = null;
+let markerCarro = null;
+
+// ==========================================
+// 2. FUNÇÕES DE TARIFAS E DGVTT
+// ==========================================
+async function consultarPrecoOficial(origem, destino) {
+    try {
+        const response = await fetch('tariffs.json');
+        const data = await response.json();
+        
+        const rotaEncontrada = data.tariffs.find(t => 
+            t.origin.toLowerCase() === origem.toLowerCase() && 
+            t.destination.toLowerCase() === destino.toLowerCase()
+        );
+
+        return rotaEncontrada ? rotaEncontrada.price : null;
+    } catch (error) {
+        console.error("Erro ao carregar as tarifas:", error);
+        return null;
+    }
+}
+
+function updatePrice() {
+    const select = document.getElementById("routeSelect") || document.getElementById("rotaSelect");
+    if (!select) return;
+
+    let base = 225;
+    const textoOpcao = select.options[select.selectedIndex].text;
+    const match = textoOpcao.match(/\((\d+)\s*XOF\)/i);
+    if (match && match[1]) {
+        base = parseFloat(match[1]);
+    } else {
+        base = parseFloat(select.value) || 225;
+    }
+
+    const valorTaxi = Math.round(base * 2);
+    const valorPrivado = Math.round(base * 2.6);
+    const valorMoto = Math.round(base * 1.4);
+
+    const elTaxi = document.getElementById("precoTaxi");
+    const elPrivado = document.getElementById("precoPrivado");
+    const elMoto = document.getElementById("precoMoto");
+
+    if (elTaxi) elTaxi.innerText = `${valorTaxi} XOF`;
+    if (elPrivado) elPrivado.innerText = `${valorPrivado} XOF`;
+    if (elMoto) elMoto.innerText = `${valorMoto} XOF`;
+}
+
+// ==========================================
+// 3. GESTÃO DO MODAL E HOTÉIS
+// ==========================================
+function abrirModalHoteis() {
+    const modal = document.getElementById("modalHoteis");
+    if (modal) modal.style.display = "block";
+    renderizarHoteis();
+}
+
+function fecharModalHoteis() {
+    const modal = document.getElementById("modalHoteis");
+    if (modal) modal.style.display = "none";
+}
+
+function renderizarHoteis() {
+    const container = document.getElementById("listaHoteisContainer");
+    if (!container) return;
+
+    container.innerHTML = hoteisBissau.map(hotel => `
+        <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: #fff; margin-bottom: 10px;">
+            <img src="${hotel.imagemPrincipal}" alt="${hotel.nome}" style="width: 100%; height: 150px; object-fit: cover;">
+            <div style="padding: 12px;">
+                <h4 style="margin: 0 0 4px 0;">${hotel.nome}</h4>
+                <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">📍 ${hotel.zona}</p>
+                <button onclick="abrirQuartosHotel('${hotel.id}')" style="width: 100%; background: #111; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer;">
+                    Ver Quartos e Preços
+                </button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function abrirQuartosHotel(hotelId) {
+    hotelAtual = hoteisBissau.find(h => h.id === hotelId);
+    if (!hotelAtual) return;
+
+    quartoAtual = null;
+    const listaHoteis = document.getElementById("listaHoteisContainer");
+    const detalhesHotel = document.getElementById("detalhesHotelContainer");
+    const btnVoltar = document.getElementById("btnVoltarHoteis");
+
+    if (listaHoteis) listaHoteis.style.display = "none";
+    if (detalhesHotel) detalhesHotel.style.display = "block";
+    if (btnVoltar) btnVoltar.style.display = "inline-block";
+
+    document.getElementById("detalheHotelNome").innerText = hotelAtual.nome;
+    document.getElementById("detalheHotelZona").innerText = `📍 ${hotelAtual.zona} | 📞 ${hotelAtual.telefone}`;
+    document.getElementById("resumoQuartoEscolhido").innerText = "Selecione um quarto acima para continuar";
+
+    const quartosContainer = document.getElementById("listaQuartosContainer");
+    if (quartosContainer) {
+        quartosContainer.innerHTML = hotelAtual.quartos.map((q, index) => `
+            <div class="cartao-quarto" onclick="escolherQuarto(${index}, this)" style="border: 2px solid #ddd; border-radius: 8px; padding: 10px; display: flex; gap: 10px; cursor: pointer; align-items: center; background: #fff; margin-bottom: 8px;">
+                <img src="${q.img}" alt="${q.tipo}" style="width: 90px; height: 75px; object-fit: cover; border-radius: 6px;">
+                <div style="flex: 1;">
+                    <h5 style="margin: 0 0 4px 0; font-size: 15px;">${q.tipo}</h5>
+                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #555;">${q.desc}</p>
+                    <span style="font-weight: bold; color: #008751; font-size: 14px;">${q.preco.toLocaleString()} XOF / noite</span>
+                </div>
+            </div>
+        `).join("");
+    }
+}
+
+function escolherQuarto(index, elemento) {
+    quartoAtual = hotelAtual.quartos[index];
+    document.querySelectorAll(".cartao-quarto").forEach(el => el.style.borderColor = "#ddd");
+    elemento.style.borderColor = "#008751";
+    atualizarTotalHotel();
+}
+
+function atualizarTotalHotel() {
+    if (!quartoAtual) return;
+    const inputNoites = document.getElementById("numNoites");
+    const noites = inputNoites ? (parseInt(inputNoites.value) || 1) : 1;
+    const total = quartoAtual.preco * noites;
+    const resumo = document.getElementById("resumoQuartoEscolhido");
+    if (resumo) {
+        resumo.innerText = `${quartoAtual.tipo} (${noites} noite(s)) — Total: ${total.toLocaleString()} XOF`;
+    }
+}
+
+function voltarListaHoteis() {
+    const detalhesHotel = document.getElementById("detalhesHotelContainer");
+    const btnVoltar = document.getElementById("btnVoltarHoteis");
+    const listaHoteis = document.getElementById("listaHoteisContainer");
+
+    if (detalhesHotel) detalhesHotel.style.display = "none";
+    if (btnVoltar) btnVoltar.style.display = "none";
+    if (listaHoteis) listaHoteis.style.display = "flex";
+}
+
+function finalizarReservaHotel() {
+    if (!quartoAtual) {
+        alert("Por favor, clique num quarto para o selecionar antes de pagar.");
+        return;
+    }
+    const inputNoites = document.getElementById("numNoites");
+    const noites = inputNoites ? (parseInt(inputNoites.value) || 1) : 1;
+    const total = quartoAtual.preco * noites;
+    const metodoSelect = document.getElementById("pagamentoHotelMetodo");
+    const metodo = metodoSelect ? metodoSelect.value : "Mobile Money";
+
+    alert(`Reserva efetuada com sucesso no ${hotelAtual.nome}!\nQuarto: ${quartoAtual.tipo}\nTotal Pago: ${total.toLocaleString()} XOF via ${metodo}`);
+    voltarListaHoteis();
+    fecharModalHoteis();
+}
+
+// ==========================================
+// 4. MAPA E ANIMAÇÃO DO CARRO
+// ==========================================
+function iniciarCarroRotaGB() {
+    if (!mapa) return;
+    if (markerCarro) mapa.removeLayer(markerCarro);
+
+    const carroIcon = L.divIcon({
+        className: 'carro-animado',
+        html: '<div style="background-color: white; padding: 6px 12px; border-radius: 20px; box-shadow: 0 3px 8px rgba(0,0,0,0.3); font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px; border: 1px solid #ddd;">🚗 <span>ROTA GB Express</span></div>',
+        iconSize: [150, 40],
+        iconAnchor: [75, 20]
+    });
+
+    let latBase = 11.8631;
+    let lngBase = -15.5984;
+
+    markerCarro = L.marker([latBase, lngBase], { icon: carroIcon }).addTo(mapa);
+
+    let t = 0;
+    setInterval(() => {
+        t += 0.08;
+        let novaLat = latBase + (Math.sin(t) * 0.0035);
+        let novaLng = lngBase + (Math.cos(t) * 0.0035);
+        if (markerCarro) markerCarro.setLatLng([novaLat, novaLng]);
+    }, 2000);
+}
+
+// ==========================================
+// 5. INICIALIZAÇÃO AUTOMÁTICA AO CARREGAR A PÁGINA
+// ==========================================
+document.addEventListener("DOMContentLoaded", function() {
+    // Atualiza tarifas
+    updatePrice();
+    const selectRoute = document.getElementById("routeSelect") || document.getElementById("rotaSelect");
+    if (selectRoute) {
+        selectRoute.addEventListener("change", updatePrice);
+    }
+
+    // Inicializa o Mapa Leaflet
+    if (document.getElementById("map")) {
+        mapa = L.map('map', {
+            center: centroBissau,
+            zoom: 15,
+            zoomControl: false
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(mapa);
+    }
+
+    // Botão de confirmar localização
+    const botaoConfirmar = document.querySelector("button[onclick*='confirmarLocalizacao']") || document.querySelector("button");
+    if (botaoConfirmar) {
+        botaoConfirmar.removeAttribute("onclick");
+        botaoConfirmar.addEventListener("click", async function(event) {
+            if (event) event.preventDefault();
+            if (!mapa) {
+                alert("O mapa ainda está a carregar.");
+                return;
+            }
+            const centroAtual = mapa.getCenter();
+            const lat = centroAtual.lat.toFixed(5);
+            const lng = centroAtual.lng.toFixed(5);
+            let preco = await consultarPrecoOficial("Cidade", "Aeroporto");
+            if (preco) {
+                alert(`Destino confirmado! (${lat}, ${lng})\nPreço Oficial DGVTT: ${preco} XOF`);
+            } else {
+                alert(`Localização registada com sucesso: ${lat}, ${lng}`);
+            }
+        });
+    }
+
+    // Carrega os hotéis no início
+    renderizarHoteis();
+});
+
+// Inicia o carro no mapa após carregar tudo
+window.addEventListener("load", function() {
+    setTimeout(() => {
+        if (typeof mapa !== "undefined" && mapa) {
+            iniciarCarroRotaGB();
+        }
+    }, 1200);
+});
