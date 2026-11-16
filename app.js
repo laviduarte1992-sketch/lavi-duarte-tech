@@ -337,71 +337,66 @@ function voltarListaHoteis() {
     if (lista) lista.style.display = "flex";
 }
 
-function calcularTotalReserva() {
-    const checkinInput = document.getElementById("checkin");
-    const checkoutInput = document.getElementById("checkout");
-    const totalNoitesSpan = document.getElementById("total-noites");
-    const valorTotalSpan = document.getElementById("valor-total");
+<div class="resumo-reserva">
+  <h3>Resumo da Reserva</h3>
+  <p id="quarto-selecionado-texto" style="color: #0b875b; font-weight: bold;">
+    Selecione um quarto acima para continuar
+  </p>
 
-    if (!checkinInput || !checkinInput.value) return;
+  <!-- Linha 1: Datas de Check-in e Check-out -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+    <div>
+      <label for="checkin">Check-in:</label>
+      <input type="date" id="checkin" onchange="calcularTotalReserva()" required>
+    </div>
+    <div>
+      <label for="checkout">Check-out:</label>
+      <input type="date" id="checkout" onchange="calcularTotalReserva()" required>
+    </div>
+  </div>
 
-    // Impede selecionar data de saída igual ou anterior à entrada
-    const dataEntrada = new Date(checkinInput.value);
-    const dataMinimaSaida = new Date(dataEntrada);
-    dataMinimaSaida.setDate(dataMinimaSaida.getDate() + 1);
-    if (checkoutInput) {
-        checkoutInput.min = dataMinimaSaida.toISOString().split("T")[0];
-    }
+  <!-- Linha 2: Número de Hóspedes (Adultos e Crianças) -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+    <div>
+      <label for="adultos">Adultos:</label>
+      <select id="adultos">
+        <option value="1">1 Adulto</option>
+        <option value="2" selected>2 Adultos</option>
+        <option value="3">3 Adultos</option>
+        <option value="4">4 Adultos</option>
+      </select>
+    </div>
+    <div>
+      <label for="criancas">Crianças:</label>
+      <select id="criancas">
+        <option value="0" selected>0 Crianças</option>
+        <option value="1">1 Criança</option>
+        <option value="2">2 Crianças</option>
+        <option value="3">3 Crianças</option>
+      </select>
+    </div>
+  </div>
 
-    if (checkinInput.value && checkoutInput && checkoutInput.value && quartoAtual) {
-        const dataSaida = new Date(checkoutInput.value);
-        const diferencaTempo = dataSaida - dataEntrada;
-        const noites = Math.ceil(diferencaTempo / (1000 * 60 * 60 * 24));
+  <!-- Linha 3: Método de Pagamento -->
+  <div style="margin-bottom: 15px;">
+    <label for="pagamentoHotelMetodo">Método de Pagamento:</label>
+    <select id="pagamentoHotelMetodo">
+      <option value="Orange Money">Orange Money</option>
+      <option value="MTN MoMo">MTN MoMo</option>
+      <option value="Cartão Visa / Mastercard">Cartão Visa / Mastercard</option>
+      <option value="Pagamento no Check-in">Pagamento no Check-in</option>
+    </select>
+  </div>
 
-        if (noites > 0) {
-            const total = noites * quartoAtual.preco;
-            if (totalNoitesSpan) totalNoitesSpan.textContent = `${noites} ${noites === 1 ? 'noite' : 'noites'}`;
-            if (valorTotalSpan) valorTotalSpan.textContent = `${total.toLocaleString()} XOF`;
-        } else {
-            if (totalNoitesSpan) totalNoitesSpan.textContent = "Data inválida";
-            if (valorTotalSpan) valorTotalSpan.textContent = "0 XOF";
-        }
-    }
-}
+  <!-- Resumo de Noites e Total -->
+  <div id="detalhes-calculo" style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
+    <span id="total-noites">0 noites</span> • Total: <strong id="valor-total">0 XOF</strong>
+  </div>
 
-function finalizarReservaHotel() {
-    if (!quartoAtual) {
-        alert("Por favor, clique num quarto para o selecionar antes de reservar.");
-        return;
-    }
-
-    const checkin = document.getElementById("checkin")?.value;
-    const checkout = document.getElementById("checkout")?.value;
-
-    if (!checkin || !checkout) {
-        alert("Por favor, selecione as datas de Check-in e Check-out.");
-        return;
-    }
-
-    const dataEntrada = new Date(checkin);
-    const dataSaida = new Date(checkout);
-    const noites = Math.ceil((dataSaida - dataEntrada) / (1000 * 60 * 60 * 24));
-
-    if (noites <= 0) {
-        alert("A data de saída (Check-out) deve ser posterior à data de entrada.");
-        return;
-    }
-
-    const adultos = document.getElementById("adultos")?.value || "1";
-    const criancas = document.getElementById("criancas")?.value || "0";
-    const total = quartoAtual.preco * noites;
-    const metodo = document.getElementById("pagamentoHotelMetodo")?.value || "Mobile Money";
-
-    alert(`✅ Reserva confirmada no ${hotelAtual.nome}!\nQuarto: ${quartoAtual.tipo}\nCheck-in: ${checkin} | Check-out: ${checkout} (${noites} noites)\nHóspedes: ${adultos} Adulto(s), ${criancas} Criança(s)\nTotal: ${total.toLocaleString()} XOF (${metodo})`);
-    
-    voltarListaHoteis();
-    fecharModalHoteis();
-}
+  <button type="button" onclick="finalizarReservaHotel()" class="btn-reservar">
+    Reservar Agora
+  </button>
+</div>
 // ==========================================
 // 4. MAPA DE BISSAU E CARTÃO ROTA GB EXPRESS
 // ==========================================
