@@ -67,39 +67,212 @@ function updatePrice() {
 }
 
 // ==========================================
-// 3. GESTÃO DO MODAL E RESERVAS DE HOTÉIS
+// 1. BASE DE DADOS DOS HOTÉIS DE BISSAU (ESTILO BOOKING)
 // ==========================================
-function abrirModalHoteis() {
-    const modal = document.getElementById("modalHoteis");
-    if (modal) {
-        modal.style.display = "block";
-        renderizarHoteis();
-    } else {
-        alert("Erro: O HTML do modalHoteis não foi encontrado no index.html!");
+const hoteisBissau = [
+    {
+        id: "ceiba",
+        nome: "Hotel Ceiba Bissau",
+        estrelas: "⭐⭐⭐⭐⭐",
+        nota: "9.1 Fantástico",
+        zona: "Avenida Pansau Na Isna, Bissau",
+        telefone: "+245 95 580 00 00",
+        imagemPrincipal: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+        quartos: [
+            { tipo: "Quarto Executivo", preco: 85000, desc: "Cama King • Wi-Fi Grátis • Piscina • Pequeno-almoço incluído", img: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Suite Presidencial", preco: 140000, desc: "Sala privada • Vista panorâmica • Transfer Aeroporto VIP", img: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=80" }
+        ]
+    },
+    {
+        id: "royal",
+        nome: "Hotel Royal Bissau",
+        estrelas: "⭐⭐⭐⭐",
+        nota: "8.6 Muito Bom",
+        zona: "Centro da Cidade (Praça), Bissau",
+        telefone: "+245 320 00 00",
+        imagemPrincipal: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
+        quartos: [
+            { tipo: "Quarto Standard", preco: 45000, desc: "Ar condicionado • TV Cabo • Wi-Fi", img: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Quarto Duplo Superior", preco: 65000, desc: "Cama casal • Varanda • Pequeno-almoço incluído", img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=80" }
+        ]
+    },
+    {
+        id: "coimbra",
+        nome: "Coimbra Hotel and SPA",
+        estrelas: "⭐⭐⭐⭐",
+        nota: "8.8 Fabuloso",
+        zona: "Avenida Amílcar Cabral, Bissau",
+        telefone: "+245 321 34 67",
+        imagemPrincipal: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
+        quartos: [
+            { tipo: "Quarto Standard", preco: 40000, desc: "Acesso à piscina • Wi-Fi • Ar condicionado", img: "https://images.unsplash.com/photo-1595576508898-0ad5c879a061?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Suite SPA", preco: 70000, desc: "Cama King • Acesso livre ao SPA e Ginásio", img: "https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=400&q=80" }
+        ]
+    },
+    {
+        id: "dunia",
+        nome: "Dunia Hotel Bissau",
+        estrelas: "⭐⭐⭐⭐",
+        nota: "8.4 Muito Bom",
+        zona: "Rua Justino Lopes, Centro, Bissau",
+        telefone: "+245 96 600 00 00",
+        imagemPrincipal: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
+        quartos: [
+            { tipo: "Quarto Individual", preco: 35000, desc: "Ar condicionado • Wi-Fi rápido • Pequeno-almoço", img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Quarto Executivo", preco: 55000, desc: "Secretária de trabalho • Cama casal • Pequeno-almoço", img: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=400&q=80" }
+        ]
+    },
+    {
+        id: "imperio",
+        nome: "Hotel Império",
+        estrelas: "⭐⭐⭐",
+        nota: "8.1 Bom",
+        zona: "Avenida Amílcar Cabral, Bissau",
+        telefone: "+245 320 12 34",
+        imagemPrincipal: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=80",
+        quartos: [
+            { tipo: "Quarto Clássico", preco: 30000, desc: "Localização central • Ar condicionado • TV", img: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Suite Império", preco: 50000, desc: "Varanda para a avenida • Pequeno-almoço incluído", img: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=400&q=80" }
+        ]
+    },
+    {
+        id: "azalai",
+        nome: "Azalaï Hotel 24 de Setembro",
+        estrelas: "⭐⭐⭐⭐",
+        nota: "8.9 Fabuloso",
+        zona: "Avenida 14 de Novembro, Bissau",
+        telefone: "+245 325 65 00",
+        imagemPrincipal: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80",
+        quartos: [
+            { tipo: "Quarto Standard", preco: 75000, desc: "Piscina exterior • Restaurante • Transfer Aeroporto", img: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=400&q=80" }
+        ]
     }
+];
+
+// ==========================================
+// 3. GESTÃO DO MODAL ESTILO BOOKING (AUTO-CRIADO SEM MEXER NO INDEX.HTML)
+// ==========================================
+function garantirModalHoteisNoDOM() {
+    if (document.getElementById("modalHoteis")) return;
+
+    const overlay = document.createElement("div");
+    overlay.id = "modalHoteisOverlay";
+    overlay.style.cssText = "display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:9998;";
+    overlay.onclick = fecharModalHoteis;
+
+    const modalHTML = `
+    <div id="modalHoteis" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 92%; max-width: 520px; max-height: 88vh; background: #f5f7fa; z-index: 9999; border-radius: 16px; box-shadow: 0 12px 35px rgba(0,0,0,0.45); overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        
+        <!-- Barra Superior Azul Estilo Booking -->
+        <div style="background: #003580; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;">
+            <div>
+                <h3 style="margin: 0; font-size: 18px;">🏨 Hotéis em Bissau</h3>
+                <span style="font-size: 12px; opacity: 0.85;">Reserva imediata • Confirmação ROTA GB</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button onclick="voltarListaHoteis()" id="btnVoltarHoteis" style="display: none; background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600;">⬅ Voltar</button>
+                <button onclick="fecharModalHoteis()" style="background: rgba(255,255,255,0.2); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 15px;">✕</button>
+            </div>
+        </div>
+
+        <div style="padding: 16px;">
+            <!-- Lista de Hotéis -->
+            <div id="listaHoteisContainer" style="display: flex; flex-direction: column; gap: 14px;"></div>
+
+            <!-- Detalhes e Quartos -->
+            <div id="detalhesHotelContainer" style="display: none;">
+                <div style="background: white; padding: 14px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+                    <h2 id="detalheHotelNome" style="margin: 0 0 4px 0; font-size: 19px; color: #111;"></h2>
+                    <p id="detalheHotelZona" style="margin: 0; color: #555; font-size: 13px;"></p>
+                </div>
+
+                <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #222;">Escolha o seu quarto:</h4>
+                <div id="listaQuartosContainer" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"></div>
+
+                <!-- Resumo e Pagamento -->
+                <div style="background: white; padding: 14px; border-radius: 12px; border: 1px solid #dce3ec; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #555;">Resumo da Reserva</h4>
+                    <p id="resumoQuartoEscolhido" style="font-weight: bold; color: #008751; margin: 0 0 12px 0; font-size: 14px;">Selecione um quarto acima</p>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 12px; font-weight: 600; color: #444;">Check-in:</label>
+                            <input type="date" id="dataCheckin" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 12px; font-weight: 600; color: #444;">Noites:</label>
+                            <input type="number" id="numNoites" value="1" min="1" onchange="atualizarTotalHotel()" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <label style="font-size: 12px; font-weight: 600; color: #444;">Método de Pagamento:</label>
+                    <select id="pagamentoHotelMetodo" style="width: 100%; padding: 8px; margin: 4px 0 14px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
+                        <option value="Orange Money">Orange Money</option>
+                        <option value="Telecel Money">Telecel Money</option>
+                        <option value="Pagar no Check-in (Hotel)">Pagar no Check-in (Hotel)</option>
+                        <option value="Cartão de Débito/Crédito">Cartão de Débito / Crédito</option>
+                    </select>
+
+                    <button onclick="finalizarReservaHotel()" style="width: 100%; background: #006ce4; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;">
+                        Reservar Agora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+    document.body.appendChild(overlay);
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+}
+
+function abrirModalHoteis() {
+    garantirModalHoteisNoDOM();
+    const modal = document.getElementById("modalHoteis");
+    const overlay = document.getElementById("modalHoteisOverlay");
+    if (modal) modal.style.display = "block";
+    if (overlay) overlay.style.display = "block";
+    voltarListaHoteis();
+    renderizarHoteis();
 }
 
 function fecharModalHoteis() {
     const modal = document.getElementById("modalHoteis");
+    const overlay = document.getElementById("modalHoteisOverlay");
     if (modal) modal.style.display = "none";
+    if (overlay) overlay.style.display = "none";
 }
 
 function renderizarHoteis() {
     const container = document.getElementById("listaHoteisContainer");
     if (!container) return;
 
-    container.innerHTML = hoteisBissau.map(hotel => `
-        <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: #fff; margin-bottom: 12px;">
-            <img src="${hotel.imagemPrincipal}" alt="${hotel.nome}" style="width: 100%; height: 150px; object-fit: cover;">
-            <div style="padding: 12px;">
-                <h4 style="margin: 0 0 4px 0;">${hotel.nome}</h4>
-                <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">📍 ${hotel.zona}</p>
-                <button onclick="abrirQuartosHotel('${hotel.id}')" style="width: 100%; background: #111; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    Ver Quartos e Preços
-                </button>
+    container.innerHTML = hoteisBissau.map(hotel => {
+        const menorPreco = Math.min(...hotel.quartos.map(q => q.preco));
+        return `
+        <div style="border: 1px solid #e0e6ed; border-radius: 12px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.06); background: #fff;">
+            <div style="position: relative;">
+                <img src="${hotel.imagemPrincipal}" alt="${hotel.nome}" style="width: 100%; height: 165px; object-fit: cover; display: block;">
+                <span style="position: absolute; top: 10px; right: 10px; background: #003580; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold;">${hotel.nota}</span>
             </div>
-        </div>
-    `).join("");
+            <div style="padding: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 16px; color: #111;">${hotel.nome}</h4>
+                    <span style="font-size: 11px;">${hotel.estrelas}</span>
+                </div>
+                <p style="margin: 0 0 10px 0; font-size: 12px; color: #006ce4;">📍 ${hotel.zona}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 10px;">
+                    <div>
+                        <span style="font-size: 11px; color: #666; display: block;">A partir de</span>
+                        <span style="font-weight: bold; font-size: 16px; color: #111;">${menorPreco.toLocaleString()} XOF</span>
+                        <span style="font-size: 11px; color: #666;">/ noite</span>
+                    </div>
+                    <button onclick="abrirQuartosHotel('${hotel.id}')" style="background: #006ce4; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer;">
+                        Ver disponibilidade
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join("");
 }
 
 function abrirQuartosHotel(hotelId) {
@@ -107,41 +280,31 @@ function abrirQuartosHotel(hotelId) {
     if (!hotelAtual) return;
 
     quartoAtual = null;
-    const listaHoteis = document.getElementById("listaHoteisContainer");
-    const detalhesHotel = document.getElementById("detalhesHotelContainer");
-    const btnVoltar = document.getElementById("btnVoltarHoteis");
+    document.getElementById("listaHoteisContainer").style.display = "none";
+    document.getElementById("detalhesHotelContainer").style.display = "block";
+    document.getElementById("btnVoltarHoteis").style.display = "inline-block";
 
-    if (listaHoteis) listaHoteis.style.display = "none";
-    if (detalhesHotel) detalhesHotel.style.display = "block";
-    if (btnVoltar) btnVoltar.style.display = "inline-block";
-
-    const elNome = document.getElementById("detalheHotelNome");
-    const elZona = document.getElementById("detalheHotelZona");
-    const elResumo = document.getElementById("resumoQuartoEscolhido");
-
-    if (elNome) elNome.innerText = hotelAtual.nome;
-    if (elZona) elZona.innerText = `📍 ${hotelAtual.zona} | 📞 ${hotelAtual.telefone}`;
-    if (elResumo) elResumo.innerText = "Selecione um quarto acima para continuar";
+    document.getElementById("detalheHotelNome").innerText = `${hotelAtual.nome} ${hotelAtual.estrelas}`;
+    document.getElementById("detalheHotelZona").innerText = `📍 ${hotelAtual.zona}  •  📞 ${hotelAtual.telefone}`;
+    document.getElementById("resumoQuartoEscolhido").innerText = "Selecione um quarto acima para continuar";
 
     const quartosContainer = document.getElementById("listaQuartosContainer");
-    if (quartosContainer) {
-        quartosContainer.innerHTML = hotelAtual.quartos.map((q, index) => `
-            <div class="cartao-quarto" onclick="escolherQuarto(${index}, this)" style="border: 2px solid #ddd; border-radius: 8px; padding: 10px; display: flex; gap: 10px; cursor: pointer; align-items: center; background: #fff; margin-bottom: 8px;">
-                <img src="${q.img}" alt="${q.tipo}" style="width: 90px; height: 75px; object-fit: cover; border-radius: 6px;">
-                <div style="flex: 1;">
-                    <h5 style="margin: 0 0 4px 0; font-size: 15px;">${q.tipo}</h5>
-                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #555;">${q.desc}</p>
-                    <span style="font-weight: bold; color: #008751; font-size: 14px;">${q.preco.toLocaleString()} XOF / noite</span>
-                </div>
+    quartosContainer.innerHTML = hotelAtual.quartos.map((q, index) => `
+        <div class="cartao-quarto" onclick="escolherQuarto(${index}, this)" style="border: 2px solid #e0e6ed; border-radius: 10px; padding: 10px; display: flex; gap: 12px; cursor: pointer; align-items: center; background: #fff; transition: 0.2s;">
+            <img src="${q.img}" alt="${q.tipo}" style="width: 95px; height: 80px; object-fit: cover; border-radius: 8px;">
+            <div style="flex: 1;">
+                <h5 style="margin: 0 0 4px 0; font-size: 15px; color: #111;">${q.tipo}</h5>
+                <p style="margin: 0 0 6px 0; font-size: 12px; color: #555; line-height: 1.3;">${q.desc}</p>
+                <span style="font-weight: bold; color: #008751; font-size: 14px;">${q.preco.toLocaleString()} XOF <small style="color:#666; font-weight:normal;">/ noite</small></span>
             </div>
-        `).join("");
-    }
+        </div>
+    `).join("");
 }
 
 function escolherQuarto(index, elemento) {
     quartoAtual = hotelAtual.quartos[index];
-    document.querySelectorAll(".cartao-quarto").forEach(el => el.style.borderColor = "#ddd");
-    elemento.style.borderColor = "#008751";
+    document.querySelectorAll(".cartao-quarto").forEach(el => el.style.borderColor = "#e0e6ed");
+    elemento.style.borderColor = "#006ce4";
     atualizarTotalHotel();
 }
 
@@ -150,38 +313,31 @@ function atualizarTotalHotel() {
     const inputNoites = document.getElementById("numNoites");
     const noites = inputNoites ? (parseInt(inputNoites.value) || 1) : 1;
     const total = quartoAtual.preco * noites;
-    const resumo = document.getElementById("resumoQuartoEscolhido");
-    if (resumo) {
-        resumo.innerText = `${quartoAtual.tipo} (${noites} noite(s)) — Total: ${total.toLocaleString()} XOF`;
-    }
+    document.getElementById("resumoQuartoEscolhido").innerText = `${quartoAtual.tipo} (${noites} noite(s)) — Total: ${total.toLocaleString()} XOF`;
 }
 
 function voltarListaHoteis() {
-    const detalhesHotel = document.getElementById("detalhesHotelContainer");
+    const detalhes = document.getElementById("detalhesHotelContainer");
     const btnVoltar = document.getElementById("btnVoltarHoteis");
-    const listaHoteis = document.getElementById("listaHoteisContainer");
-
-    if (detalhesHotel) detalhesHotel.style.display = "none";
+    const lista = document.getElementById("listaHoteisContainer");
+    if (detalhes) detalhes.style.display = "none";
     if (btnVoltar) btnVoltar.style.display = "none";
-    if (listaHoteis) listaHoteis.style.display = "flex";
+    if (lista) lista.style.display = "flex";
 }
 
 function finalizarReservaHotel() {
     if (!quartoAtual) {
-        alert("Por favor, clique num quarto para o selecionar antes de pagar.");
+        alert("Por favor, clique num quarto para o selecionar antes de reservar.");
         return;
     }
-    const inputNoites = document.getElementById("numNoites");
-    const noites = inputNoites ? (parseInt(inputNoites.value) || 1) : 1;
+    const noites = parseInt(document.getElementById("numNoites")?.value) || 1;
     const total = quartoAtual.preco * noites;
-    const metodoSelect = document.getElementById("pagamentoHotelMetodo");
-    const metodo = metodoSelect ? metodoSelect.value : "Mobile Money";
+    const metodo = document.getElementById("pagamentoHotelMetodo")?.value || "Mobile Money";
 
-    alert(`Reserva efetuada com sucesso no ${hotelAtual.nome}!\nQuarto: ${quartoAtual.tipo}\nTotal Pago: ${total.toLocaleString()} XOF via ${metodo}`);
+    alert(`✅ Reserva confirmada no ${hotelAtual.nome}!\nQuarto: ${quartoAtual.tipo}\nNoites: ${noites}\nTotal: ${total.toLocaleString()} XOF (${metodo})`);
     voltarListaHoteis();
     fecharModalHoteis();
 }
-
 // ==========================================
 // 4. MAPA DE BISSAU E CARTÃO ROTA GB EXPRESS
 // ==========================================
