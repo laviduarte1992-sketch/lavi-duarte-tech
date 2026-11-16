@@ -150,21 +150,21 @@ const hoteisBissau = [
             { tipo: "Suite Império", preco: 50000, desc: "Varanda para a avenida • Pequeno-almoço incluído", img: "img/hoteis/imperio_suite.jpg", fallback: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=400&q=80" }
         ]
     },
-    {
-        id: "azalai",
-        nome: "Azalaï Hotel 24 de Setembro",
-        estrelas: "⭐⭐⭐⭐",
-        nota: "8.9 Fabuloso",
-        zona: "Avenida Pansau Na Isna / 14 de Novembro, Bissau",
-        telefone: "+245 955 803 000",
-        imagemPrincipal: "img/hoteis/azalai_fachada.jpg",
-        fallbackImg: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80",
-        quartos: [
-            { tipo: "Quarto Standard", preco: 75000, desc: "Piscina exterior • Restaurante • Transfer Aeroporto", img: "img/hoteis/azalai_quarto1.jpg", fallback: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=400&q=80" },
-            { tipo: "Quarto Superior Vista Piscina", preco: 90000, desc: "Varanda para a piscina • Pequeno-almoço buffet", img: "img/hoteis/azalai_superior.jpg", fallback: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=400&q=80" },
-            { tipo: "Suite Executiva Azalaï", preco: 130000, desc: "Sala separada • Minibar • Transfer VIP incluído", img: "img/hoteis/azalai_suite.jpg", fallback: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=80" }
-        ]
-    }
+{
+    id: "ledger",
+    nome: "Hotel Ledger Plaza Bissau",
+    estrelas: "⭐⭐⭐⭐⭐",
+    nota: "9.2 Excecional",
+    zona: "Centro de Bissau",
+    telefone: "+245 321 000 000",
+    imagemPrincipal: "img/hoteis/ledger_fachada.jpg",
+    fallbackImg: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+    quartos: [
+        { tipo: "Quarto Standard", preco: 65000, desc: "Cama King • Ar condicionado • Wi-Fi • Pequeno-almoço", img: "img/hoteis/ledger_quarto1.jpg", fallback: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=400&q=80" },
+        { tipo: "Quarto Executivo", preco: 85000, desc: "Vista piscina • Secretária • Minibar • Pequeno-almoço", img: "img/hoteis/ledger_quarto2.jpg", fallback: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=400&q=80" },
+        { tipo: "Suite Ledger", preco: 120000, desc: "Sala de estar separada • Conforto superior • Pequeno-almoço", img: "img/hoteis/ledger_suite.jpg", fallback: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=400&q=80" }
+    ]
+}
 ];
 // ==========================================
 // 3. GESTÃO DO MODAL ESTILO BOOKING (AUTO-CRIADO SEM MEXER NO INDEX.HTML)
