@@ -230,3 +230,70 @@ document.addEventListener("DOMContentLoaded", function() {
         select.addEventListener("change", updatePrice);
     }
 });
+const hoteisBissau = [
+    {
+        id: "ceiba",
+        nome: "Hotel Ceiba Bissau",
+        zona: "Avenida Pansau Na Isna / Centro",
+        telefone: "+245 95 580 00 00",
+        imagemPrincipal: "img/hoteis/ceiba_fachada.jpg",
+        quartos: [
+            { tipo: "Quarto Executivo", preco: 85000, desc: "Cama King, Wi-Fi, Piscina, Pequeno-almoço", img: "img/hoteis/ceiba_quarto1.jpg" },
+            { tipo: "Suite Presidencial", preco: 140000, desc: "Sala privada, Vista cidade, Tudo incluído", img: "img/hoteis/ceiba_suite.jpg" }
+        ]
+    },
+    {
+        id: "royal",
+        nome: "Hotel Royal Bissau",
+        zona: "Centro da Cidade (Praça)",
+        telefone: "+245 320 00 00",
+        imagemPrincipal: "img/hoteis/royal_fachada.jpg",
+        quartos: [
+            { tipo: "Quarto Standard", preco: 45000, desc: "Ar condicionado, TV, Wi-Fi", img: "img/hoteis/royal_quarto1.jpg" },
+            { tipo: "Quarto Duplo Superior", preco: 65000, desc: "Cama casal, Varanda, Pequeno-almoço", img: "img/hoteis/royal_quarto2.jpg" }
+        ]
+    },
+    {
+        id: "coimbra",
+        nome: "Coimbra Hotel and SPA",
+        zona: "Avenida Amílcar Cabral",
+        telefone: "+245 321 34 67",
+        imagemPrincipal: "img/hoteis/coimbra_fachada.jpg",
+        quartos: [
+            { tipo: "Quarto Standard", preco: 40000, desc: "Acesso à piscina, Wi-Fi, AC", img: "img/hoteis/coimbra_quarto1.jpg" },
+            { tipo: "Suite SPA", preco: 70000, desc: "Cama King, Acesso SPA e Ginásio", img: "img/hoteis/coimbra_suite.jpg" }
+        ]
+    },
+    {
+        id: "dunia",
+        nome: "Dunia Hotel Bissau",
+        zona: "Rua Justino Lopes / Centro",
+        telefone: "+245 96 600 00 00",
+        imagemPrincipal: "img/hoteis/dunia_fachada.jpg",
+        quartos: [
+            { tipo: "Quarto Individual", preco: 35000, desc: "AC, Wi-Fi rápido, Pequeno-almoço", img: "img/hoteis/dunia_quarto1.jpg" },
+            { tipo: "Quarto Executivo", preco: 55000, desc: "Espaço de trabalho, Cama casal", img: "img/hoteis/dunia_quarto2.jpg" }
+        ]
+    },
+    {
+        id: "imperio",
+        nome: "Hotel Império",
+        zona: "Avenida Amílcar Cabral (Centro)",
+        telefone: "+245 320 12 34",
+        imagemPrincipal: "img/hoteis/imperio_fachada.jpg",
+        quartos: [
+            { tipo: "Quarto Clássico", preco: 30000, desc: "Localização central, AC, TV", img: "img/hoteis/imperio_quarto1.jpg" },
+            { tipo: "Suite Império", preco: 50000, desc: "Varanda para a avenida, Pequeno-almoço", img: "img/hoteis/imperio_suite.jpg" }
+        ]
+    },
+    {
+        id: "azalai",
+        nome: "Azalaï Hotel 24 de Setembro",
+        zona: "Avenida 14 de Novembro",
+        telefone: "+245 325 65 00",
+        imagemPrincipal: "img/hoteis/azalai_fachada.jpg",
+        quartos: [
+            { tipo: "Quarto Standard", preco: 75000, desc: "Piscina, Restaurante, Transfer Aeroporto", img: "img/hoteis/azalai_quarto1.jpg" }
+        ]
+    }
+];
