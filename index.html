@@ -1320,6 +1320,46 @@
     }, 300);
 
     window.onload = updatePrice;
+    <!-- Modal de Hotéis de Bissau -->
+<div id="modalHoteis" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; max-height: 90vh; background: #fff; z-index: 9999; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.4); padding: 20px; overflow-y: auto; font-family: sans-serif;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+        <h3 style="margin: 0; color: #111;">🏨 Hotéis em Bissau</h3>
+        <div>
+            <button onclick="voltarListaHoteis()" id="btnVoltarHoteis" style="display: none; background: #f0f0f0; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-right: 5px;">⬅ Voltar</button>
+            <button onclick="fecharModalHoteis()" style="background: #ff4d4d; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer;">✕</button>
+        </div>
+    </div>
+    <div id="listaHoteisContainer" style="display: flex; flex-direction: column; gap: 15px;"></div>
+    <div id="detalhesHotelContainer" style="display: none;">
+        <h2 id="detalheHotelNome" style="margin: 0 0 4px 0; font-size: 18px; color: #111;"></h2>
+        <p id="detalheHotelZona" style="margin: 0 0 12px 0; color: #666; font-size: 13px;"></p>
+        <h4 style="margin-bottom: 10px; font-size: 14px;">Escolha o seu Quarto:</h4>
+        <div id="listaQuartosContainer" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"></div>
+        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #ddd;">
+            <h4 style="margin: 0 0 6px 0; font-size: 13px;">Resumo da Reserva</h4>
+            <p id="resumoQuartoEscolhido" style="font-weight: bold; color: #008751; margin: 0 0 10px 0; font-size: 13px;">Selecione um quarto acima</p>
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <div style="flex: 1;">
+                    <label style="font-size: 11px; color: #555;">Check-in:</label>
+                    <input type="date" id="dataCheckin" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 11px; color: #555;">Noites:</label>
+                    <input type="number" id="numNoites" value="1" min="1" onchange="atualizarTotalHotel()" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+                </div>
+            </div>
+            <label style="font-size: 11px; color: #555;">Método de Pagamento:</label>
+            <select id="pagamentoHotelMetodo" style="width: 100%; padding: 6px; margin: 4px 0 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+                <option value="Orange Money">Orange Money</option>
+                <option value="Telecel Money">Telecel Money</option>
+                <option value="Cartão de Débito/Crédito">Cartão de Débito / Crédito</option>
+            </select>
+            <button onclick="finalizarReservaHotel()" style="width: 100%; background: #008751; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer;">
+                Confirmar & Pagar Reserva
+            </button>
+        </div>
+    </div>
+</div>
 
     </script>
     <script src="app.js"></script>
