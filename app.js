@@ -1,12 +1,11 @@
 // ROTA GB - Lógica do Cliente (Frontend)
-// Função para consultar o preço oficial da DGVTT
+
+// 1. Função para consultar o preço oficial da DGVTT
 async function consultarPrecoOficial(origem, destino) {
     try {
-        // Busca o ficheiro tariffs.json que está na raiz do projeto
         const response = await fetch('tariffs.json');
         const data = await response.json();
         
-        // Procura a rota correspondente na tabela oficial
         const rotaEncontrada = data.tariffs.find(t => 
             t.origin.toLowerCase() === origem.toLowerCase() && 
             t.destination.toLowerCase() === destino.toLowerCase()
@@ -25,36 +24,24 @@ async function consultarPrecoOficial(origem, destino) {
     }
 }
 
-// Exemplo de uso prático quando o utilizador confirma a viagem
-async function calcularViagemExemplo() {
-    let preco = await consultarPrecoOficial("Cidade", "Aeroporto");
-    if (preco) {
-        alert(`O valor oficial da viagem é: ${preco} XOF`);
-    }
-}
 let mapa;
 let centroBissau = [11.8631, -15.5984]; // Coordenadas centrais de Bissau
 
-// Função para consultar o preço oficial da DGVTT
-async function consultarPrecoOficial(origem, destino) {
-    try {
-        const response = await fetch('tariffs.json');
-        const data = await response.json();
-        
-        const rotaEncontrada = data.tariffs.find(t => 
-            t.origin.toLowerCase() === origem.toLowerCase() && 
-            t.destination.toLowerCase() === destino.toLowerCase()
-        );
+// 2. Função para atualizar os preços em todas as zonas de Bissau
+function atualizarPrecosViagemAutomatico(precoBase) {
+    const base = parseFloat(precoBase) || 225;
 
-        if (rotaEncontrada) {
-            return rotaEncontrada.price;
-        } else {
-            return null;
-        }
-    } catch (error) {
-        console.error("Erro ao carregar as tarifas:", error);
-        return null;
-    }
+    const valorTaxi = base * 2;        // Ex: 250 -> 500 XOF
+    const valorPrivado = base * 2.6;   // Carro Privado
+    const valorMoto = base * 1.4;      // Moto-Táxi
+
+    const elTaxi = document.getElementById("precoTaxi");
+    const elPrivado = document.getElementById("precoPrivado");
+    const elMoto = document.getElementById("precoMoto");
+
+    if (elTaxi) elTaxi.innerText = `${valorTaxi} XOF`;
+    if (elPrivado) elPrivado.innerText = `${valorPrivado} XOF`;
+    if (elMoto) elMoto.innerText = `${valorMoto} XOF`;
 }
 // Função definitiva e corrigida para atualizar os preços em todas as zonas de Bissau
 function atualizarPrecosViagemAutomatico(precoBase) {
