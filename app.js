@@ -230,6 +230,93 @@ document.addEventListener("DOMContentLoaded", function() {
         select.addEventListener("change", updatePrice);
     }
 });
+
+let hotelAtual = null;
+let quartoAtual = null;
+
+// 1. Desenha a lista de todos os hotéis de Bissau
+function renderizarHoteis() {
+    const container = document.getElementById("listaHoteisContainer");
+    if (!container) return;
+
+    container.innerHTML = hoteisBissau.map(hotel => `
+        <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <img src="${hotel.imagemPrincipal}" alt="${hotel.nome}" style="width: 100%; height: 150px; object-fit: cover;">
+            <div style="padding: 12px;">
+                <h4 style="margin: 0 0 4px 0;">${hotel.nome}</h4>
+                <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">📍 ${hotel.zona}</p>
+                <button onclick="abrirQuartosHotel('${hotel.id}')" style="width: 100%; background: #111; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer;">
+                    Ver Quartos e Preços
+                </button>
+            </div>
+        </div>
+    `).join("");
+}
+
+// 2. Abre os quartos do hotel selecionado
+function abrirQuartosHotel(hotelId) {
+    hotelAtual = hoteisBissau.find(h => h.id === hotelId);
+    if (!hotelAtual) return;
+
+    quartoAtual = null;
+    document.getElementById("listaHoteisContainer").style.display = "none";
+    document.getElementById("detalhesHotelContainer").style.display = "block";
+    document.getElementById("btnVoltarHoteis").style.display = "inline-block";
+
+    document.getElementById("detalheHotelNome").innerText = hotelAtual.nome;
+    document.getElementById("detalheHotelZona").innerText = `📍 ${hotelAtual.zona} | 📞 ${hotelAtual.telefone}`;
+    document.getElementById("resumoQuartoEscolhido").innerText = "Selecione um quarto acima para continuar";
+
+    const quartosContainer = document.getElementById("listaQuartosContainer");
+    quartosContainer.innerHTML = hotelAtual.quartos.map((q, index) => `
+        <div class="cartao-quarto" onclick="escolherQuarto(${index}, this)" style="border: 2px solid #ddd; border-radius: 8px; padding: 10px; display: flex; gap: 10px; cursor: pointer; align-items: center;">
+            <img src="${q.img}" alt="${q.tipo}" style="width: 90px; height: 75px; object-fit: cover; border-radius: 6px;">
+            <div style="flex: 1;">
+                <h5 style="margin: 0 0 4px 0; font-size: 15px;">${q.tipo}</h5>
+                <p style="margin: 0 0 4px 0; font-size: 12px; color: #555;">${q.desc}</p>
+                <span style="font-weight: bold; color: #008751; font-size: 14px;">${q.preco.toLocaleString()} XOF / noite</span>
+            </div>
+        </div>
+    `).join("");
+}
+
+// 3. Seleciona o quarto e calcula o total
+function escolherQuarto(index, elemento) {
+    quartoAtual = hotelAtual.quartos[index];
+    document.querySelectorAll(".cartao-quarto").forEach(el => el.style.borderColor = "#ddd");
+    elemento.style.borderColor = "#008751";
+    atualizarTotalHotel();
+}
+
+function atualizarTotalHotel() {
+    if (!quartoAtual) return;
+    const noites = parseInt(document.getElementById("numNoites").value) || 1;
+    const total = quartoAtual.preco * noites;
+    document.getElementById("resumoQuartoEscolhido").innerText = `${quartoAtual.tipo} (${noites} noite(s)) — Total: ${total.toLocaleString()} XOF`;
+}
+
+// 4. Volta à lista principal de hotéis
+function voltarListaHoteis() {
+    document.getElementById("detalhesHotelContainer").style.display = "none";
+    document.getElementById("btnVoltarHoteis").style.display = "none";
+    document.getElementById("listaHoteisContainer").style.display = "flex";
+}
+
+// 5. Simula a confirmação e pagamento da reserva
+function finalizarReservaHotel() {
+    if (!quartoAtual) {
+        alert("Por favor, clique num quarto para o selecionar antes de pagar.");
+        return;
+    }
+    const noites = parseInt(document.getElementById("numNoites").value) || 1;
+    const total = quartoAtual.preco * noites;
+    const metodo = document.getElementById("pagamentoHotelMetodo").value;
+    alert(`Reserva efetuada com sucesso no ${hotelAtual.nome}!\nQuarto: ${quartoAtual.tipo}\nTotal Pago: ${total.toLocaleString()} XOF via ${metodo}`);
+    voltarListaHoteis();
+}
+
+// Inicia a lista de hotéis assim que a página carrega
+document.addEventListener("DOMContentLoaded", renderizarHoteis);
 const hoteisBissau = [
     {
         id: "ceiba",
