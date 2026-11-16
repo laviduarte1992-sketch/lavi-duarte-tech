@@ -67,7 +67,7 @@ function updatePrice() {
 }
 
 // ==========================================
-// 1. BASE DE DADOS DOS HOTÉIS DE BISSAU (ESTILO BOOKING)
+// 1. BASE DE DADOS COMPLETA DOS HOTÉIS DE BISSAU (FOTOS REAIS + FALLBACK)
 // ==========================================
 const hoteisBissau = [
     {
@@ -75,25 +75,27 @@ const hoteisBissau = [
         nome: "Hotel Ceiba Bissau",
         estrelas: "⭐⭐⭐⭐⭐",
         nota: "9.1 Fantástico",
-        zona: "Avenida Pansau Na Isna, Bissau",
-        telefone: "+245 95 580 00 00",
-        imagemPrincipal: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+        zona: "Avenida Francisco Mendes, Bissau",
+        telefone: "+245 969 189 292",
+        imagemPrincipal: "img/hoteis/ceiba_fachada.jpg",
+        fallbackImg: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
         quartos: [
-            { tipo: "Quarto Executivo", preco: 85000, desc: "Cama King • Wi-Fi Grátis • Piscina • Pequeno-almoço incluído", img: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=400&q=80" },
-            { tipo: "Suite Presidencial", preco: 140000, desc: "Sala privada • Vista panorâmica • Transfer Aeroporto VIP", img: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=80" }
+            { tipo: "Quarto Executivo", preco: 85000, desc: "Cama King • Wi-Fi Grátis • Piscina • Pequeno-almoço incluído", img: "img/hoteis/ceiba_quarto1.jpg", fallback: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Suite Presidencial", preco: 140000, desc: "Sala privada • Vista panorâmica • Transfer Aeroporto VIP", img: "img/hoteis/ceiba_suite.jpg", fallback: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=80" }
         ]
     },
     {
         id: "royal",
-        nome: "Hotel Royal Bissau",
+        nome: "Bissau Royal Hotel",
         estrelas: "⭐⭐⭐⭐",
         nota: "8.6 Muito Bom",
-        zona: "Centro da Cidade (Praça), Bissau",
-        telefone: "+245 320 00 00",
-        imagemPrincipal: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
+        zona: "Avenida Amílcar Cabral, Bissau",
+        telefone: "+245 955 888 888",
+        imagemPrincipal: "img/hoteis/royal_fachada.jpg",
+        fallbackImg: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
         quartos: [
-            { tipo: "Quarto Standard", preco: 45000, desc: "Ar condicionado • TV Cabo • Wi-Fi", img: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=400&q=80" },
-            { tipo: "Quarto Duplo Superior", preco: 65000, desc: "Cama casal • Varanda • Pequeno-almoço incluído", img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=80" }
+            { tipo: "Quarto Standard", preco: 45000, desc: "Ar condicionado • TV Cabo • Wi-Fi", img: "img/hoteis/royal_quarto1.jpg", fallback: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Quarto Duplo Superior", preco: 65000, desc: "Cama casal • Varanda • Pequeno-almoço incluído", img: "img/hoteis/royal_quarto2.jpg", fallback: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=80" }
         ]
     },
     {
@@ -101,12 +103,13 @@ const hoteisBissau = [
         nome: "Coimbra Hotel and SPA",
         estrelas: "⭐⭐⭐⭐",
         nota: "8.8 Fabuloso",
-        zona: "Avenida Amílcar Cabral, Bissau",
-        telefone: "+245 321 34 67",
-        imagemPrincipal: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
+        zona: "Centro da Cidade, Bissau",
+        telefone: "+245 966 568 526",
+        imagemPrincipal: "img/hoteis/coimbra_fachada.jpg",
+        fallbackImg: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
         quartos: [
-            { tipo: "Quarto Standard", preco: 40000, desc: "Acesso à piscina • Wi-Fi • Ar condicionado", img: "https://images.unsplash.com/photo-1595576508898-0ad5c879a061?auto=format&fit=crop&w=400&q=80" },
-            { tipo: "Suite SPA", preco: 70000, desc: "Cama King • Acesso livre ao SPA e Ginásio", img: "https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=400&q=80" }
+            { tipo: "Quarto Standard", preco: 40000, desc: "Acesso à piscina • Wi-Fi • Ar condicionado", img: "img/hoteis/coimbra_quarto1.jpg", fallback: "https://images.unsplash.com/photo-1595576508898-0ad5c879a061?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Suite SPA", preco: 70000, desc: "Cama King • Acesso livre ao SPA e Ginásio", img: "img/hoteis/coimbra_suite.jpg", fallback: "https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=400&q=80" }
         ]
     },
     {
@@ -114,25 +117,27 @@ const hoteisBissau = [
         nome: "Dunia Hotel Bissau",
         estrelas: "⭐⭐⭐⭐",
         nota: "8.4 Muito Bom",
-        zona: "Rua Justino Lopes, Centro, Bissau",
-        telefone: "+245 96 600 00 00",
-        imagemPrincipal: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
+        zona: "Avenida Pansau Na Isna, Santa Luzia, Bissau",
+        telefone: "+245 955 803 000",
+        imagemPrincipal: "img/hoteis/dunia_fachada.jpg",
+        fallbackImg: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
         quartos: [
-            { tipo: "Quarto Individual", preco: 35000, desc: "Ar condicionado • Wi-Fi rápido • Pequeno-almoço", img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=400&q=80" },
-            { tipo: "Quarto Executivo", preco: 55000, desc: "Secretária de trabalho • Cama casal • Pequeno-almoço", img: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=400&q=80" }
+            { tipo: "Quarto Individual", preco: 35000, desc: "Ar condicionado • Wi-Fi rápido • Pequeno-almoço", img: "img/hoteis/dunia_quarto1.jpg", fallback: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Quarto Executivo", preco: 55000, desc: "Secretária de trabalho • Cama casal • Pequeno-almoço", img: "img/hoteis/dunia_quarto2.jpg", fallback: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=400&q=80" }
         ]
     },
     {
         id: "imperio",
-        nome: "Hotel Império",
+        nome: "Hôtel Império",
         estrelas: "⭐⭐⭐",
         nota: "8.1 Bom",
-        zona: "Avenida Amílcar Cabral, Bissau",
-        telefone: "+245 320 12 34",
-        imagemPrincipal: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=80",
+        zona: "Centro Histórico, Bissau",
+        telefone: "+245 955 767 973",
+        imagemPrincipal: "img/hoteis/imperio_fachada.jpg",
+        fallbackImg: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=80",
         quartos: [
-            { tipo: "Quarto Clássico", preco: 30000, desc: "Localização central • Ar condicionado • TV", img: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=400&q=80" },
-            { tipo: "Suite Império", preco: 50000, desc: "Varanda para a avenida • Pequeno-almoço incluído", img: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=400&q=80" }
+            { tipo: "Quarto Clássico", preco: 30000, desc: "Localização central • Ar condicionado • TV", img: "img/hoteis/imperio_quarto1.jpg", fallback: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=400&q=80" },
+            { tipo: "Suite Império", preco: 50000, desc: "Varanda para a avenida • Pequeno-almoço incluído", img: "img/hoteis/imperio_suite.jpg", fallback: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=400&q=80" }
         ]
     },
     {
@@ -140,11 +145,12 @@ const hoteisBissau = [
         nome: "Azalaï Hotel 24 de Setembro",
         estrelas: "⭐⭐⭐⭐",
         nota: "8.9 Fabuloso",
-        zona: "Avenida 14 de Novembro, Bissau",
-        telefone: "+245 325 65 00",
-        imagemPrincipal: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80",
+        zona: "Avenida Pansau Na Isna / 14 de Novembro, Bissau",
+        telefone: "+245 955 803 000",
+        imagemPrincipal: "img/hoteis/azalai_fachada.jpg",
+        fallbackImg: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80",
         quartos: [
-            { tipo: "Quarto Standard", preco: 75000, desc: "Piscina exterior • Restaurante • Transfer Aeroporto", img: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=400&q=80" }
+            { tipo: "Quarto Standard", preco: 75000, desc: "Piscina exterior • Restaurante • Transfer Aeroporto", img: "img/hoteis/azalai_quarto1.jpg", fallback: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=400&q=80" }
         ]
     }
 ];
@@ -162,8 +168,6 @@ function garantirModalHoteisNoDOM() {
 
     const modalHTML = `
     <div id="modalHoteis" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 92%; max-width: 520px; max-height: 88vh; background: #f5f7fa; z-index: 9999; border-radius: 16px; box-shadow: 0 12px 35px rgba(0,0,0,0.45); overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        
-        <!-- Barra Superior Azul Estilo Booking -->
         <div style="background: #003580; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;">
             <div>
                 <h3 style="margin: 0; font-size: 18px;">🏨 Hotéis em Bissau</h3>
@@ -176,10 +180,8 @@ function garantirModalHoteisNoDOM() {
         </div>
 
         <div style="padding: 16px;">
-            <!-- Lista de Hotéis -->
             <div id="listaHoteisContainer" style="display: flex; flex-direction: column; gap: 14px;"></div>
 
-            <!-- Detalhes e Quartos -->
             <div id="detalhesHotelContainer" style="display: none;">
                 <div style="background: white; padding: 14px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
                     <h2 id="detalheHotelNome" style="margin: 0 0 4px 0; font-size: 19px; color: #111;"></h2>
@@ -189,7 +191,6 @@ function garantirModalHoteisNoDOM() {
                 <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #222;">Escolha o seu quarto:</h4>
                 <div id="listaQuartosContainer" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"></div>
 
-                <!-- Resumo e Pagamento -->
                 <div style="background: white; padding: 14px; border-radius: 12px; border: 1px solid #dce3ec; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                     <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #555;">Resumo da Reserva</h4>
                     <p id="resumoQuartoEscolhido" style="font-weight: bold; color: #008751; margin: 0 0 12px 0; font-size: 14px;">Selecione um quarto acima</p>
@@ -251,7 +252,7 @@ function renderizarHoteis() {
         return `
         <div style="border: 1px solid #e0e6ed; border-radius: 12px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.06); background: #fff;">
             <div style="position: relative;">
-                <img src="${hotel.imagemPrincipal}" alt="${hotel.nome}" style="width: 100%; height: 165px; object-fit: cover; display: block;">
+                <img src="${hotel.imagemPrincipal}" onerror="this.onerror=null;this.src='${hotel.fallbackImg}';" alt="${hotel.nome}" style="width: 100%; height: 165px; object-fit: cover; display: block;">
                 <span style="position: absolute; top: 10px; right: 10px; background: #003580; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold;">${hotel.nota}</span>
             </div>
             <div style="padding: 14px;">
@@ -291,7 +292,7 @@ function abrirQuartosHotel(hotelId) {
     const quartosContainer = document.getElementById("listaQuartosContainer");
     quartosContainer.innerHTML = hotelAtual.quartos.map((q, index) => `
         <div class="cartao-quarto" onclick="escolherQuarto(${index}, this)" style="border: 2px solid #e0e6ed; border-radius: 10px; padding: 10px; display: flex; gap: 12px; cursor: pointer; align-items: center; background: #fff; transition: 0.2s;">
-            <img src="${q.img}" alt="${q.tipo}" style="width: 95px; height: 80px; object-fit: cover; border-radius: 8px;">
+            <img src="${q.img}" onerror="this.onerror=null;this.src='${q.fallback}';" alt="${q.tipo}" style="width: 95px; height: 80px; object-fit: cover; border-radius: 8px;">
             <div style="flex: 1;">
                 <h5 style="margin: 0 0 4px 0; font-size: 15px; color: #111;">${q.tipo}</h5>
                 <p style="margin: 0 0 6px 0; font-size: 12px; color: #555; line-height: 1.3;">${q.desc}</p>
