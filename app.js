@@ -337,16 +337,68 @@ function voltarListaHoteis() {
     if (lista) lista.style.display = "flex";
 }
 
+function calcularTotalReserva() {
+    const checkinInput = document.getElementById("checkin");
+    const checkoutInput = document.getElementById("checkout");
+    const totalNoitesSpan = document.getElementById("total-noites");
+    const valorTotalSpan = document.getElementById("valor-total");
+
+    if (!checkinInput || !checkinInput.value) return;
+
+    // Impede selecionar data de saída igual ou anterior à entrada
+    const dataEntrada = new Date(checkinInput.value);
+    const dataMinimaSaida = new Date(dataEntrada);
+    dataMinimaSaida.setDate(dataMinimaSaida.getDate() + 1);
+    if (checkoutInput) {
+        checkoutInput.min = dataMinimaSaida.toISOString().split("T")[0];
+    }
+
+    if (checkinInput.value && checkoutInput && checkoutInput.value && quartoAtual) {
+        const dataSaida = new Date(checkoutInput.value);
+        const diferencaTempo = dataSaida - dataEntrada;
+        const noites = Math.ceil(diferencaTempo / (1000 * 60 * 60 * 24));
+
+        if (noites > 0) {
+            const total = noites * quartoAtual.preco;
+            if (totalNoitesSpan) totalNoitesSpan.textContent = `${noites} ${noites === 1 ? 'noite' : 'noites'}`;
+            if (valorTotalSpan) valorTotalSpan.textContent = `${total.toLocaleString()} XOF`;
+        } else {
+            if (totalNoitesSpan) totalNoitesSpan.textContent = "Data inválida";
+            if (valorTotalSpan) valorTotalSpan.textContent = "0 XOF";
+        }
+    }
+}
+
 function finalizarReservaHotel() {
     if (!quartoAtual) {
         alert("Por favor, clique num quarto para o selecionar antes de reservar.");
         return;
     }
-    const noites = parseInt(document.getElementById("numNoites")?.value) || 1;
+
+    const checkin = document.getElementById("checkin")?.value;
+    const checkout = document.getElementById("checkout")?.value;
+
+    if (!checkin || !checkout) {
+        alert("Por favor, selecione as datas de Check-in e Check-out.");
+        return;
+    }
+
+    const dataEntrada = new Date(checkin);
+    const dataSaida = new Date(checkout);
+    const noites = Math.ceil((dataSaida - dataEntrada) / (1000 * 60 * 60 * 24));
+
+    if (noites <= 0) {
+        alert("A data de saída (Check-out) deve ser posterior à data de entrada.");
+        return;
+    }
+
+    const adultos = document.getElementById("adultos")?.value || "1";
+    const criancas = document.getElementById("criancas")?.value || "0";
     const total = quartoAtual.preco * noites;
     const metodo = document.getElementById("pagamentoHotelMetodo")?.value || "Mobile Money";
 
-    alert(`✅ Reserva confirmada no ${hotelAtual.nome}!\nQuarto: ${quartoAtual.tipo}\nNoites: ${noites}\nTotal: ${total.toLocaleString()} XOF (${metodo})`);
+    alert(`✅ Reserva confirmada no ${hotelAtual.nome}!\nQuarto: ${quartoAtual.tipo}\nCheck-in: ${checkin} | Check-out: ${checkout} (${noites} noites)\nHóspedes: ${adultos} Adulto(s), ${criancas} Criança(s)\nTotal: ${total.toLocaleString()} XOF (${metodo})`);
+    
     voltarListaHoteis();
     fecharModalHoteis();
 }
