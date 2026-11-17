@@ -202,33 +202,62 @@ function garantirModalHoteisNoDOM() {
                 <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #222;">Escolha o seu quarto:</h4>
                 <div id="listaQuartosContainer" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"></div>
 
-                <div style="background: white; padding: 14px; border-radius: 12px; border: 1px solid #dce3ec; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                    <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #555;">Resumo da Reserva</h4>
-                    <p id="resumoQuartoEscolhido" style="font-weight: bold; color: #008751; margin: 0 0 12px 0; font-size: 14px;">Selecione um quarto acima</p>
+               <div style="background: white; padding: 14px; border-radius: 12px; border: 1px solid #dce3ec; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #555;">Resumo da Reserva</h4>
+                <p id="resumoQuartoEscolhido" style="font-weight: bold; color: #008751; margin: 0 0 12px 0; font-size: 14px;">Selecione um quarto acima</p>
 
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <div style="flex: 1;">
-                            <label style="font-size: 12px; font-weight: 600; color: #444;">Check-in:</label>
-                            <input type="date" id="dataCheckin" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 12px; font-weight: 600; color: #444;">Noites:</label>
-                            <input type="number" id="numNoites" value="1" min="1" onchange="atualizarTotalHotel()" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
-                        </div>
+                <!-- Linha 1: Datas de Check-in e Check-out -->
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; font-weight: 600; color: #444;">Check-in:</label>
+                        <input type="date" id="checkin" onchange="calcularTotalReserva()" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
                     </div>
-
-                    <label style="font-size: 12px; font-weight: 600; color: #444;">Método de Pagamento:</label>
-                    <select id="pagamentoHotelMetodo" style="width: 100%; padding: 8px; margin: 4px 0 14px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
-                        <option value="Orange Money">Orange Money</option>
-                        <option value="Telecel Money">Telecel Money</option>
-                        <option value="Pagar no Check-in (Hotel)">Pagar no Check-in (Hotel)</option>
-                        <option value="Cartão de Débito/Crédito">Cartão de Débito / Crédito</option>
-                    </select>
-
-                    <button onclick="finalizarReservaHotel()" style="width: 100%; background: #006ce4; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;">
-                        Reservar Agora
-                    </button>
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; font-weight: 600; color: #444;">Check-out:</label>
+                        <input type="date" id="checkout" onchange="calcularTotalReserva()" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
+                    </div>
                 </div>
+
+                <!-- Linha 2: Número de Hóspedes (Adultos e Crianças) -->
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; font-weight: 600; color: #444;">Adultos:</label>
+                        <select id="adultos" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
+                            <option value="1">1 Adulto</option>
+                            <option value="2" selected>2 Adultos</option>
+                            <option value="3">3 Adultos</option>
+                            <option value="4">4 Adultos</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; font-weight: 600; color: #444;">Crianças:</label>
+                        <select id="criancas" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
+                            <option value="0" selected>0 Crianças</option>
+                            <option value="1">1 Criança</option>
+                            <option value="2">2 Crianças</option>
+                            <option value="3">3 Crianças</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Linha 3: Método de Pagamento -->
+                <label style="font-size: 12px; font-weight: 600; color: #444;">Método de Pagamento:</label>
+                <select id="pagamentoHotelMetodo" style="width: 100%; padding: 8px; margin: 4px 0 12px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;">
+                    <option value="Orange Money">Orange Money</option>
+                    <option value="Telecel Money">Telecel Money</option>
+                    <option value="Pagar no Check-in (Hotel)">Pagar no Check-in (Hotel)</option>
+                    <option value="Cartão de Débito/Crédito">Cartão de Débito / Crédito</option>
+                </select>
+
+                <!-- Resumo Dinâmico de Noites e Valor Total -->
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; color: #333; border: 1px solid #e9ecef;">
+                    Estadia: <span id="total-noites" style="font-weight: 600;">0 noites</span> • Total: <strong id="valor-total" style="color: #006ce4;">0 XOF</strong>
+                </div>
+
+                <button type="button" onclick="finalizarReservaHotel()" style="width: 100%; background: #006ce4; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;">
+                    Reservar Agora
+                </button>
+            </div>
             </div>
         </div>
     </div>`;
