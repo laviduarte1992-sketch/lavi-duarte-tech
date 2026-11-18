@@ -64,6 +64,10 @@ function updatePrice() {
     if (elTaxi) elTaxi.innerText = `${valorTaxi} XOF`;
     if (elPrivado) elPrivado.innerText = `${valorPrivado} XOF`;
     if (elMoto) elMoto.innerText = `${valorMoto} XOF`;
+    // Guarda dinamicamente os preços calculados para todos os tipos de veículo
+    window.precoTaxiOficial = valorTaxi;
+    window.precoCarroPrivado = valorPrivado;
+    window.precoMotoTaxi = valorMoto;
 }
 
 // ==========================================
