@@ -499,3 +499,93 @@ document.addEventListener("DOMContentLoaded", function() {
     // 4. Renderiza os hotéis inicialmente
     renderizarHoteis();
 });
+const TARIFAS_DESTINO = {
+  lisboa: 280000,
+  dakar: 95000,
+  casablanca: 210000,
+  paris: 340000
+};
+
+const OPCOES_VOO_AUTO = [
+  { nome: "Atlantic", guiche: "Guichê Atlantic Bissau: +245 955 700 800", fator: 1.0 },
+  { nome: "TAP Air Portugal", guiche: "Guichê Osvaldo Vieira: +245 955 100 200", fator: 1.08 },
+  { nome: "Royal Air Maroc", guiche: "Guichê Osvaldo Vieira: +245 955 100 201", fator: 0.95 },
+  { nome: "ASKY Airlines", guiche: "Guichê Osvaldo Vieira: +245 955 100 202", fator: 0.88 }
+];
+
+function calcularPrecoVooAutomatico() {
+  const destinoInput = document.getElementById("vooDestinoInput");
+  const dataIdaInput = document.getElementById("dataIda");
+  const dataVoltaInput = document.getElementById("dataVolta");
+  const tipoSelect = document.getElementById("vooTipo");
+  const passageirosSelect = document.getElementById("vooPassageiros");
+
+  let passageiros = 1;
+  if (passageirosSelect) {
+    const textoPass = passageirosSelect.value || passageirosSelect.options[passageirosSelect.selectedIndex]?.text || "";
+    const matchPass = textoPass.match(/(\d+)/);
+    if (matchPass) {
+      passageiros = Math.max(1, parseInt(matchPass[1], 10));
+    }
+  }
+
+  const destinoTexto = (destinoInput?.value || "lisboa").toLowerCase();
+  let baseDestino = 280000;
+  for (const chave in TARIFAS_DESTINO) {
+    if (destinoTexto.includes(chave)) {
+      baseDestino = TARIFAS_DESTINO[chave];
+      break;
+    }
+  }
+
+  let fatorData = 1.0;
+  if (dataIdaInput && dataIdaInput.value) {
+    const hoje = new Date();
+    const ida = new Date(dataIdaInput.value + "T00:00:00");
+    const diasAntecedencia = Math.ceil((ida - hoje) / (1000 * 60 * 60 * 24));
+
+    if (diasAntecedencia <= 3) fatorData = 1.35;
+    else if (diasAntecedencia <= 7) fatorData = 1.2;
+    else if (diasAntecedencia >= 21) fatorData = 0.9;
+
+    const diaSemana = ida.getDay();
+    if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6) {
+      fatorData *= 1.08;
+    }
+  }
+
+  const tipoTexto = ((tipoSelect?.value || "") + " " + (tipoSelect?.options[tipoSelect.selectedIndex]?.text || "")).toLowerCase();
+  const isSoIda = tipoTexto.includes("só ida") || tipoTexto.includes("so ida");
+  const fatorIdaVolta = (!isSoIda || (dataVoltaInput && dataVoltaInput.value)) ? 1.85 : 1.0;
+
+  const idx = (typeof currentVooIndex === "number" ? currentVooIndex : 0) % OPCOES_VOO_AUTO.length;
+  const opcao = OPCOES_VOO_AUTO[idx] || OPCOES_VOO_AUTO[0];
+
+  const precoCalculado = Math.round((baseDestino * fatorData * fatorIdaVolta * passageiros * opcao.fator) / 1000) * 1000;
+  window.precoVooAtual = precoCalculado;
+
+  const captionEl = document.getElementById("voosCaption");
+  if (captionEl) {
+    const destLabel = destinoInput?.value?.trim() || "Lisboa";
+    captionEl.textContent = `${opcao.nome} (Bissau -> ${destLabel}) — ${precoCalculado.toLocaleString("pt-PT")} XOF`;
+  }
+
+  const phoneEl = document.getElementById("voosPhone");
+  if (phoneEl) {
+    phoneEl.textContent = opcao.guiche;
+  }
+
+  return precoCalculado;
+}
+
+document.addEventListener("change", (e) => {
+  if (e.target.closest("#voosModal")) {
+    calcularPrecoVooAutomatico();
+  }
+});
+
+document.addEventListener("input", (e) => {
+  if (e.target.closest("#voosModal")) {
+    calcularPrecoVooAutomatico();
+  }
+});
