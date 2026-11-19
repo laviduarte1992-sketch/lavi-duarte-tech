@@ -499,93 +499,198 @@ document.addEventListener("DOMContentLoaded", function() {
     // 4. Renderiza os hotéis inicialmente
     renderizarHoteis();
 });
-const TARIFAS_DESTINO = {
-  lisboa: 280000,
-  dakar: 95000,
-  casablanca: 210000,
-  paris: 340000
-};
+(function () {
+  function calcularBasePorDestinoTexto(destinoTexto) {
+    const limpo = (destinoTexto || "Lisboa").trim().toLowerCase();
+    if (!limpo) return 310000;
 
-const OPCOES_VOO_AUTO = [
-  { nome: "Atlantic", guiche: "Guichê Atlantic Bissau: +245 955 700 800", fator: 1.0 },
-  { nome: "TAP Air Portugal", guiche: "Guichê Osvaldo Vieira: +245 955 100 200", fator: 1.08 },
-  { nome: "Royal Air Maroc", guiche: "Guichê Osvaldo Vieira: +245 955 100 201", fator: 0.95 },
-  { nome: "ASKY Airlines", guiche: "Guichê Osvaldo Vieira: +245 955 100 202", fator: 0.88 }
-];
+    // Tarifas base de referência (em XOF) por região/país/cidade
+    if (/dakar|senegal|banjul|gambia|conakry|guine|bissau|praia|cabo verde|abidjan|lome|lomé|accra|lagos|nigeria|bamako|mali/.test(limpo)) {
+      return 125000;
+    }
+    if (/casablanca|marrocos|tunes|tunisia|argel|argelia|cairo|egito/.test(limpo)) {
+      return 225000;
+    }
+    if (/lisboa|porto|portugal|madrid|barcelona|espanha|paris|franca|frança|londres|uk|reinounido|bruxelas|amsterdao|amsterdão|roma|italia|itália|berlim|alemanha/.test(limpo)) {
+      return 320000;
+    }
+    if (/brasil|sao paulo|são paulo|rio|lisboa|estados unidos|eua|miami|nova iorque|new york|toronto|canada|canadá/.test(limpo)) {
+      return 440000;
+    }
 
-function calcularPrecoVooAutomatico() {
-  const destinoInput = document.getElementById("vooDestinoInput");
-  const dataIdaInput = document.getElementById("dataIda");
-  const dataVoltaInput = document.getElementById("dataVolta");
-  const tipoSelect = document.getElementById("vooTipo");
-  const passageirosSelect = document.getElementById("vooPassageiros");
+    // Para qualquer outro país ou cidade digitada, gera uma base estável entre 180.000 e 460.000 XOF
+    let hash = 0;
+    for (let i = 0; i < limpo.length; i++) {
+      hash = (hash * 31 + limpo.charCodeAt(i)) % 100000;
+    }
+    const variacao = (hash % 280) * 1000; // 0 a 279.000 XOF
+    return 180000 + variacao;
+  }
 
-  let passageiros = 1;
-  if (passageirosSelect) {
-    const textoPass = passageirosSelect.value || passageirosSelect.options[passageirosSelect.selectedIndex]?.text || "";
-    const matchPass = textoPass.match(/(\d+)/);
+  function calcularPrecoParaData(baseDestino, dataObj, multiplicadorViagem, passageiros, fatorCompanhia) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const alvo = new Date(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate());
+    const diffDias = Math.round((alvo - hoje) / (1000 * 60 * 60 * 24));
+    const diaSemana = alvo.getDay(); // 0=Dom ... 6=Sab
+
+    // Variação realística por antecedência e dia da semana
+    let fatorAntecedencia = 1.0;
+    if (diffDias <= 1) fatorAntecedencia = 1.32;
+    else if (diffDias <= 3) fatorAntecedencia = 1.22;
+    else if (diffDias <= 7) fatorAntecedencia = 1.12;
+    else if (diffDias >= 21) fatorAntecedencia = 0.88;
+    else if (diffDias >= 14) fatorAntecedencia = 0.94;
+
+    // Dias da semana têm preços diferentes (terça/quarta costumam ser mais baratas; sex/dom mais caras)
+    const fatoresDiaSemana = [1.10, 0.96, 0.92, 0.93, 0.98, 1.12, 1.06];
+    const fatorSemana = fatoresDiaSemana[diaSemana] || 1.0;
+
+    // Micro variação por dia do mês para diferenciar datas consecutivas
+    const fatorDia = 0.96 + ((alvo.getDate() % 7) * 0.015);
+
+    const bruto = baseDestino * fatorAntecedencia * fatorSemana * fatorDia * multiplicadorViagem * passageiros * fatorCompanhia;
+    return Math.round(bruto / 1000) * 1000;
+  }
+
+  function formatarDataISO(dataObj) {
+    const y = dataObj.getFullYear();
+    const m = String(dataObj.getMonth() + 1).padStart(2, "0");
+    const d = String(dataObj.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatarDataCurta(dataObj) {
+    return dataObj.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit" });
+  }
+
+  function renderizarSugestoesDias(destinoLabel, baseDestino, dataBaseObj, multiplicadorViagem, passageiros, fatorCompanhia) {
+    const modal = document.getElementById("voosModal");
+    const destinoInput = document.getElementById("vooDestinoInput");
+    const dataIdaInput = document.getElementById("dataIda");
+    if (!modal || !destinoInput) return;
+
+    let painelDias = document.getElementById("voosDiasPrecosAuto");
+    if (!painelDias) {
+      painelDias = document.createElement("div");
+      painelDias.id = "voosDiasPrecosAuto";
+      painelDias.style.cssText = "margin: 6px 0 10px; padding: 8px; border-radius: 10px; background: #f5f8fc; border: 1px solid #dce5f2;";
+      destinoInput.parentNode.insertBefore(painelDias, destinoInput.nextSibling);
+    }
+
+    const offsets = [0, 1, 2, 3, 5, 7];
+    const botoesHTML = offsets.map((offset) => {
+      const d = new Date(dataBaseObj.getFullYear(), dataBaseObj.getMonth(), dataBaseObj.getDate() + offset);
+      const precoDia = calcularPrecoParaData(baseDestino, d, multiplicadorViagem, passageiros, fatorCompanhia);
+      const iso = formatarDataISO(d);
+      const ativa = dataIdaInput && dataIdaInput.value === iso;
+
+      return `
+        <button type="button" data-data-voo="${iso}" style="
+          flex: 1 1 30%;
+          min-width: 92px;
+          padding: 6px;
+          border-radius: 8px;
+          border: 1px solid ${ativa ? "#0066cc" : "#d0d7de"};
+          background: ${ativa ? "#e6f0ff" : "#ffffff"};
+          color: #111;
+          font-size: 10px;
+          cursor: pointer;
+          text-align: center;
+          line-height: 1.3;
+        ">
+          <div style="font-weight: bold;">${formatarDataCurta(d)}</div>
+          <div style="color: #007a33; font-weight: bold;">${precoDia.toLocaleString("pt-PT")} XOF</div>
+        </button>
+      `;
+    }).join("");
+
+    painelDias.innerHTML = `
+      <div style="font-size: 10px; font-weight: bold; color: #333; margin-bottom: 6px;">
+        Tarifas automáticas por dia — Bissau → ${destinoLabel}:
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+        ${botoesHTML}
+      </div>
+    `;
+
+    painelDias.querySelectorAll("button[data-data-voo]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const novaData = btn.getAttribute("data-data-voo");
+        if (dataIdaInput && novaData) {
+          dataIdaInput.value = novaData;
+          dataIdaInput.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        atualizarMotorVoosAutomatico();
+      });
+    });
+  }
+
+  window.atualizarMotorVoosAutomatico = function () {
+    const destinoEl = document.getElementById("vooDestinoInput");
+    const idaEl = document.getElementById("dataIda");
+    const tipoEl = document.getElementById("vooTipo");
+    const passEl = document.getElementById("vooPassageiros");
+    const captionEl = document.getElementById("voosCaption");
+    const phoneEl = document.getElementById("voosPhone");
+
+    const lista = (typeof voosDatasets !== "undefined" && Array.isArray(voosDatasets)) ? voosDatasets : [];
+    const idx = (typeof currentVooIndex === "number") ? currentVooIndex : 0;
+    const itemAtual = lista[idx] || {
+      text: "TAP Air Portugal (Bissau -> Lisboa)",
+      phone: "Guichê Osvaldo Vieira: +245 955 100 200"
+    };
+
+    const companhia = (itemAtual.text.split("(")[0] || "Voo").trim();
+    const destinoDigitado = (destinoEl?.value || "").trim();
+    const destinoLabel = destinoDigitado || (itemAtual.text.match(/->\s*([^)]+)/)?.[1] || "Lisboa").trim();
+    const rotaTexto = `Bissau -> ${destinoLabel}`;
+
+    const baseDestino = calcularBasePorDestinoTexto(destinoLabel);
+
+    let passageiros = 1;
+    const matchPass = (passEl?.value || "").match(/(\d+)/);
     if (matchPass) {
       passageiros = Math.max(1, parseInt(matchPass[1], 10));
     }
-  }
 
-  const destinoTexto = (destinoInput?.value || "lisboa").toLowerCase();
-  let baseDestino = 280000;
-  for (const chave in TARIFAS_DESTINO) {
-    if (destinoTexto.includes(chave)) {
-      baseDestino = TARIFAS_DESTINO[chave];
-      break;
+    const tipoLower = (tipoEl?.value || "Ida e Volta").toLowerCase();
+    const multiplicadorViagem = (tipoLower.includes("só") || tipoLower.includes("so")) ? 1.0 : 1.85;
+
+    let fatorCompanhia = 1.0;
+    const compLower = companhia.toLowerCase();
+    if (compLower.includes("tap")) fatorCompanhia = 1.08;
+    else if (compLower.includes("royal")) fatorCompanhia = 0.96;
+    else if (compLower.includes("asky")) fatorCompanhia = 0.88;
+
+    const dataBase = (idaEl && idaEl.value)
+      ? new Date(idaEl.value + "T00:00:00")
+      : new Date();
+
+    const precoAtual = calcularPrecoParaData(baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia);
+    window.precoVooCalculado = precoAtual;
+
+    if (captionEl) {
+      captionEl.textContent = `${companhia} (${rotaTexto}) — ${precoAtual.toLocaleString("pt-PT")} XOF`;
     }
-  }
-
-  let fatorData = 1.0;
-  if (dataIdaInput && dataIdaInput.value) {
-    const hoje = new Date();
-    const ida = new Date(dataIdaInput.value + "T00:00:00");
-    const diasAntecedencia = Math.ceil((ida - hoje) / (1000 * 60 * 60 * 24));
-
-    if (diasAntecedencia <= 3) fatorData = 1.35;
-    else if (diasAntecedencia <= 7) fatorData = 1.2;
-    else if (diasAntecedencia >= 21) fatorData = 0.9;
-
-    const diaSemana = ida.getDay();
-    if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6) {
-      fatorData *= 1.08;
+    if (phoneEl && itemAtual.phone) {
+      phoneEl.textContent = itemAtual.phone;
     }
-  }
 
-  const tipoTexto = ((tipoSelect?.value || "") + " " + (tipoSelect?.options[tipoSelect.selectedIndex]?.text || "")).toLowerCase();
-  const isSoIda = tipoTexto.includes("só ida") || tipoTexto.includes("so ida");
-  const fatorIdaVolta = (!isSoIda || (dataVoltaInput && dataVoltaInput.value)) ? 1.85 : 1.0;
+    renderizarSugestoesDias(destinoLabel, baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia);
+    return precoAtual;
+  };
 
-  const idx = (typeof currentVooIndex === "number" ? currentVooIndex : 0) % OPCOES_VOO_AUTO.length;
-  const opcao = OPCOES_VOO_AUTO[idx] || OPCOES_VOO_AUTO[0];
+  ["change", "input", "click"].forEach((ev) => {
+    document.addEventListener(ev, (e) => {
+      if (e.target && e.target.closest && e.target.closest("#voosModal")) {
+        setTimeout(window.atualizarMotorVoosAutomatico, 10);
+      }
+    });
+  });
 
-  const precoCalculado = Math.round((baseDestino * fatorData * fatorIdaVolta * passageiros * opcao.fator) / 1000) * 1000;
-  window.precoVooAtual = precoCalculado;
-
-  const captionEl = document.getElementById("voosCaption");
-  if (captionEl) {
-    const destLabel = destinoInput?.value?.trim() || "Lisboa";
-    captionEl.textContent = `${opcao.nome} (Bissau -> ${destLabel}) — ${precoCalculado.toLocaleString("pt-PT")} XOF`;
-  }
-
-  const phoneEl = document.getElementById("voosPhone");
-  if (phoneEl) {
-    phoneEl.textContent = opcao.guiche;
-  }
-
-  return precoCalculado;
-}
-
-document.addEventListener("change", (e) => {
-  if (e.target.closest("#voosModal")) {
-    calcularPrecoVooAutomatico();
-  }
-});
-
-document.addEventListener("input", (e) => {
-  if (e.target.closest("#voosModal")) {
-    calcularPrecoVooAutomatico();
-  }
-});
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(window.atualizarMotorVoosAutomatico, 150);
+  });
+})();
