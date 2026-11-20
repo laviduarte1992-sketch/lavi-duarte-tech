@@ -500,347 +500,270 @@ document.addEventListener("DOMContentLoaded", function() {
     renderizarHoteis();
 });
 (function () {
-  let pesquisaRealizada = false;
+  let dadosVooSelecionado = {
+    dataISO: "",
+    dataTexto: "",
+    precoXOF: 0,
+    tipo: "Só Ida",
+    passageiros: 1,
+    destino: "Lisboa",
+    companhia: "TAP Air Portugal"
+  };
 
-  function calcularBasePorDestinoTexto(destinoTexto) {
-    const limpo = (destinoTexto || "").trim().toLowerCase();
-    if (!limpo) return 290000;
-
-    if (/dakar|senegal|banjul|gambia|conakry|guine|guiné|praia|cabo verde|abidjan|lome|lomé|accra|lagos|nigeria|nigéria|bamako|mali/.test(limpo)) {
-      return 110000;
-    }
-    if (/casablanca|marrocos|tunes|tunisia|tunísia|argel|argelia|argélia|cairo|egito/.test(limpo)) {
-      return 185000;
-    }
-    if (/lisboa|porto|portugal|madrid|barcelona|espanha|paris|franca|frança|londres|uk|reino unido|bruxelas|amsterdao|amsterdão|roma|italia|itália|berlim|alemanha/.test(limpo)) {
-      return 295000;
-    }
-    if (/brasil|sao paulo|são paulo|rio|estados unidos|eua|miami|nova iorque|new york|toronto|canada|canadá/.test(limpo)) {
-      return 390000;
-    }
-
-    let hash = 0;
-    for (let i = 0; i < limpo.length; i++) {
-      hash = (hash * 31 + limpo.charCodeAt(i)) % 100000;
-    }
-    const variacao = (hash % 160) * 1000;
-    return 150000 + variacao;
-  }
-
-  function calcularPrecoParaData(baseDestino, dataObj, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse) {
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-
-    const alvo = new Date(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate());
-    const diffDias = Math.round((alvo - hoje) / (1000 * 60 * 60 * 24));
-    const diaSemana = alvo.getDay();
-
-    let fatorAntecedencia = 1.0;
-    if (diffDias <= 1) fatorAntecedencia = 1.14;
-    else if (diffDias <= 3) fatorAntecedencia = 1.08;
-    else if (diffDias <= 7) fatorAntecedencia = 1.04;
-    else if (diffDias >= 21) fatorAntecedencia = 0.90;
-    else if (diffDias >= 14) fatorAntecedencia = 0.95;
-
-    const fatoresDiaSemana = [1.05, 0.96, 0.93, 0.94, 0.98, 1.06, 1.03];
-    const fatorSemana = fatoresDiaSemana[diaSemana] || 1.0;
-    const fatorDia = 0.97 + ((alvo.getDate() % 5) * 0.012);
-
-    const bruto = baseDestino * fatorAntecedencia * fatorSemana * fatorDia * multiplicadorViagem * passageiros * fatorCompanhia * fatorClasse;
-    return Math.round(bruto / 1000) * 1000;
-  }
-
-  function formatarDataISO(dataObj) {
-    const y = dataObj.getFullYear();
-    const m = String(dataObj.getMonth() + 1).padStart(2, "0");
-    const d = String(dataObj.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  }
-
-  function formatarDataCurta(dataObj) {
-    return dataObj.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit" });
-  }
-
-  function limparPrecoFixoCabecalho() {
-    const captionEl = document.getElementById("voosCaption");
-    const phoneEl = document.getElementById("voosPhone");
+  function obterEstadoVooAtual() {
+    const destinoEl = document.getElementById("vooDestinoInput");
+    const idaEl = document.getElementById("dataIda");
+    const passEl = document.getElementById("vooPassageiros");
+    const radioSel = document.querySelector('input[name="tipoViagemBooking"]:checked');
     const lista = (typeof voosDatasets !== "undefined" && Array.isArray(voosDatasets)) ? voosDatasets : [];
     const idx = (typeof currentVooIndex === "number") ? currentVooIndex : 0;
-    const itemAtual = lista[idx] || {
-      text: "Atlantic",
-      phone: "Guichê Atlantic Bissau: +245 955 700 800"
-    };
+    const itemAtual = lista[idx] || { text: "TAP Air Portugal" };
 
     const companhia = (itemAtual.text.split("(")[0] || "Companhia Aérea").trim();
-    if (captionEl) {
-      captionEl.textContent = `${companhia} • Voos Internacionais & Regionais`;
-    }
-    if (phoneEl && itemAtual.phone) {
-      phoneEl.textContent = itemAtual.phone;
-    }
-  }
+    const destino = (destinoEl?.value || "").trim() || "Lisboa";
+    const tipo = radioSel ? radioSel.value : "Só Ida";
+    const matchPass = (passEl?.value || "").match(/(\d+)/);
+    const passageiros = matchPass ? Math.max(1, parseInt(matchPass[1], 10)) : 1;
 
-  function garantirBarraBookingEBotao() {
-    const destinoInput = document.getElementById("vooDestinoInput");
-    const tipoEl = document.getElementById("vooTipo");
-    const voltaEl = document.getElementById("dataVolta");
-    const idaEl = document.getElementById("dataIda");
-    if (!destinoInput) return;
+    const botaoAtivo = document.querySelector('#voosDiasPrecosAuto button[data-data-voo][style*="rgb(230, 240, 255)"]');
+    const dataISO = botaoAtivo?.getAttribute("data-data-voo") || idaEl?.value || "";
+    const precoAttr = Number(botaoAtivo?.getAttribute("data-preco-voo") || 0);
+    const precoXOF = precoAttr || Number(window.precoVooCalculado || 0);
 
-    // 1. Cria a barra estilo Booking (Ida e Volta | Só Ida | Classe) acima das datas
-    const containerDatas = idaEl ? idaEl.closest("div")?.parentElement : null;
-    if (containerDatas && !document.getElementById("barraOpcoesVooBooking")) {
-      const barra = document.createElement("div");
-      barra.id = "barraOpcoesVooBooking";
-      barra.style.cssText = `
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        margin: 8px 0;
-        padding: 8px 10px;
-        border-radius: 10px;
-        border: 1.5px solid #febb02;
-        background: #ffffff;
-        font-size: 12px;
-        color: #1a1a1a;
-      `;
-      barra.innerHTML = `
-        <div style="display:flex; align-items:center; gap:12px;">
-          <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:600;">
-            <input type="radio" name="tipoViagemBooking" value="Ida e Volta" checked style="accent-color:#006ce4; width:15px; height:15px;">
-            Ida e Volta
-          </label>
-          <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:600;">
-            <input type="radio" name="tipoViagemBooking" value="Só Ida" style="accent-color:#006ce4; width:15px; height:15px;">
-            Só Ida
-          </label>
-        </div>
-        <select id="classeCabineBooking" style="border:none; background:transparent; font-size:12px; font-weight:600; color:#1a1a1a; cursor:pointer; outline:none;">
-          <option value="economica">Classe: Económica</option>
-          <option value="executiva">Classe: Executiva</option>
-        </select>
-      `;
-      containerDatas.parentNode.insertBefore(barra, containerDatas);
-
-      // Sincroniza os botões radio com o select #vooTipo existente
-      barra.querySelectorAll('input[name="tipoViagemBooking"]').forEach((radio) => {
-        radio.addEventListener("change", () => {
-          if (tipoEl) {
-            const alvo = radio.value.toLowerCase();
-            for (let i = 0; i < tipoEl.options.length; i++) {
-              const txt = tipoEl.options[i].text.toLowerCase();
-              if ((alvo.includes("só") && (txt.includes("só") || txt.includes("so"))) ||
-                  (!alvo.includes("só") && txt.includes("volta"))) {
-                tipoEl.selectedIndex = i;
-                break;
-              }
-            }
-          }
-          window.atualizarMotorVoosAutomatico();
-        });
-      });
-
-      document.getElementById("classeCabineBooking")?.addEventListener("change", () => {
-        window.atualizarMotorVoosAutomatico();
-      });
-    }
-
-    // 2. Sincroniza o estado visual entre #vooTipo, os rádios e o campo Data de Volta
-    const radioSelecionado = document.querySelector('input[name="tipoViagemBooking"]:checked');
-    const valorTipoAtual = (radioSelecionado ? radioSelecionado.value : (tipoEl?.value || "Ida e Volta")).toLowerCase();
-    const isSoIda = valorTipoAtual.includes("só") || valorTipoAtual.includes("so");
-
-    if (tipoEl) {
-      // Se o utilizador mudou pelo <select>, atualiza também o botão radio
-      const selectLower = (tipoEl.value || "").toLowerCase();
-      const selectIsSoIda = selectLower.includes("só") || selectLower.includes("so");
-      const radios = document.querySelectorAll('input[name="tipoViagemBooking"]');
-      if (radios.length === 2 && document.activeElement === tipoEl) {
-        radios[0].checked = !selectIsSoIda;
-        radios[1].checked = selectIsSoIda;
+    let dataTexto = dataISO;
+    if (dataISO) {
+      const d = new Date(dataISO + "T00:00:00");
+      if (!isNaN(d.getTime())) {
+        dataTexto = d.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" });
       }
     }
 
-    const finalIsSoIda = document.querySelector('input[name="tipoViagemBooking"]:checked')?.value.toLowerCase().includes("só") ?? isSoIda;
+    dadosVooSelecionado = {
+      dataISO,
+      dataTexto: dataTexto || "A definir",
+      precoXOF,
+      tipo,
+      passageiros,
+      destino,
+      companhia
+    };
 
-    if (voltaEl) {
-      voltaEl.disabled = finalIsSoIda;
-      voltaEl.style.opacity = finalIsSoIda ? "0.4" : "1";
-      voltaEl.style.backgroundColor = finalIsSoIda ? "#f0f2f5" : "";
-      if (finalIsSoIda) voltaEl.value = "";
-    }
-
-    // 3. Botão Pesquisar Voos & Datas
-    if (!document.getElementById("btnPesquisarVoosAuto")) {
-      const btn = document.createElement("button");
-      btn.id = "btnPesquisarVoosAuto";
-      btn.type = "button";
-      btn.textContent = "🔍 Pesquisar Voos & Datas";
-      btn.style.cssText = `
-        width: 100%;
-        margin: 8px 0 10px;
-        padding: 11px;
-        border: none;
-        border-radius: 10px;
-        background: #006ce4;
-        color: #ffffff;
-        font-weight: bold;
-        font-size: 13px;
-        cursor: pointer;
-      `;
-      destinoInput.parentNode.insertBefore(btn, destinoInput.nextSibling);
-
-      btn.addEventListener("click", () => {
-        const destVal = (destinoInput.value || "").trim();
-        if (!destVal) {
-          alert("Por favor, digite o país ou cidade de destino (Ex: Lisboa, Dakar, Brasil, França...).");
-          destinoInput.focus();
-          return;
-        }
-        pesquisaRealizada = true;
-        window.atualizarMotorVoosAutomatico();
-      });
-    }
+    return dadosVooSelecionado;
   }
 
-  window.atualizarMotorVoosAutomatico = function () {
-    limparPrecoFixoCabecalho();
-    garantirBarraBookingEBotao();
-
-    const destinoEl = document.getElementById("vooDestinoInput");
-    const idaEl = document.getElementById("dataIda");
-    const tipoEl = document.getElementById("vooTipo");
-    const passEl = document.getElementById("vooPassageiros");
-    const classeEl = document.getElementById("classeCabineBooking");
-    const btnPesquisar = document.getElementById("btnPesquisarVoosAuto");
-
-    let painelDias = document.getElementById("voosDiasPrecosAuto");
-
-    if (!pesquisaRealizada) {
-      if (painelDias) painelDias.style.display = "none";
-      return;
+  function gerarCodigoReserva() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let codigo = "OXB";
+    for (let i = 0; i < 5; i++) {
+      codigo += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+    return codigo;
+  }
 
-    const destinoLabel = (destinoEl?.value || "").trim();
-    if (!destinoLabel) {
-      if (painelDias) painelDias.style.display = "none";
-      return;
-    }
+  function mostrarBilheteEletronico(passageiro) {
+    const modal = document.getElementById("voosModal");
+    if (!modal) return;
 
-    const lista = (typeof voosDatasets !== "undefined" && Array.isArray(voosDatasets)) ? voosDatasets : [];
-    const idx = (typeof currentVooIndex === "number") ? currentVooIndex : 0;
-    const itemAtual = lista[idx] || { text: "Atlantic" };
-    const companhia = (itemAtual.text.split("(")[0] || "Voo").trim();
+    const voo = obterEstadoVooAtual();
+    const pnr = gerarCodigoReserva();
+    const valorFormatado = `${Number(voo.precoXOF || 0).toLocaleString("pt-PT")} XOF`;
 
-    let fatorCompanhia = 1.0;
-    const compLower = companhia.toLowerCase();
-    if (compLower.includes("tap")) fatorCompanhia = 1.04;
-    else if (compLower.includes("royal")) fatorCompanhia = 0.96;
-    else if (compLower.includes("asky")) fatorCompanhia = 0.90;
-
-    let passageiros = 1;
-    const matchPass = (passEl?.value || "").match(/(\d+)/);
-    if (matchPass) {
-      passageiros = Math.max(1, parseInt(matchPass[1], 10));
-    }
-
-    const radioSel = document.querySelector('input[name="tipoViagemBooking"]:checked');
-    const tipoTexto = (radioSel ? radioSel.value : (tipoEl?.value || "Ida e Volta")).toLowerCase();
-    const isSoIda = tipoTexto.includes("só") || tipoTexto.includes("so");
-    const tipoLabel = isSoIda ? "Só Ida" : "Ida e Volta";
-    const multiplicadorViagem = isSoIda ? 1.0 : 1.65;
-
-    const fatorClasse = (classeEl && classeEl.value === "executiva") ? 1.45 : 1.0;
-
-    const baseDestino = calcularBasePorDestinoTexto(destinoLabel);
-    const dataBase = (idaEl && idaEl.value)
-      ? new Date(idaEl.value + "T00:00:00")
-      : new Date();
-
-    const precoAtual = calcularPrecoParaData(baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
-    window.precoVooCalculado = precoAtual;
-
-    if (!painelDias && btnPesquisar) {
-      painelDias = document.createElement("div");
-      painelDias.id = "voosDiasPrecosAuto";
-      painelDias.style.cssText = "margin: 4px 0 10px; padding: 8px; border-radius: 10px; background: #f5f8fc; border: 1px solid #dce5f2;";
-      btnPesquisar.parentNode.insertBefore(painelDias, btnPesquisar.nextSibling);
-    }
-
-    if (!painelDias) return;
-    painelDias.style.display = "block";
-
-    const offsets = [0, 1, 2, 3, 5, 7];
-    const botoesHTML = offsets.map((offset) => {
-      const d = new Date(dataBase.getFullYear(), dataBase.getMonth(), dataBase.getDate() + offset);
-      const precoDia = calcularPrecoParaData(baseDestino, d, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
-      const iso = formatarDataISO(d);
-      const ativa = idaEl && idaEl.value === iso;
-
-      return `
-        <button type="button" data-data-voo="${iso}" data-preco-voo="${precoDia}" style="
-          flex: 1 1 30%;
-          min-width: 92px;
-          padding: 6px;
-          border-radius: 8px;
-          border: 1px solid ${ativa ? "#006ce4" : "#d0d7de"};
-          background: ${ativa ? "#e6f0ff" : "#ffffff"};
-          color: #111;
-          font-size: 10px;
-          cursor: pointer;
-          text-align: center;
-          line-height: 1.3;
-        ">
-          <div style="font-weight: bold;">${formatarDataCurta(d)}</div>
-          <div style="color: #007a33; font-weight: bold;">${precoDia.toLocaleString("pt-PT")} XOF</div>
-          <div style="color: #555; font-size: 9px;">${tipoLabel} • ${passageiros} Pass.</div>
-        </button>
+    let areaBilhete = document.getElementById("bilheteEletronicoGerado");
+    if (!areaBilhete) {
+      areaBilhete = document.createElement("div");
+      areaBilhete.id = "bilheteEletronicoGerado";
+      areaBilhete.style.cssText = `
+        margin-top: 12px;
+        padding: 14px;
+        border-radius: 12px;
+        border: 2px dashed #006ce4;
+        background: #ffffff;
+        color: #111;
+        font-size: 12px;
       `;
-    }).join("");
+      modal.appendChild(areaBilhete);
+    }
 
-    painelDias.innerHTML = `
-      <div style="font-size: 11px; font-weight: bold; color: #1a1a1a; margin-bottom: 6px;">
-        Resultados (${tipoLabel}) — Bissau → ${destinoLabel} (${companhia}):
+    const assunto = encodeURIComponent(`Bilhete Eletrónico (${pnr}) - Bissau -> ${voo.destino}`);
+    const corpo = encodeURIComponent(
+`BILHETE ELETRÓNICO (E-TICKET)
+Código de Reserva: ${pnr}
+Passageiro: ${passageiro.nome}
+Telefone: ${passageiro.telefone}
+E-mail: ${passageiro.email}
+
+Companhia: ${voo.companhia}
+Rota: Bissau (OXB) -> ${voo.destino}
+Tipo de Viagem: ${voo.tipo}
+Data de Ida: ${voo.dataTexto}
+Passageiros: ${voo.passageiros}
+Total Estimado: ${valorFormatado}`
+    );
+
+    areaBilhete.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e5e7eb; padding-bottom:8px; margin-bottom:10px;">
+        <div>
+          <div style="font-size:11px; color:#006ce4; font-weight:bold;">BILHETE ELETRÓNICO EMITIDO</div>
+          <div style="font-size:15px; font-weight:bold;">Reserva: ${pnr}</div>
+        </div>
+        <span style="background:#e6f7ed; color:#007a33; padding:4px 8px; border-radius:999px; font-size:10px; font-weight:bold;">E-TICKET</span>
       </div>
-      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-        ${botoesHTML}
+
+      <div style="line-height:1.6; margin-bottom:10px;">
+        <div><strong>Passageiro:</strong> ${passageiro.nome}</div>
+        <div><strong>E-mail:</strong> ${passageiro.email}</div>
+        <div><strong>Contacto:</strong> ${passageiro.telefone}</div>
+        <div><strong>Companhia:</strong> ${voo.companhia}</div>
+        <div><strong>Rota:</strong> Bissau (OXB) → ${voo.destino} (${voo.tipo})</div>
+        <div><strong>Data de Ida:</strong> ${voo.dataTexto} | <strong>Passageiros:</strong> ${voo.passageiros}</div>
+        <div style="margin-top:4px; font-size:13px; color:#007a33;"><strong>Valor:</strong> ${valorFormatado}</div>
       </div>
-      <div style="margin-top: 6px; font-size: 11px; color: #006ce4; font-weight: bold; text-align: right;">
-        Selecionado: ${precoAtual.toLocaleString("pt-PT")} XOF (${tipoLabel})
+
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <a href="mailto:${encodeURIComponent(passageiro.email)}?subject=${assunto}&body=${corpo}" style="
+          flex:1 1 45%;
+          text-align:center;
+          text-decoration:none;
+          padding:9px 10px;
+          border-radius:8px;
+          background:#006ce4;
+          color:#fff;
+          font-weight:bold;
+          font-size:11px;
+        ">✉️ Enviar para ${passageiro.email}</a>
+
+        <button type="button" id="btnImprimirBilheteAuto" style="
+          flex:1 1 45%;
+          padding:9px 10px;
+          border-radius:8px;
+          border:1px solid #006ce4;
+          background:#eef5ff;
+          color:#006ce4;
+          font-weight:bold;
+          font-size:11px;
+          cursor:pointer;
+        ">🖨️ Imprimir / Guardar PDF</button>
       </div>
     `;
 
-    painelDias.querySelectorAll("button[data-data-voo]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const novaData = btn.getAttribute("data-data-voo");
-        if (idaEl && novaData) {
-          idaEl.value = novaData;
+    areaBilhete.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+    document.getElementById("btnImprimirBilheteAuto")?.addEventListener("click", () => {
+      const janela = window.open("", "_blank", "width=600,height=700");
+      if (!janela) return;
+      janela.document.write(`
+        <html>
+          <head><title>Bilhete Eletrónico - ${pnr}</title></head>
+          <body style="font-family:Arial,sans-serif; padding:24px; color:#111;">
+            <h2>Bilhete Eletrónico (E-Ticket)</h2>
+            <p><strong>Código de Reserva:</strong> ${pnr}</p>
+            <hr>
+            <p><strong>Passageiro:</strong> ${passageiro.nome}</p>
+            <p><strong>E-mail:</strong> ${passageiro.email}</p>
+            <p><strong>Contacto:</strong> ${passageiro.telefone}</p>
+            <p><strong>Companhia:</strong> ${voo.companhia}</p>
+            <p><strong>Rota:</strong> Bissau (OXB) → ${voo.destino} (${voo.tipo})</p>
+            <p><strong>Data de Ida:</strong> ${voo.dataTexto}</p>
+            <p><strong>Passageiros:</strong> ${voo.passageiros}</p>
+            <p><strong>Total:</strong> ${valorFormatado}</p>
+            <script>window.onload = function(){ window.print(); };<\/script>
+          </body>
+        </html>
+      `);
+      janela.document.close();
+    });
+  }
+
+  function garantirFormularioPassageiro() {
+    const painelDias = document.getElementById("voosDiasPrecosAuto");
+    if (!painelDias || painelDias.style.display === "none") return;
+
+    if (!document.getElementById("btnAvancarDadosPassageiro")) {
+      const btnAvancar = document.createElement("button");
+      btnAvancar.id = "btnAvancarDadosPassageiro";
+      btnAvancar.type = "button";
+      btnAvancar.textContent = "Avançar para Dados do Passageiro →";
+      btnAvancar.style.cssText = `
+        width: 100%;
+        margin-top: 8px;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        background: #007a33;
+        color: #fff;
+        font-weight: bold;
+        font-size: 12px;
+        cursor: pointer;
+      `;
+      painelDias.appendChild(btnAvancar);
+
+      btnAvancar.addEventListener("click", () => {
+        const voo = obterEstadoVooAtual();
+        let formBox = document.getElementById("formDadosPassageiroVoo");
+        if (!formBox) {
+          formBox = document.createElement("div");
+          formBox.id = "formDadosPassageiroVoo";
+          formBox.style.cssText = `
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+          `;
+          painelDias.parentNode.insertBefore(formBox, painelDias.nextSibling);
         }
-        window.atualizarMotorVoosAutomatico();
-      });
-    });
-  };
 
-  ["change", "input", "click"].forEach((ev) => {
-    document.addEventListener(ev, (e) => {
-      if (e.target && e.target.closest && e.target.closest("#voosModal")) {
-        setTimeout(() => {
-          limparPrecoFixoCabecalho();
-          garantirBarraBookingEBotao();
-          if (pesquisaRealizada) {
-            window.atualizarMotorVoosAutomatico();
+        formBox.style.display = "block";
+        formBox.innerHTML = `
+          <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:#0f172a;">
+            Dados do Passageiro — ${voo.dataTexto} (${Number(voo.precoXOF || 0).toLocaleString("pt-PT")} XOF)
+          </div>
+
+          <div style="margin-bottom:8px;">
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Nome completo</label>
+            <input id="passNomeCompleto" type="text" placeholder="Ex: Mamadu Baldé" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:12px;">
+          </div>
+
+          <div style="margin-bottom:8px;">
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">E-mail para receber o bilhete eletrónico</label>
+            <input id="passEmailBilhete" type="email" placeholder="Ex: cliente@email.com" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:12px;">
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Contacto / Telefone</label>
+            <input id="passTelefoneContacto" type="tel" placeholder="Ex: +245 955 000 000" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:12px;">
+          </div>
+
+          <button id="btnEmitirBilheteEletronico" type="button" style="
+            width:100%;
+            padding:10px;
+            border:none;
+            border-radius:8px;
+            background:#006ce4;
+            color:#fff;
+            font-weight:bold;
+            font-size:12px;
+            cursor:pointer;
+          ">🎫 Emitir e Enviar Bilhete Eletrónico</button>
+        `;
+
+        formBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+        document.getElementById("btnEmitirBilheteEletronico")?.addEventListener("click", () => {
+          const nome = (document.getElementById("passNomeCompleto")?.value || "").trim();
+          const email = (document.getElementById("passEmailBilhete")?.value || "").trim();
+          const telefone = (document.getElementById("passTelefoneContacto")?.value || "").trim();
+
+          if (!nome || !email || !telefone) {
+            alert("Preencha o nome completo, o e-mail e o contacto para emitir o bilhete eletrónico.");
+            return;
           }
-        }, 25);
-      }
-    });
-  });
 
-  document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-      limparPrecoFixoCabecalho();
-      garantirBarraBookingEBotao();
-    }, 150);
-  });
+          mostrarBilheteEletronico({ nome, email, telefone });
+        });
+      });
+    }
+  }
+
+  setInterval(garantirFormularioPassageiro, 400);
 })();
