@@ -500,7 +500,42 @@ document.addEventListener("DOMContentLoaded", function() {
     renderizarHoteis();
 });
 (function () {
+  // Configure aqui as suas chaves do EmailJS para envio automático sem abrir o cliente de e-mail
+  const EMAILJS_CONFIG = {
+    enabled: false, // Mude para true depois de preencher as 3 chaves abaixo
+    publicKey: "SUA_PUBLIC_KEY_AQUI",
+    serviceId: "SEU_SERVICE_ID_AQUI",
+    templateId: "SEU_TEMPLATE_ID_AQUI"
+  };
+
   let pesquisaRealizada = false;
+
+  function carregarEmailJSSDK(callback) {
+    if (!EMAILJS_CONFIG.enabled) return callback(false);
+    if (window.emailjs) return callback(true);
+
+    const existente = document.getElementById("emailjs-sdk-script");
+    if (existente) {
+      existente.addEventListener("load", () => callback(Boolean(window.emailjs)));
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "emailjs-sdk-script";
+    script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
+    script.onload = () => {
+      try {
+        if (window.emailjs && EMAILJS_CONFIG.publicKey) {
+          window.emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+        }
+        callback(Boolean(window.emailjs));
+      } catch (e) {
+        callback(false);
+      }
+    };
+    script.onerror = () => callback(false);
+    document.head.appendChild(script);
+  }
 
   function calcularBasePorDestinoTexto(destinoTexto) {
     const limpo = (destinoTexto || "").trim().toLowerCase();
@@ -588,12 +623,84 @@ document.addEventListener("DOMContentLoaded", function() {
     return codigo;
   }
 
-  function mostrarBilheteEletronico(passageiro, voo) {
+  function obterMetodoPagamentoAtual() {
     const modal = document.getElementById("voosModal");
-    if (!modal) return;
+    if (!modal) return "Mobile Money (Orange / Telecel)";
+    const selects = modal.querySelectorAll("select");
+    for (const sel of selects) {
+      if (sel.id !== "classeCabineBooking" && sel.id !== "vooTipo" && sel.id !== "vooPassageiros") {
+        return sel.value || "Mobile Money (Orange / Telecel)";
+      }
+    }
+    return "Mobile Money (Orange / Telecel)";
+  }
 
+  function lerDadosPassageiro() {
+    const nome = (document.getElementById("passNomeCompleto")?.value || "").trim();
+    const email = (document.getElementById("passEmailBilhete")?.value || "").trim();
+    const telefone = (document.getElementById("passTelefoneContacto")?.value || "").trim();
+    return { nome, email, telefone };
+  }
+
+  async function emitirBilheteEEnviarEmail(passageiro, voo, statusTargetEl) {
     const pnr = gerarCodigoReserva();
     const valorFormatado = `${Number(voo.precoXOF || 0).toLocaleString("pt-PT")} XOF`;
+    const metodoPagamento = obterMetodoPagamentoAtual();
+
+    let statusEmailTexto = EMAILJS_CONFIG.enabled
+      ? "A enviar e-mail automático..."
+      : "Pronto para envio por e-mail (configure EmailJS para envio 100% automático).";
+
+    const areaBilhete = renderizarBilheteEletronico({
+      pnr,
+      passageiro,
+      voo,
+      valorFormatado,
+      metodoPagamento,
+      statusEmailTexto
+    });
+
+    const alvoStatus = statusTargetEl || areaBilhete?.querySelector("#statusEnvioEmailAuto");
+
+    if (EMAILJS_CONFIG.enabled && EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.serviceId && EMAILJS_CONFIG.templateId) {
+      carregarEmailJSSDK(async (ok) => {
+        if (!ok || !window.emailjs) {
+          if (alvoStatus) {
+            alvoStatus.textContent = "Não foi possível carregar o serviço de e-mail automático. Use o botão de e-mail abaixo.";
+          }
+          return;
+        }
+        try {
+          await window.emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+            to_email: passageiro.email,
+            passenger_name: passageiro.nome,
+            passenger_phone: passageiro.telefone,
+            pnr_code: pnr,
+            airline: voo.companhia,
+            route: `Bissau (OXB) -> ${voo.destino}`,
+            trip_type: voo.tipo,
+            departure_date: voo.dataTexto,
+            passengers_count: voo.passageiros,
+            total_price: valorFormatado,
+            payment_method: metodoPagamento
+          });
+          if (alvoStatus) {
+            alvoStatus.style.color = "#007a33";
+            alvoStatus.textContent = `✅ Bilhete eletrónico enviado automaticamente para ${passageiro.email}!`;
+          }
+        } catch (err) {
+          if (alvoStatus) {
+            alvoStatus.style.color = "#b45309";
+            alvoStatus.textContent = "Aviso no envio automático. Pode enviar usando o botão 'Enviar por E-mail' abaixo.";
+          }
+        }
+      });
+    }
+  }
+
+  function renderizarBilheteEletronico({ pnr, passageiro, voo, valorFormatado, metodoPagamento, statusEmailTexto }) {
+    const modal = document.getElementById("voosModal");
+    if (!modal) return null;
 
     let areaBilhete = document.getElementById("bilheteEletronicoGerado");
     if (!areaBilhete) {
@@ -624,7 +731,8 @@ Rota: Bissau (OXB) -> ${voo.destino}
 Tipo de Viagem: ${voo.tipo}
 Data de Ida: ${voo.dataTexto}
 Passageiros: ${voo.passageiros}
-Total Estimado: ${valorFormatado}`
+Pagamento: ${metodoPagamento}
+Total: ${valorFormatado}`
     );
 
     areaBilhete.innerHTML = `
@@ -643,7 +751,12 @@ Total Estimado: ${valorFormatado}`
         <div><strong>Companhia:</strong> ${voo.companhia}</div>
         <div><strong>Rota:</strong> Bissau (OXB) → ${voo.destino} (${voo.tipo})</div>
         <div><strong>Data de Ida:</strong> ${voo.dataTexto} | <strong>Passageiros:</strong> ${voo.passageiros}</div>
+        <div><strong>Pagamento:</strong> ${metodoPagamento}</div>
         <div style="margin-top:4px; font-size:13px; color:#007a33;"><strong>Valor:</strong> ${valorFormatado}</div>
+      </div>
+
+      <div id="statusEnvioEmailAuto" style="margin-bottom:10px; font-size:11px; font-weight:600; color:#334155;">
+        ${statusEmailTexto}
       </div>
 
       <div style="display:flex; flex-wrap:wrap; gap:8px;">
@@ -657,7 +770,7 @@ Total Estimado: ${valorFormatado}`
           color:#fff;
           font-weight:bold;
           font-size:11px;
-        ">✉️ Enviar para ${passageiro.email}</a>
+        ">✉️ Enviar por E-mail</a>
 
         <button type="button" id="btnImprimirBilheteAuto" style="
           flex:1 1 45%;
@@ -692,6 +805,7 @@ Total Estimado: ${valorFormatado}`
             <p><strong>Rota:</strong> Bissau (OXB) → ${voo.destino} (${voo.tipo})</p>
             <p><strong>Data de Ida:</strong> ${voo.dataTexto}</p>
             <p><strong>Passageiros:</strong> ${voo.passageiros}</p>
+            <p><strong>Pagamento:</strong> ${metodoPagamento}</p>
             <p><strong>Total:</strong> ${valorFormatado}</p>
             <script>window.onload = function(){ window.print(); };<\/script>
           </body>
@@ -699,6 +813,8 @@ Total Estimado: ${valorFormatado}`
       `);
       janela.document.close();
     });
+
+    return areaBilhete;
   }
 
   function garantirFormularioPassageiro(vooAtual) {
@@ -777,19 +893,36 @@ Total Estimado: ${valorFormatado}`
         formBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
         document.getElementById("btnEmitirBilheteEletronico")?.addEventListener("click", () => {
-          const nome = (document.getElementById("passNomeCompleto")?.value || "").trim();
-          const email = (document.getElementById("passEmailBilhete")?.value || "").trim();
-          const telefone = (document.getElementById("passTelefoneContacto")?.value || "").trim();
-
-          if (!nome || !email || !telefone) {
+          const passageiro = lerDadosPassageiro();
+          if (!passageiro.nome || !passageiro.email || !passageiro.telefone) {
             alert("Preencha o nome completo, o e-mail e o contacto para emitir o bilhete eletrónico.");
             return;
           }
-
-          mostrarBilheteEletronico({ nome, email, telefone }, window.__ultimoEstadoVoo || estado);
+          emitirBilheteEEnviarEmail(passageiro, window.__ultimoEstadoVoo || estado);
         });
       });
     }
+  }
+
+  function ligarBotaoConfirmarEPagar() {
+    const modal = document.getElementById("voosModal");
+    if (!modal || modal.dataset.checkoutLigado === "1") return;
+    modal.dataset.checkoutLigado = "1";
+
+    modal.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      const textoBtn = (btn.textContent || "").toLowerCase();
+      if (textoBtn.includes("confirmar") && textoBtn.includes("pagar")) {
+        const passageiro = lerDadosPassageiro();
+        const estado = window.__ultimoEstadoVoo;
+        if (estado && passageiro.nome && passageiro.email && passageiro.telefone) {
+          setTimeout(() => {
+            emitirBilheteEEnviarEmail(passageiro, estado);
+          }, 50);
+        }
+      }
+    });
   }
 
   function garantirBarraBookingEBotao() {
@@ -798,6 +931,8 @@ Total Estimado: ${valorFormatado}`
     const voltaEl = document.getElementById("dataVolta");
     const idaEl = document.getElementById("dataIda");
     if (!destinoInput) return;
+
+    ligarBotaoConfirmarEPagar();
 
     const containerDatas = idaEl ? idaEl.closest("div")?.parentElement : null;
     if (containerDatas && !document.getElementById("barraOpcoesVooBooking")) {
