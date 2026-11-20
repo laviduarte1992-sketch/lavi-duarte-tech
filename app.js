@@ -527,7 +527,7 @@ document.addEventListener("DOMContentLoaded", function() {
     return 150000 + variacao;
   }
 
-  function calcularPrecoParaData(baseDestino, dataObj, multiplicadorViagem, passageiros, fatorCompanhia) {
+  function calcularPrecoParaData(baseDestino, dataObj, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse) {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
@@ -546,7 +546,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const fatorSemana = fatoresDiaSemana[diaSemana] || 1.0;
     const fatorDia = 0.97 + ((alvo.getDate() % 5) * 0.012);
 
-    const bruto = baseDestino * fatorAntecedencia * fatorSemana * fatorDia * multiplicadorViagem * passageiros * fatorCompanhia;
+    const bruto = baseDestino * fatorAntecedencia * fatorSemana * fatorDia * multiplicadorViagem * passageiros * fatorCompanhia * fatorClasse;
     return Math.round(bruto / 1000) * 1000;
   }
 
@@ -580,21 +580,99 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  function garantirBotaoPesquisar() {
+  function garantirBarraBookingEBotao() {
     const destinoInput = document.getElementById("vooDestinoInput");
     const tipoEl = document.getElementById("vooTipo");
     const voltaEl = document.getElementById("dataVolta");
+    const idaEl = document.getElementById("dataIda");
     if (!destinoInput) return;
 
-    // Atualiza estado do campo Data de Volta consoante "Ida e Volta" vs "Só Ida"
-    if (tipoEl && voltaEl) {
-      const val = (tipoEl.value || "").toLowerCase();
-      const isSoIda = val.includes("só") || val.includes("so");
-      voltaEl.disabled = isSoIda;
-      voltaEl.style.opacity = isSoIda ? "0.45" : "1";
-      if (isSoIda) voltaEl.value = "";
+    // 1. Cria a barra estilo Booking (Ida e Volta | Só Ida | Classe) acima das datas
+    const containerDatas = idaEl ? idaEl.closest("div")?.parentElement : null;
+    if (containerDatas && !document.getElementById("barraOpcoesVooBooking")) {
+      const barra = document.createElement("div");
+      barra.id = "barraOpcoesVooBooking";
+      barra.style.cssText = `
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 8px 0;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1.5px solid #febb02;
+        background: #ffffff;
+        font-size: 12px;
+        color: #1a1a1a;
+      `;
+      barra.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+          <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:600;">
+            <input type="radio" name="tipoViagemBooking" value="Ida e Volta" checked style="accent-color:#006ce4; width:15px; height:15px;">
+            Ida e Volta
+          </label>
+          <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:600;">
+            <input type="radio" name="tipoViagemBooking" value="Só Ida" style="accent-color:#006ce4; width:15px; height:15px;">
+            Só Ida
+          </label>
+        </div>
+        <select id="classeCabineBooking" style="border:none; background:transparent; font-size:12px; font-weight:600; color:#1a1a1a; cursor:pointer; outline:none;">
+          <option value="economica">Classe: Económica</option>
+          <option value="executiva">Classe: Executiva</option>
+        </select>
+      `;
+      containerDatas.parentNode.insertBefore(barra, containerDatas);
+
+      // Sincroniza os botões radio com o select #vooTipo existente
+      barra.querySelectorAll('input[name="tipoViagemBooking"]').forEach((radio) => {
+        radio.addEventListener("change", () => {
+          if (tipoEl) {
+            const alvo = radio.value.toLowerCase();
+            for (let i = 0; i < tipoEl.options.length; i++) {
+              const txt = tipoEl.options[i].text.toLowerCase();
+              if ((alvo.includes("só") && (txt.includes("só") || txt.includes("so"))) ||
+                  (!alvo.includes("só") && txt.includes("volta"))) {
+                tipoEl.selectedIndex = i;
+                break;
+              }
+            }
+          }
+          window.atualizarMotorVoosAutomatico();
+        });
+      });
+
+      document.getElementById("classeCabineBooking")?.addEventListener("change", () => {
+        window.atualizarMotorVoosAutomatico();
+      });
     }
 
+    // 2. Sincroniza o estado visual entre #vooTipo, os rádios e o campo Data de Volta
+    const radioSelecionado = document.querySelector('input[name="tipoViagemBooking"]:checked');
+    const valorTipoAtual = (radioSelecionado ? radioSelecionado.value : (tipoEl?.value || "Ida e Volta")).toLowerCase();
+    const isSoIda = valorTipoAtual.includes("só") || valorTipoAtual.includes("so");
+
+    if (tipoEl) {
+      // Se o utilizador mudou pelo <select>, atualiza também o botão radio
+      const selectLower = (tipoEl.value || "").toLowerCase();
+      const selectIsSoIda = selectLower.includes("só") || selectLower.includes("so");
+      const radios = document.querySelectorAll('input[name="tipoViagemBooking"]');
+      if (radios.length === 2 && document.activeElement === tipoEl) {
+        radios[0].checked = !selectIsSoIda;
+        radios[1].checked = selectIsSoIda;
+      }
+    }
+
+    const finalIsSoIda = document.querySelector('input[name="tipoViagemBooking"]:checked')?.value.toLowerCase().includes("só") ?? isSoIda;
+
+    if (voltaEl) {
+      voltaEl.disabled = finalIsSoIda;
+      voltaEl.style.opacity = finalIsSoIda ? "0.4" : "1";
+      voltaEl.style.backgroundColor = finalIsSoIda ? "#f0f2f5" : "";
+      if (finalIsSoIda) voltaEl.value = "";
+    }
+
+    // 3. Botão Pesquisar Voos & Datas
     if (!document.getElementById("btnPesquisarVoosAuto")) {
       const btn = document.createElement("button");
       btn.id = "btnPesquisarVoosAuto";
@@ -629,17 +707,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
   window.atualizarMotorVoosAutomatico = function () {
     limparPrecoFixoCabecalho();
-    garantirBotaoPesquisar();
+    garantirBarraBookingEBotao();
 
     const destinoEl = document.getElementById("vooDestinoInput");
     const idaEl = document.getElementById("dataIda");
     const tipoEl = document.getElementById("vooTipo");
     const passEl = document.getElementById("vooPassageiros");
+    const classeEl = document.getElementById("classeCabineBooking");
     const btnPesquisar = document.getElementById("btnPesquisarVoosAuto");
 
     let painelDias = document.getElementById("voosDiasPrecosAuto");
 
-    // Só mostra os preços depois do cliente clicar em "Pesquisar Voos"
     if (!pesquisaRealizada) {
       if (painelDias) painelDias.style.display = "none";
       return;
@@ -668,17 +746,20 @@ document.addEventListener("DOMContentLoaded", function() {
       passageiros = Math.max(1, parseInt(matchPass[1], 10));
     }
 
-    const tipoTexto = (tipoEl?.value || "Ida e Volta").toLowerCase();
+    const radioSel = document.querySelector('input[name="tipoViagemBooking"]:checked');
+    const tipoTexto = (radioSel ? radioSel.value : (tipoEl?.value || "Ida e Volta")).toLowerCase();
     const isSoIda = tipoTexto.includes("só") || tipoTexto.includes("so");
     const tipoLabel = isSoIda ? "Só Ida" : "Ida e Volta";
     const multiplicadorViagem = isSoIda ? 1.0 : 1.65;
+
+    const fatorClasse = (classeEl && classeEl.value === "executiva") ? 1.45 : 1.0;
 
     const baseDestino = calcularBasePorDestinoTexto(destinoLabel);
     const dataBase = (idaEl && idaEl.value)
       ? new Date(idaEl.value + "T00:00:00")
       : new Date();
 
-    const precoAtual = calcularPrecoParaData(baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia);
+    const precoAtual = calcularPrecoParaData(baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
     window.precoVooCalculado = precoAtual;
 
     if (!painelDias && btnPesquisar) {
@@ -694,7 +775,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const offsets = [0, 1, 2, 3, 5, 7];
     const botoesHTML = offsets.map((offset) => {
       const d = new Date(dataBase.getFullYear(), dataBase.getMonth(), dataBase.getDate() + offset);
-      const precoDia = calcularPrecoParaData(baseDestino, d, multiplicadorViagem, passageiros, fatorCompanhia);
+      const precoDia = calcularPrecoParaData(baseDestino, d, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
       const iso = formatarDataISO(d);
       const ativa = idaEl && idaEl.value === iso;
 
@@ -742,13 +823,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   };
 
-  // Mantém o cabeçalho sem preço fixo e reage às mudanças
   ["change", "input", "click"].forEach((ev) => {
     document.addEventListener(ev, (e) => {
       if (e.target && e.target.closest && e.target.closest("#voosModal")) {
         setTimeout(() => {
           limparPrecoFixoCabecalho();
-          garantirBotaoPesquisar();
+          garantirBarraBookingEBotao();
           if (pesquisaRealizada) {
             window.atualizarMotorVoosAutomatico();
           }
@@ -760,7 +840,7 @@ document.addEventListener("DOMContentLoaded", function() {
   document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       limparPrecoFixoCabecalho();
-      garantirBotaoPesquisar();
+      garantirBarraBookingEBotao();
     }, 150);
   });
 })();
