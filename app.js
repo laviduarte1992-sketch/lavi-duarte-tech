@@ -500,55 +500,83 @@ document.addEventListener("DOMContentLoaded", function() {
     renderizarHoteis();
 });
 (function () {
-  let dadosVooSelecionado = {
-    dataISO: "",
-    dataTexto: "",
-    precoXOF: 0,
-    tipo: "Só Ida",
-    passageiros: 1,
-    destino: "Lisboa",
-    companhia: "TAP Air Portugal"
-  };
+  let pesquisaRealizada = false;
 
-  function obterEstadoVooAtual() {
-    const destinoEl = document.getElementById("vooDestinoInput");
-    const idaEl = document.getElementById("dataIda");
-    const passEl = document.getElementById("vooPassageiros");
-    const radioSel = document.querySelector('input[name="tipoViagemBooking"]:checked');
-    const lista = (typeof voosDatasets !== "undefined" && Array.isArray(voosDatasets)) ? voosDatasets : [];
-    const idx = (typeof currentVooIndex === "number") ? currentVooIndex : 0;
-    const itemAtual = lista[idx] || { text: "TAP Air Portugal" };
+  function calcularBasePorDestinoTexto(destinoTexto) {
+    const limpo = (destinoTexto || "").trim().toLowerCase();
+    if (!limpo) return 290000;
 
-    const companhia = (itemAtual.text.split("(")[0] || "Companhia Aérea").trim();
-    const destino = (destinoEl?.value || "").trim() || "Lisboa";
-    const tipo = radioSel ? radioSel.value : "Só Ida";
-    const matchPass = (passEl?.value || "").match(/(\d+)/);
-    const passageiros = matchPass ? Math.max(1, parseInt(matchPass[1], 10)) : 1;
-
-    const botaoAtivo = document.querySelector('#voosDiasPrecosAuto button[data-data-voo][style*="rgb(230, 240, 255)"]');
-    const dataISO = botaoAtivo?.getAttribute("data-data-voo") || idaEl?.value || "";
-    const precoAttr = Number(botaoAtivo?.getAttribute("data-preco-voo") || 0);
-    const precoXOF = precoAttr || Number(window.precoVooCalculado || 0);
-
-    let dataTexto = dataISO;
-    if (dataISO) {
-      const d = new Date(dataISO + "T00:00:00");
-      if (!isNaN(d.getTime())) {
-        dataTexto = d.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" });
-      }
+    if (/dakar|senegal|banjul|gambia|conakry|guine|guiné|praia|cabo verde|abidjan|lome|lomé|accra|lagos|nigeria|nigéria|bamako|mali/.test(limpo)) {
+      return 110000;
+    }
+    if (/casablanca|marrocos|tunes|tunisia|tunísia|argel|argelia|argélia|cairo|egito/.test(limpo)) {
+      return 185000;
+    }
+    if (/lisboa|porto|portugal|madrid|barcelona|espanha|paris|franca|frança|londres|uk|reino unido|bruxelas|amsterdao|amsterdão|roma|italia|itália|berlim|alemanha/.test(limpo)) {
+      return 295000;
+    }
+    if (/brasil|sao paulo|são paulo|rio|estados unidos|eua|miami|nova iorque|new york|toronto|canada|canadá/.test(limpo)) {
+      return 390000;
     }
 
-    dadosVooSelecionado = {
-      dataISO,
-      dataTexto: dataTexto || "A definir",
-      precoXOF,
-      tipo,
-      passageiros,
-      destino,
-      companhia
+    let hash = 0;
+    for (let i = 0; i < limpo.length; i++) {
+      hash = (hash * 31 + limpo.charCodeAt(i)) % 100000;
+    }
+    return 150000 + ((hash % 160) * 1000);
+  }
+
+  function calcularPrecoParaData(baseDestino, dataObj, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const alvo = new Date(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate());
+    const diffDias = Math.round((alvo - hoje) / (1000 * 60 * 60 * 24));
+    const diaSemana = alvo.getDay();
+
+    let fatorAntecedencia = 1.0;
+    if (diffDias <= 1) fatorAntecedencia = 1.14;
+    else if (diffDias <= 3) fatorAntecedencia = 1.08;
+    else if (diffDias <= 7) fatorAntecedencia = 1.04;
+    else if (diffDias >= 21) fatorAntecedencia = 0.90;
+    else if (diffDias >= 14) fatorAntecedencia = 0.95;
+
+    const fatoresDiaSemana = [1.05, 0.96, 0.93, 0.94, 0.98, 1.06, 1.03];
+    const fatorSemana = fatoresDiaSemana[diaSemana] || 1.0;
+    const fatorDia = 0.97 + ((alvo.getDate() % 5) * 0.012);
+
+    const bruto = baseDestino * fatorAntecedencia * fatorSemana * fatorDia * multiplicadorViagem * passageiros * fatorCompanhia * fatorClasse;
+    return Math.round(bruto / 1000) * 1000;
+  }
+
+  function formatarDataISO(dataObj) {
+    const y = dataObj.getFullYear();
+    const m = String(dataObj.getMonth() + 1).padStart(2, "0");
+    const d = String(dataObj.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatarDataCurta(dataObj) {
+    return dataObj.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit" });
+  }
+
+  function limparPrecoFixoCabecalho() {
+    const captionEl = document.getElementById("voosCaption");
+    const phoneEl = document.getElementById("voosPhone");
+    const lista = (typeof voosDatasets !== "undefined" && Array.isArray(voosDatasets)) ? voosDatasets : [];
+    const idx = (typeof currentVooIndex === "number") ? currentVooIndex : 0;
+    const itemAtual = lista[idx] || {
+      text: "Atlantic",
+      phone: "Guichê Atlantic Bissau: +245 955 700 800"
     };
 
-    return dadosVooSelecionado;
+    const companhia = (itemAtual.text.split("(")[0] || "Companhia Aérea").trim();
+    if (captionEl) {
+      captionEl.textContent = `${companhia} • Voos Internacionais & Regionais`;
+    }
+    if (phoneEl && itemAtual.phone) {
+      phoneEl.textContent = itemAtual.phone;
+    }
   }
 
   function gerarCodigoReserva() {
@@ -560,11 +588,10 @@ document.addEventListener("DOMContentLoaded", function() {
     return codigo;
   }
 
-  function mostrarBilheteEletronico(passageiro) {
+  function mostrarBilheteEletronico(passageiro, voo) {
     const modal = document.getElementById("voosModal");
     if (!modal) return;
 
-    const voo = obterEstadoVooAtual();
     const pnr = gerarCodigoReserva();
     const valorFormatado = `${Number(voo.precoXOF || 0).toLocaleString("pt-PT")} XOF`;
 
@@ -674,7 +701,7 @@ Total Estimado: ${valorFormatado}`
     });
   }
 
-  function garantirFormularioPassageiro() {
+  function garantirFormularioPassageiro(vooAtual) {
     const painelDias = document.getElementById("voosDiasPrecosAuto");
     if (!painelDias || painelDias.style.display === "none") return;
 
@@ -698,7 +725,6 @@ Total Estimado: ${valorFormatado}`
       painelDias.appendChild(btnAvancar);
 
       btnAvancar.addEventListener("click", () => {
-        const voo = obterEstadoVooAtual();
         let formBox = document.getElementById("formDadosPassageiroVoo");
         if (!formBox) {
           formBox = document.createElement("div");
@@ -713,10 +739,11 @@ Total Estimado: ${valorFormatado}`
           painelDias.parentNode.insertBefore(formBox, painelDias.nextSibling);
         }
 
+        const estado = window.__ultimoEstadoVoo || vooAtual;
         formBox.style.display = "block";
         formBox.innerHTML = `
           <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:#0f172a;">
-            Dados do Passageiro — ${voo.dataTexto} (${Number(voo.precoXOF || 0).toLocaleString("pt-PT")} XOF)
+            Dados do Passageiro — ${estado.dataTexto} (${Number(estado.precoXOF || 0).toLocaleString("pt-PT")} XOF)
           </div>
 
           <div style="margin-bottom:8px;">
@@ -759,11 +786,266 @@ Total Estimado: ${valorFormatado}`
             return;
           }
 
-          mostrarBilheteEletronico({ nome, email, telefone });
+          mostrarBilheteEletronico({ nome, email, telefone }, window.__ultimoEstadoVoo || estado);
         });
       });
     }
   }
 
-  setInterval(garantirFormularioPassageiro, 400);
+  function garantirBarraBookingEBotao() {
+    const destinoInput = document.getElementById("vooDestinoInput");
+    const tipoEl = document.getElementById("vooTipo");
+    const voltaEl = document.getElementById("dataVolta");
+    const idaEl = document.getElementById("dataIda");
+    if (!destinoInput) return;
+
+    const containerDatas = idaEl ? idaEl.closest("div")?.parentElement : null;
+    if (containerDatas && !document.getElementById("barraOpcoesVooBooking")) {
+      const barra = document.createElement("div");
+      barra.id = "barraOpcoesVooBooking";
+      barra.style.cssText = `
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 8px 0;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1.5px solid #febb02;
+        background: #ffffff;
+        font-size: 12px;
+        color: #1a1a1a;
+      `;
+      barra.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+          <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:600;">
+            <input type="radio" name="tipoViagemBooking" value="Ida e Volta" checked style="accent-color:#006ce4; width:15px; height:15px;">
+            Ida e Volta
+          </label>
+          <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:600;">
+            <input type="radio" name="tipoViagemBooking" value="Só Ida" style="accent-color:#006ce4; width:15px; height:15px;">
+            Só Ida
+          </label>
+        </div>
+        <select id="classeCabineBooking" style="border:none; background:transparent; font-size:12px; font-weight:600; color:#1a1a1a; cursor:pointer; outline:none;">
+          <option value="economica">Classe: Económica</option>
+          <option value="executiva">Classe: Executiva</option>
+        </select>
+      `;
+      containerDatas.parentNode.insertBefore(barra, containerDatas);
+
+      barra.querySelectorAll('input[name="tipoViagemBooking"]').forEach((radio) => {
+        radio.addEventListener("change", () => {
+          if (tipoEl) {
+            const alvo = radio.value.toLowerCase();
+            for (let i = 0; i < tipoEl.options.length; i++) {
+              const txt = tipoEl.options[i].text.toLowerCase();
+              if ((alvo.includes("só") && (txt.includes("só") || txt.includes("so"))) ||
+                  (!alvo.includes("só") && txt.includes("volta"))) {
+                tipoEl.selectedIndex = i;
+                break;
+              }
+            }
+          }
+          window.atualizarMotorVoosAutomatico();
+        });
+      });
+
+      document.getElementById("classeCabineBooking")?.addEventListener("change", () => {
+        window.atualizarMotorVoosAutomatico();
+      });
+    }
+
+    const radioSelecionado = document.querySelector('input[name="tipoViagemBooking"]:checked');
+    const valorTipoAtual = (radioSelecionado ? radioSelecionado.value : (tipoEl?.value || "Ida e Volta")).toLowerCase();
+    const finalIsSoIda = valorTipoAtual.includes("só") || valorTipoAtual.includes("so");
+
+    if (voltaEl) {
+      voltaEl.disabled = finalIsSoIda;
+      voltaEl.style.opacity = finalIsSoIda ? "0.4" : "1";
+      voltaEl.style.backgroundColor = finalIsSoIda ? "#f0f2f5" : "";
+      if (finalIsSoIda) voltaEl.value = "";
+    }
+
+    if (!document.getElementById("btnPesquisarVoosAuto")) {
+      const btn = document.createElement("button");
+      btn.id = "btnPesquisarVoosAuto";
+      btn.type = "button";
+      btn.textContent = "🔍 Pesquisar Voos & Datas";
+      btn.style.cssText = `
+        width: 100%;
+        margin: 8px 0 10px;
+        padding: 11px;
+        border: none;
+        border-radius: 10px;
+        background: #006ce4;
+        color: #ffffff;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: pointer;
+      `;
+      destinoInput.parentNode.insertBefore(btn, destinoInput.nextSibling);
+
+      btn.addEventListener("click", () => {
+        const destVal = (destinoInput.value || "").trim();
+        if (!destVal) {
+          alert("Por favor, digite o país ou cidade de destino (Ex: Lisboa, Dakar, Brasil, França...).");
+          destinoInput.focus();
+          return;
+        }
+        pesquisaRealizada = true;
+        window.atualizarMotorVoosAutomatico();
+      });
+    }
+  }
+
+  window.atualizarMotorVoosAutomatico = function () {
+    limparPrecoFixoCabecalho();
+    garantirBarraBookingEBotao();
+
+    const destinoEl = document.getElementById("vooDestinoInput");
+    const idaEl = document.getElementById("dataIda");
+    const tipoEl = document.getElementById("vooTipo");
+    const passEl = document.getElementById("vooPassageiros");
+    const classeEl = document.getElementById("classeCabineBooking");
+    const btnPesquisar = document.getElementById("btnPesquisarVoosAuto");
+
+    let painelDias = document.getElementById("voosDiasPrecosAuto");
+
+    if (!pesquisaRealizada) {
+      if (painelDias) painelDias.style.display = "none";
+      return;
+    }
+
+    const destinoLabel = (destinoEl?.value || "").trim();
+    if (!destinoLabel) {
+      if (painelDias) painelDias.style.display = "none";
+      return;
+    }
+
+    const lista = (typeof voosDatasets !== "undefined" && Array.isArray(voosDatasets)) ? voosDatasets : [];
+    const idx = (typeof currentVooIndex === "number") ? currentVooIndex : 0;
+    const itemAtual = lista[idx] || { text: "Atlantic" };
+    const companhia = (itemAtual.text.split("(")[0] || "Voo").trim();
+
+    let fatorCompanhia = 1.0;
+    const compLower = companhia.toLowerCase();
+    if (compLower.includes("tap")) fatorCompanhia = 1.04;
+    else if (compLower.includes("royal")) fatorCompanhia = 0.96;
+    else if (compLower.includes("asky")) fatorCompanhia = 0.90;
+
+    let passageiros = 1;
+    const matchPass = (passEl?.value || "").match(/(\d+)/);
+    if (matchPass) {
+      passageiros = Math.max(1, parseInt(matchPass[1], 10));
+    }
+
+    const radioSel = document.querySelector('input[name="tipoViagemBooking"]:checked');
+    const tipoTexto = (radioSel ? radioSel.value : (tipoEl?.value || "Ida e Volta")).toLowerCase();
+    const isSoIda = tipoTexto.includes("só") || tipoTexto.includes("so");
+    const tipoLabel = isSoIda ? "Só Ida" : "Ida e Volta";
+    const multiplicadorViagem = isSoIda ? 1.0 : 1.65;
+    const fatorClasse = (classeEl && classeEl.value === "executiva") ? 1.45 : 1.0;
+
+    const baseDestino = calcularBasePorDestinoTexto(destinoLabel);
+    const dataBase = (idaEl && idaEl.value)
+      ? new Date(idaEl.value + "T00:00:00")
+      : new Date();
+
+    const precoAtual = calcularPrecoParaData(baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
+    window.precoVooCalculado = precoAtual;
+    window.__ultimoEstadoVoo = {
+      dataISO: formatarDataISO(dataBase),
+      dataTexto: dataBase.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" }),
+      precoXOF: precoAtual,
+      tipo: tipoLabel,
+      passageiros,
+      destino: destinoLabel,
+      companhia
+    };
+
+    if (!painelDias && btnPesquisar) {
+      painelDias = document.createElement("div");
+      painelDias.id = "voosDiasPrecosAuto";
+      painelDias.style.cssText = "margin: 4px 0 10px; padding: 8px; border-radius: 10px; background: #f5f8fc; border: 1px solid #dce5f2;";
+      btnPesquisar.parentNode.insertBefore(painelDias, btnPesquisar.nextSibling);
+    }
+
+    if (!painelDias) return;
+    painelDias.style.display = "block";
+
+    const offsets = [0, 1, 2, 3, 5, 7];
+    const botoesHTML = offsets.map((offset) => {
+      const d = new Date(dataBase.getFullYear(), dataBase.getMonth(), dataBase.getDate() + offset);
+      const precoDia = calcularPrecoParaData(baseDestino, d, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
+      const iso = formatarDataISO(d);
+      const ativa = idaEl && idaEl.value === iso;
+
+      return `
+        <button type="button" data-data-voo="${iso}" data-preco-voo="${precoDia}" style="
+          flex: 1 1 30%;
+          min-width: 92px;
+          padding: 6px;
+          border-radius: 8px;
+          border: 1px solid ${ativa ? "#006ce4" : "#d0d7de"};
+          background: ${ativa ? "#e6f0ff" : "#ffffff"};
+          color: #111;
+          font-size: 10px;
+          cursor: pointer;
+          text-align: center;
+          line-height: 1.3;
+        ">
+          <div style="font-weight: bold;">${formatarDataCurta(d)}</div>
+          <div style="color: #007a33; font-weight: bold;">${precoDia.toLocaleString("pt-PT")} XOF</div>
+          <div style="color: #555; font-size: 9px;">${tipoLabel} • ${passageiros} Pass.</div>
+        </button>
+      `;
+    }).join("");
+
+    painelDias.innerHTML = `
+      <div style="font-size: 11px; font-weight: bold; color: #1a1a1a; margin-bottom: 6px;">
+        Resultados (${tipoLabel}) — Bissau → ${destinoLabel} (${companhia}):
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+        ${botoesHTML}
+      </div>
+      <div style="margin-top: 6px; font-size: 11px; color: #006ce4; font-weight: bold; text-align: right;">
+        Selecionado: ${precoAtual.toLocaleString("pt-PT")} XOF (${tipoLabel})
+      </div>
+    `;
+
+    painelDias.querySelectorAll("button[data-data-voo]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const novaData = btn.getAttribute("data-data-voo");
+        if (idaEl && novaData) {
+          idaEl.value = novaData;
+        }
+        window.atualizarMotorVoosAutomatico();
+      });
+    });
+
+    garantirFormularioPassageiro(window.__ultimoEstadoVoo);
+  };
+
+  ["change", "input", "click"].forEach((ev) => {
+    document.addEventListener(ev, (e) => {
+      if (e.target && e.target.closest && e.target.closest("#voosModal")) {
+        setTimeout(() => {
+          limparPrecoFixoCabecalho();
+          garantirBarraBookingEBotao();
+          if (pesquisaRealizada) {
+            window.atualizarMotorVoosAutomatico();
+          }
+        }, 25);
+      }
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+      limparPrecoFixoCabecalho();
+      garantirBarraBookingEBotao();
+    }, 150);
+  });
 })();
