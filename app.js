@@ -500,9 +500,8 @@ document.addEventListener("DOMContentLoaded", function() {
     renderizarHoteis();
 });
 (function () {
-  // Configure aqui as suas chaves do EmailJS para envio automático sem abrir o cliente de e-mail
   const EMAILJS_CONFIG = {
-    enabled: false, // Mude para true depois de preencher as 3 chaves abaixo
+    enabled: false,
     publicKey: "SUA_PUBLIC_KEY_AQUI",
     serviceId: "SEU_SERVICE_ID_AQUI",
     templateId: "SEU_TEMPLATE_ID_AQUI"
@@ -537,11 +536,11 @@ document.addEventListener("DOMContentLoaded", function() {
     document.head.appendChild(script);
   }
 
-  function calcularBasePorDestinoTexto(destinoTexto) {
-    const limpo = (destinoTexto || "").trim().toLowerCase();
+  function calcularValorLocalTexto(texto) {
+    const limpo = (texto || "").trim().toLowerCase();
     if (!limpo) return 290000;
 
-    if (/dakar|senegal|banjul|gambia|conakry|guine|guiné|praia|cabo verde|abidjan|lome|lomé|accra|lagos|nigeria|nigéria|bamako|mali/.test(limpo)) {
+    if (/bissau|oxb|dakar|senegal|banjul|gambia|conakry|guine|guiné|praia|cabo verde|abidjan|lome|lomé|accra|lagos|nigeria|nigéria|bamako|mali/.test(limpo)) {
       return 110000;
     }
     if (/casablanca|marrocos|tunes|tunisia|tunísia|argel|argelia|argélia|cairo|egito/.test(limpo)) {
@@ -561,7 +560,27 @@ document.addEventListener("DOMContentLoaded", function() {
     return 150000 + ((hash % 160) * 1000);
   }
 
-  function calcularPrecoParaData(baseDestino, dataObj, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse) {
+  function calcularBasePorRota(origemTexto, destinoTexto) {
+    const orig = (origemTexto || "Bissau (OXB)").trim().toLowerCase();
+    const dest = (destinoTexto || "Lisboa").trim().toLowerCase();
+
+    // Se for a mesma cidade/país, tarifa regional/curta base
+    if (orig === dest) return 115000;
+
+    // Rota direta Bissau <-> Dakar
+    const envolveBissau = /bissau|oxb/.test(orig) || /bissau|oxb/.test(dest);
+    const envolveDakar = /dakar|senegal/.test(orig) || /dakar|senegal/.test(dest);
+    if (envolveBissau && envolveDakar) return 105000;
+
+    const vOrig = calcularValorLocalTexto(orig);
+    const vDest = calcularValorLocalTexto(dest);
+
+    // Combina origem e destino para que qualquer sentido (ex: Lisboa -> Bissau ou Dakar -> Lisboa) tenha tarifa coerente
+    const base = Math.round(((vOrig * 0.35 + vDest * 0.85)) / 1000) * 1000;
+    return Math.max(95000, base);
+  }
+
+  function calcularPrecoParaData(baseRota, dataObj, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse) {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
@@ -580,7 +599,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const fatorSemana = fatoresDiaSemana[diaSemana] || 1.0;
     const fatorDia = 0.97 + ((alvo.getDate() % 5) * 0.012);
 
-    const bruto = baseDestino * fatorAntecedencia * fatorSemana * fatorDia * multiplicadorViagem * passageiros * fatorCompanhia * fatorClasse;
+    const bruto = baseRota * fatorAntecedencia * fatorSemana * fatorDia * multiplicadorViagem * passageiros * fatorCompanhia * fatorClasse;
     return Math.round(bruto / 1000) * 1000;
   }
 
@@ -593,6 +612,74 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function formatarDataCurta(dataObj) {
     return dataObj.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit" });
+  }
+
+  function encontrarCampoOrigem(destinoInput) {
+    const modal = document.getElementById("voosModal");
+    if (!modal) return null;
+
+    const porId = document.getElementById("vooOrigemInput") || document.getElementById("origemVoo") || document.getElementById("vooOrigem");
+    if (porId) return porId;
+
+    const inputs = Array.from(modal.querySelectorAll('input[type="text"], input:not([type])'));
+    for (const inp of inputs) {
+      if (inp === destinoInput) continue;
+      const val = (inp.value || inp.placeholder || "").toLowerCase();
+      if (val.includes("bissau") || val.includes("oxb") || val.includes("origem")) {
+        return inp;
+      }
+    }
+    return null;
+  }
+
+  function habilitarOrigemLivre() {
+    const destinoInput = document.getElementById("vooDestinoInput");
+    if (!destinoInput) return;
+
+    const origemInput = encontrarCampoOrigem(destinoInput);
+    if (origemInput) {
+      origemInput.id = origemInput.id || "vooOrigemInput";
+      origemInput.readOnly = false;
+      origemInput.disabled = false;
+      origemInput.style.backgroundColor = "#ffffff";
+      origemInput.style.cursor = "text";
+      origemInput.placeholder = "Origem (Ex: Bissau (OXB), Lisboa, Dakar...)";
+      if (!origemInput.value || origemInput.value.trim() === "") {
+        origemInput.value = "Bissau (OXB)";
+      }
+    }
+
+    if (!document.getElementById("btnInverterRotaAuto") && destinoInput.parentNode) {
+      const btnSwap = document.createElement("button");
+      btnSwap.id = "btnInverterRotaAuto";
+      btnSwap.type = "button";
+      btnSwap.textContent = "⇄ Inverter Origem e Destino";
+      btnSwap.style.cssText = `
+        width: 100%;
+        margin: 4px 0 6px;
+        padding: 7px 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 11px;
+        cursor: pointer;
+      `;
+      destinoInput.parentNode.insertBefore(btnSwap, destinoInput);
+
+      btnSwap.addEventListener("click", () => {
+        const origEl = encontrarCampoOrigem(destinoInput);
+        if (!origEl) return;
+        const atualOrig = (origEl.value || "Bissau (OXB)").trim();
+        const atualDest = (destinoInput.value || "").trim();
+        origEl.value = atualDest || "Lisboa";
+        destinoInput.value = atualOrig || "Bissau (OXB)";
+        if (pesquisaRealizada) {
+          window.atualizarMotorVoosAutomatico();
+        }
+      });
+    }
   }
 
   function limparPrecoFixoCabecalho() {
@@ -616,7 +703,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function gerarCodigoReserva() {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let codigo = "OXB";
+    let codigo = "FLT";
     for (let i = 0; i < 5; i++) {
       codigo += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -647,7 +734,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const valorFormatado = `${Number(voo.precoXOF || 0).toLocaleString("pt-PT")} XOF`;
     const metodoPagamento = obterMetodoPagamentoAtual();
 
-    let statusEmailTexto = EMAILJS_CONFIG.enabled
+    const statusEmailTexto = EMAILJS_CONFIG.enabled
       ? "A enviar e-mail automático..."
       : "Pronto para envio por e-mail (configure EmailJS para envio 100% automático).";
 
@@ -677,7 +764,9 @@ document.addEventListener("DOMContentLoaded", function() {
             passenger_phone: passageiro.telefone,
             pnr_code: pnr,
             airline: voo.companhia,
-            route: `Bissau (OXB) -> ${voo.destino}`,
+            origin: voo.origem,
+            destination: voo.destino,
+            route: `${voo.origem} -> ${voo.destino}`,
             trip_type: voo.tipo,
             departure_date: voo.dataTexto,
             passengers_count: voo.passageiros,
@@ -718,7 +807,7 @@ document.addEventListener("DOMContentLoaded", function() {
       modal.appendChild(areaBilhete);
     }
 
-    const assunto = encodeURIComponent(`Bilhete Eletrónico (${pnr}) - Bissau -> ${voo.destino}`);
+    const assunto = encodeURIComponent(`Bilhete Eletrónico (${pnr}) - ${voo.origem} -> ${voo.destino}`);
     const corpo = encodeURIComponent(
 `BILHETE ELETRÓNICO (E-TICKET)
 Código de Reserva: ${pnr}
@@ -727,7 +816,7 @@ Telefone: ${passageiro.telefone}
 E-mail: ${passageiro.email}
 
 Companhia: ${voo.companhia}
-Rota: Bissau (OXB) -> ${voo.destino}
+Rota: ${voo.origem} -> ${voo.destino}
 Tipo de Viagem: ${voo.tipo}
 Data de Ida: ${voo.dataTexto}
 Passageiros: ${voo.passageiros}
@@ -749,7 +838,7 @@ Total: ${valorFormatado}`
         <div><strong>E-mail:</strong> ${passageiro.email}</div>
         <div><strong>Contacto:</strong> ${passageiro.telefone}</div>
         <div><strong>Companhia:</strong> ${voo.companhia}</div>
-        <div><strong>Rota:</strong> Bissau (OXB) → ${voo.destino} (${voo.tipo})</div>
+        <div><strong>Rota:</strong> ${voo.origem} → ${voo.destino} (${voo.tipo})</div>
         <div><strong>Data de Ida:</strong> ${voo.dataTexto} | <strong>Passageiros:</strong> ${voo.passageiros}</div>
         <div><strong>Pagamento:</strong> ${metodoPagamento}</div>
         <div style="margin-top:4px; font-size:13px; color:#007a33;"><strong>Valor:</strong> ${valorFormatado}</div>
@@ -802,7 +891,7 @@ Total: ${valorFormatado}`
             <p><strong>E-mail:</strong> ${passageiro.email}</p>
             <p><strong>Contacto:</strong> ${passageiro.telefone}</p>
             <p><strong>Companhia:</strong> ${voo.companhia}</p>
-            <p><strong>Rota:</strong> Bissau (OXB) → ${voo.destino} (${voo.tipo})</p>
+            <p><strong>Rota:</strong> ${voo.origem} → ${voo.destino} (${voo.tipo})</p>
             <p><strong>Data de Ida:</strong> ${voo.dataTexto}</p>
             <p><strong>Passageiros:</strong> ${voo.passageiros}</p>
             <p><strong>Pagamento:</strong> ${metodoPagamento}</p>
@@ -859,7 +948,7 @@ Total: ${valorFormatado}`
         formBox.style.display = "block";
         formBox.innerHTML = `
           <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:#0f172a;">
-            Dados do Passageiro — ${estado.dataTexto} (${Number(estado.precoXOF || 0).toLocaleString("pt-PT")} XOF)
+            Dados do Passageiro (${estado.origem} → ${estado.destino}) — ${estado.dataTexto} (${Number(estado.precoXOF || 0).toLocaleString("pt-PT")} XOF)
           </div>
 
           <div style="margin-bottom:8px;">
@@ -932,6 +1021,7 @@ Total: ${valorFormatado}`
     const idaEl = document.getElementById("dataIda");
     if (!destinoInput) return;
 
+    habilitarOrigemLivre();
     ligarBotaoConfirmarEPagar();
 
     const containerDatas = idaEl ? idaEl.closest("div")?.parentElement : null;
@@ -1025,7 +1115,7 @@ Total: ${valorFormatado}`
       btn.addEventListener("click", () => {
         const destVal = (destinoInput.value || "").trim();
         if (!destVal) {
-          alert("Por favor, digite o país ou cidade de destino (Ex: Lisboa, Dakar, Brasil, França...).");
+          alert("Por favor, digite o país ou cidade de destino (Ex: Lisboa, Dakar, Bissau, Brasil...).");
           destinoInput.focus();
           return;
         }
@@ -1040,6 +1130,7 @@ Total: ${valorFormatado}`
     garantirBarraBookingEBotao();
 
     const destinoEl = document.getElementById("vooDestinoInput");
+    const origemEl = encontrarCampoOrigem(destinoEl);
     const idaEl = document.getElementById("dataIda");
     const tipoEl = document.getElementById("vooTipo");
     const passEl = document.getElementById("vooPassageiros");
@@ -1053,6 +1144,7 @@ Total: ${valorFormatado}`
       return;
     }
 
+    const origemLabel = (origemEl?.value || "").trim() || "Bissau (OXB)";
     const destinoLabel = (destinoEl?.value || "").trim();
     if (!destinoLabel) {
       if (painelDias) painelDias.style.display = "none";
@@ -1083,12 +1175,12 @@ Total: ${valorFormatado}`
     const multiplicadorViagem = isSoIda ? 1.0 : 1.65;
     const fatorClasse = (classeEl && classeEl.value === "executiva") ? 1.45 : 1.0;
 
-    const baseDestino = calcularBasePorDestinoTexto(destinoLabel);
+    const baseRota = calcularBasePorRota(origemLabel, destinoLabel);
     const dataBase = (idaEl && idaEl.value)
       ? new Date(idaEl.value + "T00:00:00")
       : new Date();
 
-    const precoAtual = calcularPrecoParaData(baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
+    const precoAtual = calcularPrecoParaData(baseRota, dataBase, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
     window.precoVooCalculado = precoAtual;
     window.__ultimoEstadoVoo = {
       dataISO: formatarDataISO(dataBase),
@@ -1096,6 +1188,7 @@ Total: ${valorFormatado}`
       precoXOF: precoAtual,
       tipo: tipoLabel,
       passageiros,
+      origem: origemLabel,
       destino: destinoLabel,
       companhia
     };
@@ -1113,7 +1206,7 @@ Total: ${valorFormatado}`
     const offsets = [0, 1, 2, 3, 5, 7];
     const botoesHTML = offsets.map((offset) => {
       const d = new Date(dataBase.getFullYear(), dataBase.getMonth(), dataBase.getDate() + offset);
-      const precoDia = calcularPrecoParaData(baseDestino, d, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
+      const precoDia = calcularPrecoParaData(baseRota, d, multiplicadorViagem, passageiros, fatorCompanhia, fatorClasse);
       const iso = formatarDataISO(d);
       const ativa = idaEl && idaEl.value === iso;
 
@@ -1140,7 +1233,7 @@ Total: ${valorFormatado}`
 
     painelDias.innerHTML = `
       <div style="font-size: 11px; font-weight: bold; color: #1a1a1a; margin-bottom: 6px;">
-        Resultados (${tipoLabel}) — Bissau → ${destinoLabel} (${companhia}):
+        Resultados (${tipoLabel}) — ${origemLabel} → ${destinoLabel} (${companhia}):
       </div>
       <div style="display: flex; flex-wrap: wrap; gap: 6px;">
         ${botoesHTML}
