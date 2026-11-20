@@ -502,29 +502,29 @@ document.addEventListener("DOMContentLoaded", function() {
 (function () {
   function calcularBasePorDestinoTexto(destinoTexto) {
     const limpo = (destinoTexto || "Lisboa").trim().toLowerCase();
-    if (!limpo) return 310000;
+    if (!limpo) return 290000;
 
-    // Tarifas base de referência (em XOF) por região/país/cidade
-    if (/dakar|senegal|banjul|gambia|conakry|guine|bissau|praia|cabo verde|abidjan|lome|lomé|accra|lagos|nigeria|bamako|mali/.test(limpo)) {
-      return 125000;
+    // Tarifas base de referência (em XOF) — pensadas como referência de bilhete
+    if (/dakar|senegal|banjul|gambia|conakry|guine|guiné|praia|cabo verde|abidjan|lome|lomé|accra|lagos|nigeria|nigéria|bamako|mali/.test(limpo)) {
+      return 110000;
     }
-    if (/casablanca|marrocos|tunes|tunisia|argel|argelia|cairo|egito/.test(limpo)) {
-      return 225000;
+    if (/casablanca|marrocos|tunes|tunisia|tunísia|argel|argelia|argélia|cairo|egito/.test(limpo)) {
+      return 185000;
     }
-    if (/lisboa|porto|portugal|madrid|barcelona|espanha|paris|franca|frança|londres|uk|reinounido|bruxelas|amsterdao|amsterdão|roma|italia|itália|berlim|alemanha/.test(limpo)) {
-      return 320000;
+    if (/lisboa|porto|portugal|madrid|barcelona|espanha|paris|franca|frança|londres|uk|reino unido|bruxelas|amsterdao|amsterdão|roma|italia|itália|berlim|alemanha/.test(limpo)) {
+      return 295000;
     }
-    if (/brasil|sao paulo|são paulo|rio|lisboa|estados unidos|eua|miami|nova iorque|new york|toronto|canada|canadá/.test(limpo)) {
-      return 440000;
+    if (/brasil|sao paulo|são paulo|rio|estados unidos|eua|miami|nova iorque|new york|toronto|canada|canadá/.test(limpo)) {
+      return 390000;
     }
 
-    // Para qualquer outro país ou cidade digitada, gera uma base estável entre 180.000 e 460.000 XOF
+    // Qualquer outro país ou cidade digitada: faixa equilibrada entre 150.000 e 310.000 XOF
     let hash = 0;
     for (let i = 0; i < limpo.length; i++) {
       hash = (hash * 31 + limpo.charCodeAt(i)) % 100000;
     }
-    const variacao = (hash % 280) * 1000; // 0 a 279.000 XOF
-    return 180000 + variacao;
+    const variacao = (hash % 160) * 1000; // 0 a 159.000 XOF
+    return 150000 + variacao;
   }
 
   function calcularPrecoParaData(baseDestino, dataObj, multiplicadorViagem, passageiros, fatorCompanhia) {
@@ -535,20 +535,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const diffDias = Math.round((alvo - hoje) / (1000 * 60 * 60 * 24));
     const diaSemana = alvo.getDay(); // 0=Dom ... 6=Sab
 
-    // Variação realística por antecedência e dia da semana
+    // Ajuste moderado por antecedência
     let fatorAntecedencia = 1.0;
-    if (diffDias <= 1) fatorAntecedencia = 1.32;
-    else if (diffDias <= 3) fatorAntecedencia = 1.22;
-    else if (diffDias <= 7) fatorAntecedencia = 1.12;
-    else if (diffDias >= 21) fatorAntecedencia = 0.88;
-    else if (diffDias >= 14) fatorAntecedencia = 0.94;
+    if (diffDias <= 1) fatorAntecedencia = 1.14;
+    else if (diffDias <= 3) fatorAntecedencia = 1.08;
+    else if (diffDias <= 7) fatorAntecedencia = 1.04;
+    else if (diffDias >= 21) fatorAntecedencia = 0.90;
+    else if (diffDias >= 14) fatorAntecedencia = 0.95;
 
-    // Dias da semana têm preços diferentes (terça/quarta costumam ser mais baratas; sex/dom mais caras)
-    const fatoresDiaSemana = [1.10, 0.96, 0.92, 0.93, 0.98, 1.12, 1.06];
+    // Variação por dia da semana (terça/quarta mais económicas; sexta/domingo um pouco mais altas)
+    const fatoresDiaSemana = [1.05, 0.96, 0.93, 0.94, 0.98, 1.06, 1.03];
     const fatorSemana = fatoresDiaSemana[diaSemana] || 1.0;
 
-    // Micro variação por dia do mês para diferenciar datas consecutivas
-    const fatorDia = 0.96 + ((alvo.getDate() % 7) * 0.015);
+    // Pequena diferença entre dias consecutivos
+    const fatorDia = 0.97 + ((alvo.getDate() % 5) * 0.012);
 
     const bruto = baseDestino * fatorAntecedencia * fatorSemana * fatorDia * multiplicadorViagem * passageiros * fatorCompanhia;
     return Math.round(bruto / 1000) * 1000;
@@ -565,7 +565,7 @@ document.addEventListener("DOMContentLoaded", function() {
     return dataObj.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit" });
   }
 
-  function renderizarSugestoesDias(destinoLabel, baseDestino, dataBaseObj, multiplicadorViagem, passageiros, fatorCompanhia) {
+  function renderizarSugestoesDias(destinoLabel, tipoLabel, baseDestino, dataBaseObj, multiplicadorViagem, passageiros, fatorCompanhia) {
     const modal = document.getElementById("voosModal");
     const destinoInput = document.getElementById("vooDestinoInput");
     const dataIdaInput = document.getElementById("dataIda");
@@ -602,13 +602,14 @@ document.addEventListener("DOMContentLoaded", function() {
         ">
           <div style="font-weight: bold;">${formatarDataCurta(d)}</div>
           <div style="color: #007a33; font-weight: bold;">${precoDia.toLocaleString("pt-PT")} XOF</div>
+          <div style="color: #555; font-size: 9px;">${tipoLabel}</div>
         </button>
       `;
     }).join("");
 
     painelDias.innerHTML = `
       <div style="font-size: 10px; font-weight: bold; color: #333; margin-bottom: 6px;">
-        Tarifas automáticas por dia — Bissau → ${destinoLabel}:
+        Tarifas (${tipoLabel}) por dia — Bissau → ${destinoLabel}:
       </div>
       <div style="display: flex; flex-wrap: wrap; gap: 6px;">
         ${botoesHTML}
@@ -622,7 +623,7 @@ document.addEventListener("DOMContentLoaded", function() {
           dataIdaInput.value = novaData;
           dataIdaInput.dispatchEvent(new Event("change", { bubbles: true }));
         }
-        atualizarMotorVoosAutomatico();
+        window.atualizarMotorVoosAutomatico();
       });
     });
   }
@@ -656,13 +657,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     const tipoLower = (tipoEl?.value || "Ida e Volta").toLowerCase();
-    const multiplicadorViagem = (tipoLower.includes("só") || tipoLower.includes("so")) ? 1.0 : 1.85;
+    const isSoIda = tipoLower.includes("só") || tipoLower.includes("so");
+    const tipoLabel = isSoIda ? "Só Ida" : "Ida e Volta";
+    const multiplicadorViagem = isSoIda ? 1.0 : 1.65;
 
     let fatorCompanhia = 1.0;
     const compLower = companhia.toLowerCase();
-    if (compLower.includes("tap")) fatorCompanhia = 1.08;
+    if (compLower.includes("tap")) fatorCompanhia = 1.04;
     else if (compLower.includes("royal")) fatorCompanhia = 0.96;
-    else if (compLower.includes("asky")) fatorCompanhia = 0.88;
+    else if (compLower.includes("asky")) fatorCompanhia = 0.90;
 
     const dataBase = (idaEl && idaEl.value)
       ? new Date(idaEl.value + "T00:00:00")
@@ -672,13 +675,13 @@ document.addEventListener("DOMContentLoaded", function() {
     window.precoVooCalculado = precoAtual;
 
     if (captionEl) {
-      captionEl.textContent = `${companhia} (${rotaTexto}) — ${precoAtual.toLocaleString("pt-PT")} XOF`;
+      captionEl.textContent = `${companhia} (${rotaTexto} • ${tipoLabel}) — ${precoAtual.toLocaleString("pt-PT")} XOF`;
     }
     if (phoneEl && itemAtual.phone) {
       phoneEl.textContent = itemAtual.phone;
     }
 
-    renderizarSugestoesDias(destinoLabel, baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia);
+    renderizarSugestoesDias(destinoLabel, tipoLabel, baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia);
     return precoAtual;
   };
 
