@@ -504,7 +504,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const limpo = (destinoTexto || "Lisboa").trim().toLowerCase();
     if (!limpo) return 290000;
 
-    // Tarifas base de referência (em XOF) — pensadas como referência de bilhete
     if (/dakar|senegal|banjul|gambia|conakry|guine|guiné|praia|cabo verde|abidjan|lome|lomé|accra|lagos|nigeria|nigéria|bamako|mali/.test(limpo)) {
       return 110000;
     }
@@ -518,12 +517,11 @@ document.addEventListener("DOMContentLoaded", function() {
       return 390000;
     }
 
-    // Qualquer outro país ou cidade digitada: faixa equilibrada entre 150.000 e 310.000 XOF
     let hash = 0;
     for (let i = 0; i < limpo.length; i++) {
       hash = (hash * 31 + limpo.charCodeAt(i)) % 100000;
     }
-    const variacao = (hash % 160) * 1000; // 0 a 159.000 XOF
+    const variacao = (hash % 160) * 1000;
     return 150000 + variacao;
   }
 
@@ -533,9 +531,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const alvo = new Date(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate());
     const diffDias = Math.round((alvo - hoje) / (1000 * 60 * 60 * 24));
-    const diaSemana = alvo.getDay(); // 0=Dom ... 6=Sab
+    const diaSemana = alvo.getDay();
 
-    // Ajuste moderado por antecedência
     let fatorAntecedencia = 1.0;
     if (diffDias <= 1) fatorAntecedencia = 1.14;
     else if (diffDias <= 3) fatorAntecedencia = 1.08;
@@ -543,11 +540,8 @@ document.addEventListener("DOMContentLoaded", function() {
     else if (diffDias >= 21) fatorAntecedencia = 0.90;
     else if (diffDias >= 14) fatorAntecedencia = 0.95;
 
-    // Variação por dia da semana (terça/quarta mais económicas; sexta/domingo um pouco mais altas)
     const fatoresDiaSemana = [1.05, 0.96, 0.93, 0.94, 0.98, 1.06, 1.03];
     const fatorSemana = fatoresDiaSemana[diaSemana] || 1.0;
-
-    // Pequena diferença entre dias consecutivos
     const fatorDia = 0.97 + ((alvo.getDate() % 5) * 0.012);
 
     const bruto = baseDestino * fatorAntecedencia * fatorSemana * fatorDia * multiplicadorViagem * passageiros * fatorCompanhia;
@@ -639,13 +633,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const lista = (typeof voosDatasets !== "undefined" && Array.isArray(voosDatasets)) ? voosDatasets : [];
     const idx = (typeof currentVooIndex === "number") ? currentVooIndex : 0;
     const itemAtual = lista[idx] || {
-      text: "TAP Air Portugal (Bissau -> Lisboa)",
-      phone: "Guichê Osvaldo Vieira: +245 955 100 200"
+      text: "Atlantic (Bissau -> Lisboa)",
+      phone: "Guichê Atlantic Bissau: +245 955 700 800"
     };
 
     const companhia = (itemAtual.text.split("(")[0] || "Voo").trim();
     const destinoDigitado = (destinoEl?.value || "").trim();
-    const destinoLabel = destinoDigitado || (itemAtual.text.match(/->\s*([^)]+)/)?.[1] || "Lisboa").trim();
+    const destinoLabel = destinoDigitado || (itemAtual.text.match(/->\s*([^)—]+)/)?.[1] || "Lisboa").trim();
     const rotaTexto = `Bissau -> ${destinoLabel}`;
 
     const baseDestino = calcularBasePorDestinoTexto(destinoLabel);
@@ -674,8 +668,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const precoAtual = calcularPrecoParaData(baseDestino, dataBase, multiplicadorViagem, passageiros, fatorCompanhia);
     window.precoVooCalculado = precoAtual;
 
+    // Remove qualquer preço fixo em cima e mostra apenas companhia, rota, tipo e data/preço dinâmico
     if (captionEl) {
-      captionEl.textContent = `${companhia} (${rotaTexto} • ${tipoLabel}) — ${precoAtual.toLocaleString("pt-PT")} XOF`;
+      const diaFormatado = formatarDataCurta(dataBase);
+      captionEl.textContent = `${companhia} (${rotaTexto} • ${tipoLabel}) — ${diaFormatado}: ${precoAtual.toLocaleString("pt-PT")} XOF`;
     }
     if (phoneEl && itemAtual.phone) {
       phoneEl.textContent = itemAtual.phone;
@@ -688,7 +684,8 @@ document.addEventListener("DOMContentLoaded", function() {
   ["change", "input", "click"].forEach((ev) => {
     document.addEventListener(ev, (e) => {
       if (e.target && e.target.closest && e.target.closest("#voosModal")) {
-        setTimeout(window.atualizarMotorVoosAutomatico, 10);
+        setTimeout(window.atualizarMotorVoosAutomatico, 20);
+        setTimeout(window.atualizarMotorVoosAutomatico, 120);
       }
     });
   });
