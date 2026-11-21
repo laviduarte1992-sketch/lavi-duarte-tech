@@ -1366,116 +1366,87 @@ Total: ${valorFormatado}`
   });
 })();]
 (function () {
-  let veiculoSelecionado = {
-    nome: "Táxi Oficial",
-    precoXOF: 500
-  };
+  const TABELA_PADRAO = [
+    { match: /t[áa]xi\s*oficial/i, nome: "Táxi Oficial", precoXOF: 500 },
+    { match: /carro\s*privado/i, nome: "Carro Privado", precoXOF: 650 },
+    { match: /moto-?t[áa]xi/i, nome: "Moto-Táxi", precoXOF: 350 }
+  ];
 
-  function lerPrecoDoTexto(texto) {
-    const match = (texto || "").replace(/\./g, "").match(/(\d+)\s*XOF/i);
-    return match ? Number(match[1]) : 0;
+  window.__veiculoSelecionado = { nome: "Táxi Oficial", precoXOF: 500 };
+
+  function obterCartoesVeiculo() {
+    const candidatos = Array.from(document.querySelectorAll("div, button, label, li"));
+    return candidatos.filter((el) => {
+      if (el.children.length > 4) return false;
+      const txt = (el.textContent || "").trim();
+      return (
+        txt.length > 0 &&
+        txt.length < 90 &&
+        /XOF/i.test(txt) &&
+        TABELA_PADRAO.some((item) => item.match.test(txt))
+      );
+    });
   }
 
-  function atualizarVeiculoAtivo(cartaoEl) {
-    if (!cartaoEl) return;
-    const texto = cartaoEl.textContent || "";
-    const preco = lerPrecoDoTexto(texto);
-    if (!preco) return;
+  function aplicarValoresCorretosNosCartoes() {
+    const cartoes = obterCartoesVeiculo();
+    cartoes.forEach((cartao) => {
+      const textoAtual = cartao.textContent || "";
+      const regra = TABELA_PADRAO.find((item) => item.match.test(textoAtual));
+      if (!regra) return;
 
-    let nome = "Táxi Oficial";
-    if (/carro\s*privado/i.test(texto)) nome = "Carro Privado";
-    else if (/moto/i.test(texto)) nome = "Moto-Táxi";
-
-    veiculoSelecionado = { nome, precoXOF: preco };
-    window.__veiculoSelecionado = veiculoSelecionado;
+      // Substitui apenas o valor em XOF se estiver diferente do valor da regra
+      if (!textoAtual.includes(`${regra.precoXOF} XOF`)) {
+        cartao.childNodes.forEach((no) => {
+          if (no.nodeType === Node.TEXT_NODE && /\d+\s*XOF/i.test(no.textContent || "")) {
+            no.textContent = no.textContent.replace(/\d+\s*XOF/i, `${regra.precoXOF} XOF`);
+          }
+        });
+        cartao.querySelectorAll("span, p, div, strong, b").forEach((filho) => {
+          if (filho.children.length === 0 && /\d+\s*XOF/i.test(filho.textContent || "")) {
+            filho.textContent = filho.textContent.replace(/\d+\s*XOF/i, `${regra.precoXOF} XOF`);
+          }
+        });
+      }
+    });
   }
 
-  // 1. Deteta quando o utilizador clica em Táxi Oficial, Carro Privado ou Moto-Táxi
+  function marcarCartaoAtivo(cartaoEscolhido, regra) {
+    const cartoes = obterCartoesVeiculo();
+    cartoes.forEach((c) => {
+      c.style.outline = "";
+      c.style.borderColor = "";
+      c.style.backgroundColor = "";
+    });
+
+    if (cartaoEscolhido) {
+      cartaoEscolhido.style.borderColor = "#16a34a";
+      cartaoEscolhido.style.backgroundColor = "#f0fdf4";
+    }
+
+    window.__veiculoSelecionado = {
+      nome: regra.nome,
+      precoXOF: regra.precoXOF
+    };
+  }
+
   document.addEventListener("click", (e) => {
     const alvo = e.target.closest("div, button, label, li");
     if (!alvo) return;
 
     const texto = alvo.textContent || "";
-    if (
-      (/t[áa]xi\s*oficial/i.test(texto) ||
-        /carro\s*privado/i.test(texto) ||
-        /moto-?t[áa]xi/i.test(texto)) &&
-      /XOF/i.test(texto) &&
-      texto.length < 120
-    ) {
-      atualizarVeiculoAtivo(alvo);
+    const regra = TABELA_PADRAO.find((item) => item.match.test(texto));
+
+    if (regra && /XOF/i.test(texto) && texto.length < 100) {
+      e.stopPropagation();
+      aplicarValoresCorretosNosCartoes();
+      marcarCartaoAtivo(alvo, regra);
     }
+  }, true);
 
-    // 2. Quando clica em "Pedir Viagem", envia o valor real do cartão (ex: 500 XOF)
-    const btnPedir = e.target.closest("button");
-    if (btnPedir && /pedir\s*viagem/i.test(btnPedir.textContent || "")) {
-      const rotaSelect = Array.from(document.querySelectorAll("select")).find((s) =>
-        /→|->|rota|cristo|cidade/i.test(s.textContent || "")
-      );
-      const rotaTexto = rotaSelect
-        ? rotaSelect.options[rotaSelect.selectedIndex]?.text || ""
-        : "Rota Bissau";
-
-      const telefoneInput = Array.from(document.querySelectorAll("input")).find((i) =>
-        /orange|telecel|\+245/i.test(i.placeholder || "")
-      );
-      const telefone = (telefoneInput?.value || "").trim();
-
-      const metodoSelect = Array.from(document.querySelectorAll("select")).find((s) =>
-        /orange\s*money|telecel|mtn|wave/i.test(s.textContent || "")
-      );
-      const metodo = metodoSelect
-        ? metodoSelect.options[metodoSelect.selectedIndex]?.text || "Orange Money"
-        : "Orange Money";
-
-      // Corrige o texto "Valor: 250 XOF" logo após o clique, caso o código antigo o escreva
-      setTimeout(() => {
-        document.querySelectorAll("p, div, span").forEach((el) => {
-          if (
-            el.children.length === 0 &&
-            /Valor:\s*\d+\s*XOF/i.test(el.textContent || "")
-          ) {
-            el.textContent = el.textContent.replace(
-              /Valor:\s*\d+\s*XOF/i,
-              `Valor: ${veiculoSelecionado.precoXOF} XOF`
-            );
-          }
-        });
-      }, 50);
-
-      // Envia para /api/criar-pagamento para registar a comissão automática
-      if (typeof window.iniciarPagamentoComComissao === "function" && telefone) {
-        window
-          .iniciarPagamentoComComissao({
-            categoria: "mobilidade",
-            servico: veiculoSelecionado.nome,
-            clienteNome: "Cliente App Bissau",
-            clienteEmail: "",
-            clienteTelefone: telefone,
-            detalhes: rotaTexto,
-            valorBaseXOF: veiculoSelecionado.precoXOF,
-            metodoPagamento: metodo
-          })
-          .catch((err) => console.warn("Aviso pagamento viagem:", err.message));
-      }
-    }
-  });
-
-  // 3. Garante que, mesmo se o texto mudar depois, o valor exibido seja sempre o do cartão
-  const obs = new MutationObserver(() => {
-    document.querySelectorAll("p, div, span").forEach((el) => {
-      if (
-        el.children.length === 0 &&
-        /Valor:\s*\d+\s*XOF/i.test(el.textContent || "") &&
-        !el.textContent.includes(`Valor: ${veiculoSelecionado.precoXOF} XOF`)
-      ) {
-        el.textContent = el.textContent.replace(
-          /Valor:\s*\d+\s*XOF/i,
-          `Valor: ${veiculoSelecionado.precoXOF} XOF`
-        );
-      }
-    });
-  });
-
-  obs.observe(document.body, { childList: true, subtree: true, characterData: true });
+  setTimeout(() => {
+    aplicarValoresCorretosNosCartoes();
+    const primeiro = obterCartoesVeiculo()[0];
+    if (primeiro) marcarCartaoAtivo(primeiro, TABELA_PADRAO[0]);
+  }, 300);
 })();
