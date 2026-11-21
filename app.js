@@ -1364,4 +1364,118 @@ Total: ${valorFormatado}`
       }
     }
   });
+})();]
+(function () {
+  let veiculoSelecionado = {
+    nome: "Táxi Oficial",
+    precoXOF: 500
+  };
+
+  function lerPrecoDoTexto(texto) {
+    const match = (texto || "").replace(/\./g, "").match(/(\d+)\s*XOF/i);
+    return match ? Number(match[1]) : 0;
+  }
+
+  function atualizarVeiculoAtivo(cartaoEl) {
+    if (!cartaoEl) return;
+    const texto = cartaoEl.textContent || "";
+    const preco = lerPrecoDoTexto(texto);
+    if (!preco) return;
+
+    let nome = "Táxi Oficial";
+    if (/carro\s*privado/i.test(texto)) nome = "Carro Privado";
+    else if (/moto/i.test(texto)) nome = "Moto-Táxi";
+
+    veiculoSelecionado = { nome, precoXOF: preco };
+    window.__veiculoSelecionado = veiculoSelecionado;
+  }
+
+  // 1. Deteta quando o utilizador clica em Táxi Oficial, Carro Privado ou Moto-Táxi
+  document.addEventListener("click", (e) => {
+    const alvo = e.target.closest("div, button, label, li");
+    if (!alvo) return;
+
+    const texto = alvo.textContent || "";
+    if (
+      (/t[áa]xi\s*oficial/i.test(texto) ||
+        /carro\s*privado/i.test(texto) ||
+        /moto-?t[áa]xi/i.test(texto)) &&
+      /XOF/i.test(texto) &&
+      texto.length < 120
+    ) {
+      atualizarVeiculoAtivo(alvo);
+    }
+
+    // 2. Quando clica em "Pedir Viagem", envia o valor real do cartão (ex: 500 XOF)
+    const btnPedir = e.target.closest("button");
+    if (btnPedir && /pedir\s*viagem/i.test(btnPedir.textContent || "")) {
+      const rotaSelect = Array.from(document.querySelectorAll("select")).find((s) =>
+        /→|->|rota|cristo|cidade/i.test(s.textContent || "")
+      );
+      const rotaTexto = rotaSelect
+        ? rotaSelect.options[rotaSelect.selectedIndex]?.text || ""
+        : "Rota Bissau";
+
+      const telefoneInput = Array.from(document.querySelectorAll("input")).find((i) =>
+        /orange|telecel|\+245/i.test(i.placeholder || "")
+      );
+      const telefone = (telefoneInput?.value || "").trim();
+
+      const metodoSelect = Array.from(document.querySelectorAll("select")).find((s) =>
+        /orange\s*money|telecel|mtn|wave/i.test(s.textContent || "")
+      );
+      const metodo = metodoSelect
+        ? metodoSelect.options[metodoSelect.selectedIndex]?.text || "Orange Money"
+        : "Orange Money";
+
+      // Corrige o texto "Valor: 250 XOF" logo após o clique, caso o código antigo o escreva
+      setTimeout(() => {
+        document.querySelectorAll("p, div, span").forEach((el) => {
+          if (
+            el.children.length === 0 &&
+            /Valor:\s*\d+\s*XOF/i.test(el.textContent || "")
+          ) {
+            el.textContent = el.textContent.replace(
+              /Valor:\s*\d+\s*XOF/i,
+              `Valor: ${veiculoSelecionado.precoXOF} XOF`
+            );
+          }
+        });
+      }, 50);
+
+      // Envia para /api/criar-pagamento para registar a comissão automática
+      if (typeof window.iniciarPagamentoComComissao === "function" && telefone) {
+        window
+          .iniciarPagamentoComComissao({
+            categoria: "mobilidade",
+            servico: veiculoSelecionado.nome,
+            clienteNome: "Cliente App Bissau",
+            clienteEmail: "",
+            clienteTelefone: telefone,
+            detalhes: rotaTexto,
+            valorBaseXOF: veiculoSelecionado.precoXOF,
+            metodoPagamento: metodo
+          })
+          .catch((err) => console.warn("Aviso pagamento viagem:", err.message));
+      }
+    }
+  });
+
+  // 3. Garante que, mesmo se o texto mudar depois, o valor exibido seja sempre o do cartão
+  const obs = new MutationObserver(() => {
+    document.querySelectorAll("p, div, span").forEach((el) => {
+      if (
+        el.children.length === 0 &&
+        /Valor:\s*\d+\s*XOF/i.test(el.textContent || "") &&
+        !el.textContent.includes(`Valor: ${veiculoSelecionado.precoXOF} XOF`)
+      ) {
+        el.textContent = el.textContent.replace(
+          /Valor:\s*\d+\s*XOF/i,
+          `Valor: ${veiculoSelecionado.precoXOF} XOF`
+        );
+      }
+    });
+  });
+
+  obs.observe(document.body, { childList: true, subtree: true, characterData: true });
 })();
