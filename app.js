@@ -1278,97 +1278,109 @@ Total: ${valorFormatado}`
   });
 })();
 (function () {
-  let selecionado = {
+  let veiculoAtual = {
     tipo: "TAXI",
     nome: "Táxi Oficial",
-    valorXOF: 1050
+    valor: 450
   };
 
-  function extrairValorXOF(texto) {
-    const limpo = (texto || "").replace(/\s+/g, " ");
-    const m = limpo.match(/(\d[\d\s.]*)\s*XOF/i);
-    if (!m) return null;
-    const num = Number(m[1].replace(/[^\d]/g, ""));
-    return num > 0 ? num : null;
+  function lerValorCartao(el) {
+    if (!el) return null;
+    const match = (el.textContent || "").replace(/\s+/g, " ").match(/(\d+)\s*XOF/i);
+    return match ? Number(match[1]) : null;
   }
 
-  function identificarVeiculo(texto) {
-    const t = (texto || "").toLowerCase();
-    if (t.includes("moto")) return { tipo: "MOTO-TAXI", nome: "Moto-Táxi" };
-    if (t.includes("privado") || t.includes("carro")) return { tipo: "CARRO PRIVADO", nome: "Carro Privado" };
-    return { tipo: "TAXI", nome: "Táxi Oficial" };
-  }
-
-  function encontrarCartoes() {
-    const todos = Array.from(document.querySelectorAll("div, button, label"));
-    return todos.filter((el) => {
-      const txt = (el.textContent || "").trim();
-      if (!txt || txt.length > 80) return false;
-      const temVeiculo = /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(txt);
-      const temPreco = /\d+\s*XOF/i.test(txt);
-      const temFilhoCartao = Array.from(el.children).some((c) =>
-        /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(c.textContent || "")
+  function pegarCartoesVeiculo() {
+    return Array.from(document.querySelectorAll("div, button, label")).filter((el) => {
+      if (el.children.length > 4) return false;
+      const t = (el.textContent || "").trim();
+      const temTipo = /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(t);
+      const temXof = /\d+\s*XOF/i.test(t);
+      const temSubcartao = Array.from(el.children).some((filho) =>
+        /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(filho.textContent || "")
       );
-      return temVeiculo && temPreco && !temFilhoCartao;
+      return temTipo && temXof && !temSubcartao && t.length < 90;
     });
   }
 
-  function destacarCartao(cartaoAtivo) {
-    encontrarCartoes().forEach((c) => {
+  function pintarSelecao(cartaoSelecionado) {
+    pegarCartoesVeiculo().forEach((c) => {
       c.style.border = "1px solid #d1d5db";
       c.style.backgroundColor = "#ffffff";
-      c.style.boxShadow = "none";
     });
-    if (cartaoAtivo) {
-      cartaoAtivo.style.border = "2px solid #16a34a";
-      cartaoAtivo.style.backgroundColor = "#f0fdf4";
-      cartaoAtivo.style.boxShadow = "0 0 0 2px rgba(22, 163, 74, 0.15)";
+    if (cartaoSelecionado) {
+      cartaoSelecionado.style.border = "2px solid #16a34a";
+      cartaoSelecionado.style.backgroundColor = "#f0fdf4";
     }
   }
 
-  document.addEventListener("click", (e) => {
-    const cartoes = encontrarCartoes();
-    const cartaoClicado = cartoes.find((c) => c === e.target || c.contains(e.target));
+  function atualizarTextoConfirmacao() {
+    document.querySelectorAll("p, div, span").forEach((el) => {
+      if (el.children.length === 0 && /Valor:\s*\d+\s*XOF/i.test(el.textContent || "")) {
+        const textoAtual = el.textContent || "";
+        const metodoMatch = textoAtual.match(/\(([^)]+)\)/);
+        const metodoParte = metodoMatch ? metodoMatch[1] : "Orange Money";
+        const metodoLimpo = metodoParte.replace(/\s*-\s*(TAXI|CARRO PRIVADO|MOTO-TAXI)/i, "").trim();
+        el.textContent = `Valor: ${veiculoAtual.valor} XOF (${metodoLimpo} - ${veiculoAtual.tipo})`;
+      }
+    });
+  }
 
-    if (cartaoClicado) {
-      const texto = cartaoClicado.textContent || "";
-      const valor = extrairValorXOF(texto);
-      const info = identificarVeiculo(texto);
+  document.addEventListener("click", (e) => {
+    const cartoes = pegarCartoesVeiculo();
+    const cartao = cartoes.find((c) => c === e.target || c.contains(e.target));
+
+    if (cartao) {
+      const valor = lerValorCartao(cartao);
+      const txt = (cartao.textContent || "").toLowerCase();
+      let tipo = "TAXI";
+      let nome = "Táxi Oficial";
+      if (txt.includes("moto")) {
+        tipo = "MOTO-TAXI";
+        nome = "Moto-Táxi";
+      } else if (txt.includes("privado") || txt.includes("carro")) {
+        tipo = "CARRO PRIVADO";
+        nome = "Carro Privado";
+      }
 
       if (valor) {
-        selecionado = {
-          tipo: info.tipo,
-          nome: info.nome,
-          valorXOF: valor
-        };
-        window.__veiculoSelecionado = selecionado;
-        destacarCartao(cartaoClicado);
+        veiculoAtual = { tipo, nome, valor };
+        window.__veiculoSelecionado = veiculoAtual;
+        pintarSelecao(cartao);
       }
       return;
     }
 
-    const btnPagar = e.target.closest("button");
-    if (btnPagar && /pagar\s*&\s*pedir\s*viagem/i.test(btnPagar.textContent || "")) {
-      // Se nenhum cartão foi clicado manualmente, lê o valor do 1.º cartão visível ou o já selecionado
-      if (!window.__veiculoSelecionado && cartoes[0]) {
-        const v0 = extrairValorXOF(cartoes[0].textContent || "");
-        const i0 = identificarVeiculo(cartoes[0].textContent || "");
-        if (v0) selecionado = { tipo: i0.tipo, nome: i0.nome, valorXOF: v0 };
+    const botao = e.target.closest("button");
+    if (botao && /pagar\s*&\s*pedir\s*viagem/i.test(botao.textContent || "")) {
+      // Se nenhum cartão foi clicado após abrir/mudar rota, tenta ler o cartão marcado ou o primeiro
+      const cartaoMarcado = cartoes.find((c) => c.style.border && c.style.border.includes("16a34a"));
+      const alvoValor = cartaoMarcado || cartoes[0];
+      if (alvoValor) {
+        const val = lerValorCartao(alvoValor);
+        const txt = (alvoValor.textContent || "").toLowerCase();
+        let tipo = veiculoAtual.tipo;
+        let nome = veiculoAtual.nome;
+        if (txt.includes("moto")) {
+          tipo = "MOTO-TAXI";
+          nome = "Moto-Táxi";
+        } else if (txt.includes("privado") || txt.includes("carro")) {
+          tipo = "CARRO PRIVADO";
+          nome = "Carro Privado";
+        } else if (txt.includes("oficial")) {
+          tipo = "TAXI";
+          nome = "Táxi Oficial";
+        }
+        if (val) {
+          veiculoAtual = { tipo, nome, valor: val };
+          window.__veiculoSelecionado = veiculoAtual;
+        }
       }
 
-      const valorFinal = (window.__veiculoSelecionado && window.__veiculoSelecionado.valorXOF) || selecionado.valorXOF;
-      const tipoFinal = (window.__veiculoSelecionado && window.__veiculoSelecionado.tipo) || selecionado.tipo;
-
-      const aplicarValorNoAviso = () => {
-        document.querySelectorAll("p, div, span").forEach((el) => {
-          if (el.children.length === 0 && /Valor:\s*\d+\s*XOF/i.test(el.textContent || "")) {
-            el.textContent = `Valor: ${valorFinal} XOF (Orange Money - ${tipoFinal})`;
-          }
-        });
-      };
-
-      setTimeout(aplicarValorNoAviso, 80);
-      setTimeout(aplicarValorNoAviso, 300);
+      // Tenta atualizar várias vezes nos primeiros 2 segundos para apanhar o momento em que o ecrã aparece
+      [50, 150, 300, 600, 1200].forEach((ms) => {
+        setTimeout(atualizarTextoConfirmacao, ms);
+      });
     }
   });
 })();
