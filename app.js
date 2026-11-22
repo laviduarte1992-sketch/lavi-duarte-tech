@@ -1278,217 +1278,311 @@ Total: ${valorFormatado}`
   });
 })();
 (function () {
-  if (window.__fluxoUberBissauAtivo) return;
-  window.__fluxoUberBissauAtivo = true;
+  if (window.__superAppMobilidadeV2) return;
+  window.__superAppMobilidadeV2 = true;
 
-  const MULT = {
-    TAXI: 2,
-    PRIVADO: 2.6,
-    MOTO: 1.4
-  };
+  const ROTAS_DGVTT = [
+    { nome: "Cidade → Mercado de Bandim", baseXOF: 225 },
+    { nome: "Cidade → Guimetal", baseXOF: 525 },
+    { nome: "Cidade → Cristo Redentor", baseXOF: 400 },
+    { nome: "Cidade → Aeroporto / Plub", baseXOF: 600 },
+    { nome: "Cidade → Antula / Safim", baseXOF: 750 }
+  ];
 
-  let estado = {
-    tipo: "TAXI",
-    rotulo: "TAXI",
-    nome: "Táxi Oficial",
-    valor: 0
-  };
+  const VEICULOS = [
+    { id: "TAXI", rotulo: "TAXI", nome: "Táxi Oficial", emoji: "🚕", mult: 2.0 },
+    { id: "PRIVADO", rotulo: "CARRO PRIVADO", nome: "Carro Privado", emoji: "🚗", mult: 2.6 },
+    { id: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", emoji: "🏍️", mult: 1.4 }
+  ];
 
-  function extrairXOF(texto) {
-    const m = (texto || "").replace(/\s+/g, " ").match(/(\d[\d\s.]*)\s*XOF/i);
-    if (!m) return 0;
-    const n = Number(m[1].replace(/[^\d]/g, ""));
-    return Number.isFinite(n) && n > 0 ? n : 0;
+  let rotaAtual = ROTAS_DGVTT[0];
+  let veiculoAtual = VEICULOS[0];
+  let faseViagem = "IDLE"; // IDLE | PROCURANDO | ENCONTRADO | EM_CURSO | CANCELADA
+  let timerBusca = null;
+  let timerEtapas = null;
+  let segundosCorridos = 0;
+
+  function precoFinalXOF() {
+    return Math.round(rotaAtual.baseXOF * veiculoAtual.mult);
   }
 
-  function baseRotaAtual() {
-    for (const sel of document.querySelectorAll("select")) {
-      const opt = sel.options && sel.options[sel.selectedIndex];
-      const txt = (opt ? opt.text : sel.value) || "";
-      const v = extrairXOF(txt);
-      if (v > 0 && /→|->|rota|cidade|bandim|guimetal|cristo/i.test(txt)) {
-        return v;
-      }
-    }
-    return 0;
-  }
-
-  function infoVeiculo(texto) {
-    const t = (texto || "").toLowerCase();
-    if (t.includes("moto")) {
-      return { tipo: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", mult: MULT.MOTO };
-    }
-    if (t.includes("privado") || t.includes("carro")) {
-      return { tipo: "PRIVADO", rotulo: "CARRO PRIVADO", nome: "Carro Privado", mult: MULT.PRIVADO };
-    }
-    return { tipo: "TAXI", rotulo: "TAXI", nome: "Táxi Oficial", mult: MULT.TAXI };
-  }
-
-  function cartoesVeiculo() {
-    return Array.from(document.querySelectorAll("div, button, label")).filter((el) => {
-      if (el.children.length > 4) return false;
-      const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
-      if (!txt || txt.length > 90) return false;
-      const temTipo = /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(txt);
-      const temXof = /\d+\s*XOF/i.test(txt);
-      const temFilhoCartao = Array.from(el.children).some((c) =>
-        /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(c.textContent || "")
-      );
-      return temTipo && temXof && !temFilhoCartao;
-    });
-  }
-
-  function escreverPrecoNoCartao(cartao, preco) {
-    if (!cartao || !preco) return;
-    const folhas = Array.from(cartao.querySelectorAll("*")).filter((n) => n.children.length === 0);
-    const exato = folhas.find((n) => /^\s*\d[\d\s.]*\s*XOF\s*$/i.test(n.textContent || ""));
-    if (exato) {
-      exato.textContent = `${preco} XOF`;
-      return;
-    }
-    const parcial = folhas.find((n) => /\d+\s*XOF/i.test(n.textContent || ""));
-    if (parcial) {
-      parcial.textContent = parcial.textContent.replace(/\d[\d\s.]*\s*XOF/i, `${preco} XOF`);
-    }
-  }
-
-  function sincronizarCartoes() {
-    const base = baseRotaAtual();
-    const cartoes = cartoesVeiculo();
-
-    cartoes.forEach((cartao) => {
-      const info = infoVeiculo(cartao.textContent || "");
-      const preco = base > 0 ? Math.round(base * info.mult) : extrairXOF(cartao.textContent || "");
-      if (preco > 0) escreverPrecoNoCartao(cartao, preco);
-
-      const ativo = info.tipo === estado.tipo;
-      cartao.style.border = ativo ? "2px solid #16a34a" : "1px solid #d1d5db";
-      cartao.style.backgroundColor = ativo ? "#f0fdf4" : "#ffffff";
-      cartao.style.cursor = "pointer";
-
-      if (ativo && preco > 0) {
-        estado.valor = preco;
+  function refrescarMapaBissau() {
+    [window.map, window.mapa, window.mapaBissau, window.leafletMap].forEach((m) => {
+      if (m && typeof m.invalidateSize === "function") {
+        setTimeout(() => m.invalidateSize(), 120);
       }
     });
 
-    if (!estado.valor && cartoes[0]) {
-      const i0 = infoVeiculo(cartoes[0].textContent || "");
-      estado = {
-        tipo: i0.tipo,
-        rotulo: i0.rotulo,
-        nome: i0.nome,
-        valor: extrairXOF(cartoes[0].textContent || "") || (base ? Math.round(base * i0.mult) : 0)
-      };
-    }
-
-    window.__veiculoSelecionado = {
-      nome: estado.nome,
-      tipo: estado.rotulo,
-      precoXOF: estado.valor
-    };
-  }
-
-  function melhorarBuscaMotorista() {
-    sincronizarCartoes();
-    const valorFinal = estado.valor || baseRotaAtual();
-    if (!valorFinal) return;
-
-    document.querySelectorAll("p, div, span, strong").forEach((el) => {
-      if (el.children.length === 0 && /Valor:\s*\d+\s*XOF/i.test(el.textContent || "")) {
-        const atual = el.textContent || "";
-        const m = atual.match(/\(([^)]+)\)/);
-        let metodo = "Orange Money";
-        if (m && m[1]) {
-          metodo = m[1].replace(/\s*-\s*(TAXI|CARRO PRIVADO|MOTO-?TAXI)/i, "").trim() || metodo;
-        }
-        el.textContent = `Valor: ${valorFinal} XOF (${metodo} - ${estado.rotulo})`;
+    document.querySelectorAll("[id*='map'], [class*='map'], .leaflet-container").forEach((el) => {
+      if (el.id === "superapp-painel-viagem") return;
+      const cs = window.getComputedStyle(el);
+      if (cs.display === "none" || cs.visibility === "hidden") {
+        el.style.display = "block";
+        el.style.visibility = "visible";
+      }
+      if (el.clientHeight < 220) {
+        el.style.minHeight = "260px";
       }
     });
-
-    // Adiciona mensagem de busca estilo Uber se ainda não existir no bloco de procura
-    const alvoBusca = Array.from(document.querySelectorAll("div, p")).find((el) =>
-      /a procurar condutor/i.test(el.textContent || "") && el.children.length <= 4
-    );
-    if (alvoBusca && !alvoBusca.querySelector("[data-uber-status]")) {
-      const badge = document.createElement("div");
-      badge.setAttribute("data-uber-status", "1");
-      badge.style.marginTop = "6px";
-      badge.style.fontSize = "13px";
-      badge.style.fontWeight = "600";
-      badge.style.color = "#374151";
-      badge.textContent = `A localizar ${estado.nome} disponível em Bissau...`;
-      alvoBusca.appendChild(badge);
-    }
   }
 
-  function dispararCobrancaRealSeDisponivel() {
-    const valorFinal = estado.valor || baseRotaAtual();
-    if (!valorFinal || typeof window.iniciarPagamentoComComissao !== "function") return;
-
-    const telInput = Array.from(document.querySelectorAll("input")).find((i) =>
-      /orange|telecel|\+245|telefone|conta/i.test(i.placeholder || i.name || i.id || "")
-    );
-    const telefone = (telInput?.value || "").trim();
-    if (!telefone) return;
-
-    const metodoSelect = Array.from(document.querySelectorAll("select")).find((s) =>
-      /orange|telecel|cart[aã]o|mtn|wave/i.test(s.textContent || "")
-    );
-    const metodo = metodoSelect?.options?.[metodoSelect.selectedIndex]?.text || "Orange Money";
-
-    const rotaSelect = Array.from(document.querySelectorAll("select")).find((s) =>
-      /→|->|rota|bandim|guimetal|cristo/i.test(s.textContent || "")
-    );
-    const rota = rotaSelect?.options?.[rotaSelect.selectedIndex]?.text || "Rota Bissau";
-
-    window
-      .iniciarPagamentoComComissao({
-        categoria: "mobilidade",
-        servico: estado.nome,
-        clienteNome: "Cliente App Bissau",
-        clienteEmail: "",
-        clienteTelefone: telefone,
-        detalhes: rota,
-        valorBaseXOF: valorFinal,
-        metodoPagamento: metodo
-      })
-      .catch((err) => console.warn("Aviso pagamento viagem:", err?.message || err));
+  function limparTimers() {
+    if (timerBusca) clearInterval(timerBusca);
+    if (timerEtapas) clearTimeout(timerEtapas);
+    timerBusca = null;
+    timerEtapas = null;
   }
 
-  document.addEventListener("click", (e) => {
-    const cartoes = cartoesVeiculo();
-    const clicado = cartoes.find((c) => c === e.target || c.contains(e.target));
+  function renderizarPainel(container) {
+    const preco = precoFinalXOF();
+    const comissaoEstimada = Math.round(preco * 0.1);
 
-    if (clicado) {
-      const info = infoVeiculo(clicado.textContent || "");
-      const base = baseRotaAtual();
-      const preco = base > 0 ? Math.round(base * info.mult) : extrairXOF(clicado.textContent || "");
-      estado = {
-        tipo: info.tipo,
-        rotulo: info.rotulo,
-        nome: info.nome,
-        valor: preco || estado.valor
-      };
-      sincronizarCartoes();
-      return;
+    let blocoEstado = "";
+    if (faseViagem === "PROCURANDO" || faseViagem === "ENCONTRADO" || faseViagem === "EM_CURSO") {
+      const mm = String(Math.floor(segundosCorridos / 60)).padStart(2, "0");
+      const ss = String(segundosCorridos % 60).padStart(2, "0");
+
+      const tituloEstado =
+        faseViagem === "PROCURANDO"
+          ? `A procurar ${veiculoAtual.nome} em Bissau...`
+          : faseViagem === "ENCONTRADO"
+          ? `Motorista encontrado! ${veiculoAtual.nome} a caminho...`
+          : `Viagem em curso (${veiculoAtual.nome})`;
+
+      const corFundo = faseViagem === "EM_CURSO" ? "#ecfdf5" : "#fffbeb";
+      const corBorda = faseViagem === "EM_CURSO" ? "#10b981" : "#f59e0b";
+
+      blocoEstado = `
+        <div style="margin-top:16px;padding:16px;border-radius:12px;background:${corFundo};border:1.5px solid ${corBorda};">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#92400e;margin-bottom:6px;">
+            Modo Demonstração / Parcerias em Ativação
+          </div>
+          <div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:6px;">
+            ${tituloEstado}
+          </div>
+          <div style="font-size:14px;color:#374151;margin-bottom:8px;">
+            <strong>Valor do veículo:</strong> ${preco} XOF (${veiculoAtual.rotulo}) · <strong>Rota:</strong> ${rotaAtual.nome}
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;">
+            <span style="padding:4px 8px;border-radius:999px;background:#fef3c7;font-weight:700;">1. A procurar motorista</span>
+            <span style="padding:4px 8px;border-radius:999px;background:${faseViagem !== "PROCURANDO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">2. A caminho</span>
+            <span style="padding:4px 8px;border-radius:999px;background:${faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">3. Viagem em curso</span>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${mm}:${ss}</div>
+          <button type="button" id="btn-cancelar-viagem-v2" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
+            Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)
+          </button>
+          <div style="font-size:11px;color:#6b7280;margin-top:8px;">
+            Regra de reembolso: cancelamento antes da chegada ou sem motorista disponível devolve 100% do valor simulado sem taxa.
+          </div>
+        </div>
+      `;
+    } else if (faseViagem === "CANCELADA") {
+      blocoEstado = `
+        <div style="margin-top:16px;padding:14px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;font-size:14px;">
+          <strong>Viagem cancelada.</strong> Nenhum valor real foi cobrado (Modo Demonstração / Parcerias em Ativação). Pode escolher outro veículo ou rota acima.
+        </div>
+      `;
     }
 
-    const btn = e.target.closest("button");
-    if (btn && /pagar\s*&\s*pedir\s*viagem|pedir\s*viagem/i.test(btn.textContent || "")) {
-      sincronizarCartoes();
-      dispararCobrancaRealSeDisponivel();
-      [50, 150, 350, 700, 1200, 2000].forEach((ms) => {
-        setTimeout(melhorarBuscaMotorista, ms);
+    container.innerHTML = `
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <span style="font-size:12px;font-weight:700;color:#065f46;background:#d1fae5;padding:4px 10px;border-radius:999px;">
+            3 PASSOS RÁPIDOS · BISSAU
+          </span>
+          <span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;padding:4px 10px;border-radius:999px;">
+            Modo Demonstração / Parcerias em Ativação
+          </span>
+        </div>
+
+        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
+          1. Escolha a rota e o ponto de referência
+        </label>
+        <select id="select-rota-v2" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">
+          ${ROTAS_DGVTT.map(
+            (r) =>
+              `<option value="${r.baseXOF}" ${r.nome === rotaAtual.nome ? "selected" : ""}>${r.nome} (Base: ${r.baseXOF} XOF)</option>`
+          ).join("")}
+        </select>
+        <input id="input-ref-v2" type="text" placeholder="Ponto de referência (ex: Mercado de Bandim, portão azul...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
+
+        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
+          2. Escolha o veículo (preço final do veículo selecionado)
+        </label>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+          ${VEICULOS.map((v) => {
+            const ativo = v.id === veiculoAtual.id;
+            const p = Math.round(rotaAtual.baseXOF * v.mult);
+            return `
+              <button type="button" data-veiculo-v2="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
+                <div style="font-size:18px;">${v.emoji}</div>
+                <div style="font-size:12px;font-weight:700;color:#111827;margin-top:2px;">${v.nome}</div>
+                <div style="font-size:15px;font-weight:800;color:#111827;margin-top:4px;">${p} XOF</div>
+              </button>
+            `;
+          }).join("")}
+        </div>
+
+        <div style="padding:12px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#111827;">
+            <span>Total (${veiculoAtual.nome}):</span>
+            <span id="resumo-preco-v2" style="color:#15803d;font-size:17px;">${preco} XOF</span>
+          </div>
+          <div style="font-size:11px;color:#6b7280;margin-top:4px;">
+            Fluxo previsto com parceiros locais: tarifa ao condutor + comissão de plataforma (~${comissaoEstimada} XOF). Débito automático real será ativado após acordo com operadoras/parceiros.
+          </div>
+        </div>
+
+        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
+          3. Método e número apenas para confirmar o pedido
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:8px;margin-bottom:12px;">
+          <select id="select-metodo-v2" style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;background:#fff;">
+            <option value="Orange Money">Orange Money</option>
+            <option value="Telecel">Telecel</option>
+            <option value="Cartão">Cartão</option>
+          </select>
+          <input id="input-tel-v2" type="tel" placeholder="+245 955..." style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;box-sizing:border-box;" />
+        </div>
+
+        <button type="button" id="btn-pedir-v2" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">
+          Pedir ${veiculoAtual.nome} · ${preco} XOF
+        </button>
+
+        ${blocoEstado}
+      </div>
+    `;
+
+    // Liga eventos do painel
+    const selRota = container.querySelector("#select-rota-v2");
+    if (selRota) {
+      selRota.addEventListener("change", () => {
+        const idx = selRota.selectedIndex;
+        rotaAtual = ROTAS_DGVTT[idx] || ROTAS_DGVTT[0];
+        renderizarPainel(container);
       });
     }
-  });
 
-  document.addEventListener("change", (e) => {
-    if (e.target && e.target.tagName === "SELECT") {
-      setTimeout(sincronizarCartoes, 60);
+    container.querySelectorAll("[data-veiculo-v2]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-veiculo-v2");
+        veiculoAtual = VEICULOS.find((v) => v.id === id) || VEICULOS[0];
+        window.__veiculoSelecionado = {
+          nome: veiculoAtual.nome,
+          tipo: veiculoAtual.rotulo,
+          precoXOF: precoFinalXOF()
+        };
+        renderizarPainel(container);
+      });
+    });
+
+    const btnPedir = container.querySelector("#btn-pedir-v2");
+    if (btnPedir) {
+      btnPedir.addEventListener("click", () => {
+        limparTimers();
+        faseViagem = "PROCURANDO";
+        segundosCorridos = 0;
+        renderizarPainel(container);
+
+        const tel = (container.querySelector("#input-tel-v2")?.value || "").trim();
+        const metodo = container.querySelector("#select-metodo-v2")?.value || "Orange Money";
+        const ref = (container.querySelector("#input-ref-v2")?.value || "").trim();
+        const valor = precoFinalXOF();
+
+        window.__veiculoSelecionado = {
+          nome: veiculoAtual.nome,
+          tipo: veiculoAtual.rotulo,
+          precoXOF: valor
+        };
+
+        if (typeof window.iniciarPagamentoComComissao === "function") {
+          window
+            .iniciarPagamentoComComissao({
+              categoria: "mobilidade",
+              servico: veiculoAtual.nome,
+              clienteNome: "Cliente App Bissau",
+              clienteEmail: "",
+              clienteTelefone: tel || "+245000000000",
+              detalhes: `${rotaAtual.nome}${ref ? " (" + ref + ")" : ""}`,
+              valorBaseXOF: valor,
+              metodoPagamento: `${metodo} [DEMO]`
+            })
+            .catch(() => {});
+        }
+
+        timerBusca = setInterval(() => {
+          segundosCorridos += 1;
+          const crono = container.querySelector("#superapp-painel-viagem div[style*='font-size:22px']");
+          if (crono) {
+            const m = String(Math.floor(segundosCorridos / 60)).padStart(2, "0");
+            const s = String(segundosCorridos % 60).padStart(2, "0");
+            crono.textContent = `${m}:${s}`;
+          }
+        }, 1000);
+
+        timerEtapas = setTimeout(() => {
+          if (faseViagem === "PROCURANDO") {
+            faseViagem = "ENCONTRADO";
+            renderizarPainel(container);
+            timerEtapas = setTimeout(() => {
+              if (faseViagem === "ENCONTRADO") {
+                faseViagem = "EM_CURSO";
+                renderizarPainel(container);
+              }
+            }, 4000);
+          }
+        }, 3500);
+      });
     }
+
+    const btnCancelar = container.querySelector("#btn-cancelar-viagem-v2");
+    if (btnCancelar) {
+      btnCancelar.addEventListener("click", () => {
+        limparTimers();
+        faseViagem = "CANCELADA";
+        renderizarPainel(container);
+      });
+    }
+  }
+
+  function montarSubstituicaoLimpa() {
+    refrescarMapaBissau();
+    if (document.getElementById("superapp-painel-viagem")) return;
+
+    const botaoAntigo = Array.from(document.querySelectorAll("button")).find((b) =>
+      /pagar\s*&\s*pedir\s*viagem|pedir\s*viagem/i.test(b.textContent || "")
+    );
+    if (!botaoAntigo) return;
+
+    // Sobe até o bloco que contém rota, cartões de veículo e botão de pedir viagem
+    let alvo = botaoAntigo.parentElement;
+    for (let i = 0; i < 6 && alvo && alvo.parentElement; i++) {
+      const txt = alvo.textContent || "";
+      if (/t[áa]xi\s*oficial/i.test(txt) && /moto-?t[áa]xi/i.test(txt) && /rota/i.test(txt)) {
+        break;
+      }
+      alvo = alvo.parentElement;
+    }
+
+    if (!alvo || !alvo.parentElement) return;
+
+    const painel = document.createElement("div");
+    painel.id = "superapp-painel-viagem";
+    alvo.parentElement.insertBefore(painel, alvo);
+    alvo.style.display = "none";
+
+    renderizarPainel(painel);
+  }
+
+  window.addEventListener("load", () => {
+    setTimeout(montarSubstituicaoLimpa, 300);
+    setTimeout(refrescarMapaBissau, 600);
   });
 
-  window.addEventListener("load", () => setTimeout(sincronizarCartoes, 200));
-  setTimeout(sincronizarCartoes, 250);
+  document.addEventListener("click", () => {
+    setTimeout(refrescarMapaBissau, 200);
+  });
+
+  setTimeout(montarSubstituicaoLimpa, 350);
 })();
