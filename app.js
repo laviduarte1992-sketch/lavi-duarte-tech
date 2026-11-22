@@ -1278,15 +1278,75 @@ Total: ${valorFormatado}`
   });
 })();
 (function () {
-  if (window.__superAppMobilidadeV2) return;
-  window.__superAppMobilidadeV2 = true;
+  if (window.__superAppMobilidadeV3) return;
+  window.__superAppMobilidadeV3 = true;
 
-  const ROTAS_DGVTT = [
-    { nome: "Cidade → Mercado de Bandim", baseXOF: 225 },
-    { nome: "Cidade → Guimetal", baseXOF: 525 },
-    { nome: "Cidade → Cristo Redentor", baseXOF: 400 },
-    { nome: "Cidade → Aeroporto / Plub", baseXOF: 600 },
-    { nome: "Cidade → Antula / Safim", baseXOF: 750 }
+  const ZONAS_ROTAS = [
+    {
+      zona: "📍 Partidas: Centro da Cidade (Praça / Centro)",
+      rotas: [
+        { nome: "Cidade → Mercado de Bandim", baseXOF: 225 },
+        { nome: "Cidade → Cristo Redentor", baseXOF: 250 },
+        { nome: "Cidade → Belém / Missira", baseXOF: 325 },
+        { nome: "Cidade → Bairro d'Ajuda 1º e 2º fase", baseXOF: 350 },
+        { nome: "Cidade → Hospital 3 de Agosto", baseXOF: 375 },
+        { nome: "Cidade → Bairro Internacional", baseXOF: 425 },
+        { nome: "Cidade → Hotel Emb. América", baseXOF: 200 },
+        { nome: "Cidade → Bairro Militar / Prédio Nino", baseXOF: 450 },
+        { nome: "Cidade → Bairro Militar Somec", baseXOF: 475 },
+        { nome: "Cidade → B. Militar / Terminal TUB", baseXOF: 525 },
+        { nome: "Cidade → Brá / Seminário", baseXOF: 550 },
+        { nome: "Cidade → Paragem Central", baseXOF: 475 },
+        { nome: "Cidade → Guimetal", baseXOF: 525 },
+        { nome: "Cidade → São Paulo", baseXOF: 550 },
+        { nome: "Cidade → Háfia / Cruzamento", baseXOF: 575 },
+        { nome: "Cidade → Paragem Manjaco", baseXOF: 650 },
+        { nome: "Cidade → Rotunda do Aeroporto", baseXOF: 675 },
+        { nome: "Cidade → Aeroporto", baseXOF: 700 },
+        { nome: "Cidade → Base Aérea / PRAKLAS", baseXOF: 750 },
+        { nome: "Cidade → Bissalanca Poilão", baseXOF: 800 },
+        { nome: "Cidade → Enterramento", baseXOF: 200 },
+        { nome: "Cidade → STENACKS / Safim", baseXOF: 950 },
+        { nome: "Cidade → ENA (CENFA)", baseXOF: 650 },
+        { nome: "Cidade → Av. Brasil", baseXOF: 700 },
+        { nome: "Cidade → Paulo Barros", baseXOF: 775 },
+        { nome: "Cidade → Caracol", baseXOF: 175 },
+        { nome: "Cidade → Padaria Nhonho", baseXOF: 250 },
+        { nome: "Cidade → Zona 7", baseXOF: 275 },
+        { nome: "Cidade → Bairro Plano", baseXOF: 325 },
+        { nome: "Cidade → Bairro Ministro", baseXOF: 375 },
+        { nome: "Cidade → SHEL Quelelê", baseXOF: 425 },
+        { nome: "Cidade → Sobrade", baseXOF: 475 },
+        { nome: "Cidade → Ponta Neto", baseXOF: 525 },
+        { nome: "Cidade → Bôr / Terminal TUB", baseXOF: 550 },
+        { nome: "Cidade → Aldeia SOS", baseXOF: 575 },
+        { nome: "Cidade → Cemitério de N'hala", baseXOF: 600 },
+        { nome: "Cidade → Bairro Bissack (Ponte Cibe)", baseXOF: 275 },
+        { nome: "Cidade → Bissack / Terminal TUB", baseXOF: 325 },
+        { nome: "Cidade → Estado Major / QG", baseXOF: 275 },
+        { nome: "Cidade → Igreja Católica de Antula", baseXOF: 450 },
+        { nome: "Cidade → Pluba / Abílio Santos", baseXOF: 475 },
+        { nome: "Cidade → Pefine", baseXOF: 650 },
+        { nome: "Cidade → Estádio 24 de Setembro", baseXOF: 800 }
+      ]
+    },
+    {
+      zona: "📍 Partidas: Mercado de Bandim",
+      rotas: [
+        { nome: "Mercado Bandim → SHEL / Palmeiras", baseXOF: 225 },
+        { nome: "Mercado Bandim → Chapa de Bissau", baseXOF: 275 },
+        { nome: "Mercado Bandim → Bairro d'Ajuda", baseXOF: 325 },
+        { nome: "Mercado Bandim → Hospital 3 de Agosto", baseXOF: 350 },
+        { nome: "Mercado Bandim → Bairro Internacional", baseXOF: 375 },
+        { nome: "Mercado Bandim → Bairro Militar Prédio Nino", baseXOF: 450 },
+        { nome: "Mercado Bandim → Bº Militar / Terminal TUB", baseXOF: 525 },
+        { nome: "Mercado Bandim → Paragem Central", baseXOF: 550 },
+        { nome: "Mercado Bandim → Enterramento", baseXOF: 575 },
+        { nome: "Mercado Bandim → Seminário Brá", baseXOF: 650 },
+        { nome: "Mercado Bandim → Aeroporto", baseXOF: 325 },
+        { nome: "Mercado Bandim → Safim", baseXOF: 550 }
+      ]
+    }
   ];
 
   const VEICULOS = [
@@ -1295,7 +1355,8 @@ Total: ${valorFormatado}`
     { id: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", emoji: "🏍️", mult: 1.4 }
   ];
 
-  let rotaAtual = ROTAS_DGVTT[0];
+  let zonaIdx = 0;
+  let rotaAtual = ZONAS_ROTAS[0].rotas[0];
   let veiculoAtual = VEICULOS[0];
   let faseViagem = "IDLE"; // IDLE | PROCURANDO | ENCONTRADO | EM_CURSO | CANCELADA
   let timerBusca = null;
@@ -1336,6 +1397,7 @@ Total: ${valorFormatado}`
   function renderizarPainel(container) {
     const preco = precoFinalXOF();
     const comissaoEstimada = Math.round(preco * 0.1);
+    const rotasDaZona = ZONAS_ROTAS[zonaIdx]?.rotas || ZONAS_ROTAS[0].rotas;
 
     let blocoEstado = "";
     if (faseViagem === "PROCURANDO" || faseViagem === "ENCONTRADO" || faseViagem === "EM_CURSO") {
@@ -1369,7 +1431,7 @@ Total: ${valorFormatado}`
             <span style="padding:4px 8px;border-radius:999px;background:${faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">3. Viagem em curso</span>
           </div>
           <div style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${mm}:${ss}</div>
-          <button type="button" id="btn-cancelar-viagem-v2" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
+          <button type="button" id="btn-cancelar-viagem-v3" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
             Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)
           </button>
           <div style="font-size:11px;color:#6b7280;margin-top:8px;">
@@ -1389,7 +1451,7 @@ Total: ${valorFormatado}`
       <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
           <span style="font-size:12px;font-weight:700;color:#065f46;background:#d1fae5;padding:4px 10px;border-radius:999px;">
-            3 PASSOS RÁPIDOS · BISSAU
+            3 PASSOS RÁPIDOS · ROTA OFICIAL DGVTT BISSAU
           </span>
           <span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;padding:4px 10px;border-radius:999px;">
             Modo Demonstração / Parcerias em Ativação
@@ -1397,15 +1459,22 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
-          1. Escolha a rota e o ponto de referência
+          1. Escolha a zona de partida, a rota e o ponto de referência
         </label>
-        <select id="select-rota-v2" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">
-          ${ROTAS_DGVTT.map(
-            (r) =>
-              `<option value="${r.baseXOF}" ${r.nome === rotaAtual.nome ? "selected" : ""}>${r.nome} (Base: ${r.baseXOF} XOF)</option>`
+        <select id="select-zona-v3" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;font-weight:600;margin-bottom:8px;background:#f9fafb;">
+          ${ZONAS_ROTAS.map(
+            (z, i) => `<option value="${i}" ${i === zonaIdx ? "selected" : ""}>${z.zona} (${z.rotas.length} rotas)</option>`
           ).join("")}
         </select>
-        <input id="input-ref-v2" type="text" placeholder="Ponto de referência (ex: Mercado de Bandim, portão azul...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
+
+        <select id="select-rota-v3" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">
+          ${rotasDaZona.map(
+            (r) =>
+              `<option value="${r.baseXOF}" ${r.nome === rotaAtual.nome ? "selected" : ""}>${r.nome} (${r.baseXOF} XOF)</option>`
+          ).join("")}
+        </select>
+
+        <input id="input-ref-v3" type="text" placeholder="Ponto de referência (ex: Mercado de Bandim, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
           2. Escolha o veículo (preço final do veículo selecionado)
@@ -1415,7 +1484,7 @@ Total: ${valorFormatado}`
             const ativo = v.id === veiculoAtual.id;
             const p = Math.round(rotaAtual.baseXOF * v.mult);
             return `
-              <button type="button" data-veiculo-v2="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
+              <button type="button" data-veiculo-v3="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
                 <div style="font-size:18px;">${v.emoji}</div>
                 <div style="font-size:12px;font-weight:700;color:#111827;margin-top:2px;">${v.nome}</div>
                 <div style="font-size:15px;font-weight:800;color:#111827;margin-top:4px;">${p} XOF</div>
@@ -1427,10 +1496,10 @@ Total: ${valorFormatado}`
         <div style="padding:12px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;margin-bottom:14px;">
           <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#111827;">
             <span>Total (${veiculoAtual.nome}):</span>
-            <span id="resumo-preco-v2" style="color:#15803d;font-size:17px;">${preco} XOF</span>
+            <span id="resumo-preco-v3" style="color:#15803d;font-size:17px;">${preco} XOF</span>
           </div>
           <div style="font-size:11px;color:#6b7280;margin-top:4px;">
-            Fluxo previsto com parceiros locais: tarifa ao condutor + comissão de plataforma (~${comissaoEstimada} XOF). Débito automático real será ativado após acordo com operadoras/parceiros.
+            Rota base: ${rotaAtual.nome} (${rotaAtual.baseXOF} XOF) · Comissão estimada da plataforma: ~${comissaoEstimada} XOF. Débito automático real será ativado após acordo com operadoras/parceiros.
           </div>
         </div>
 
@@ -1438,15 +1507,15 @@ Total: ${valorFormatado}`
           3. Método e número apenas para confirmar o pedido
         </label>
         <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:8px;margin-bottom:12px;">
-          <select id="select-metodo-v2" style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;background:#fff;">
+          <select id="select-metodo-v3" style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;background:#fff;">
             <option value="Orange Money">Orange Money</option>
             <option value="Telecel">Telecel</option>
             <option value="Cartão">Cartão</option>
           </select>
-          <input id="input-tel-v2" type="tel" placeholder="+245 955..." style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;box-sizing:border-box;" />
+          <input id="input-tel-v3" type="tel" placeholder="+245 955..." style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;box-sizing:border-box;" />
         </div>
 
-        <button type="button" id="btn-pedir-v2" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">
+        <button type="button" id="btn-pedir-v3" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">
           Pedir ${veiculoAtual.nome} · ${preco} XOF
         </button>
 
@@ -1454,19 +1523,27 @@ Total: ${valorFormatado}`
       </div>
     `;
 
-    // Liga eventos do painel
-    const selRota = container.querySelector("#select-rota-v2");
-    if (selRota) {
-      selRota.addEventListener("change", () => {
-        const idx = selRota.selectedIndex;
-        rotaAtual = ROTAS_DGVTT[idx] || ROTAS_DGVTT[0];
+    const selZona = container.querySelector("#select-zona-v3");
+    if (selZona) {
+      selZona.addEventListener("change", () => {
+        zonaIdx = Number(selZona.value) || 0;
+        rotaAtual = (ZONAS_ROTAS[zonaIdx] && ZONAS_ROTAS[zonaIdx].rotas[0]) || ZONAS_ROTAS[0].rotas[0];
         renderizarPainel(container);
       });
     }
 
-    container.querySelectorAll("[data-veiculo-v2]").forEach((btn) => {
+    const selRota = container.querySelector("#select-rota-v3");
+    if (selRota) {
+      selRota.addEventListener("change", () => {
+        const lista = (ZONAS_ROTAS[zonaIdx] && ZONAS_ROTAS[zonaIdx].rotas) || ZONAS_ROTAS[0].rotas;
+        rotaAtual = lista[selRota.selectedIndex] || lista[0];
+        renderizarPainel(container);
+      });
+    }
+
+    container.querySelectorAll("[data-veiculo-v3]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-veiculo-v2");
+        const id = btn.getAttribute("data-veiculo-v3");
         veiculoAtual = VEICULOS.find((v) => v.id === id) || VEICULOS[0];
         window.__veiculoSelecionado = {
           nome: veiculoAtual.nome,
@@ -1477,7 +1554,7 @@ Total: ${valorFormatado}`
       });
     });
 
-    const btnPedir = container.querySelector("#btn-pedir-v2");
+    const btnPedir = container.querySelector("#btn-pedir-v3");
     if (btnPedir) {
       btnPedir.addEventListener("click", () => {
         limparTimers();
@@ -1485,9 +1562,9 @@ Total: ${valorFormatado}`
         segundosCorridos = 0;
         renderizarPainel(container);
 
-        const tel = (container.querySelector("#input-tel-v2")?.value || "").trim();
-        const metodo = container.querySelector("#select-metodo-v2")?.value || "Orange Money";
-        const ref = (container.querySelector("#input-ref-v2")?.value || "").trim();
+        const tel = (container.querySelector("#input-tel-v3")?.value || "").trim();
+        const metodo = container.querySelector("#select-metodo-v3")?.value || "Orange Money";
+        const ref = (container.querySelector("#input-ref-v3")?.value || "").trim();
         const valor = precoFinalXOF();
 
         window.__veiculoSelecionado = {
@@ -1536,7 +1613,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnCancelar = container.querySelector("#btn-cancelar-viagem-v2");
+    const btnCancelar = container.querySelector("#btn-cancelar-viagem-v3");
     if (btnCancelar) {
       btnCancelar.addEventListener("click", () => {
         limparTimers();
@@ -1548,14 +1625,17 @@ Total: ${valorFormatado}`
 
   function montarSubstituicaoLimpa() {
     refrescarMapaBissau();
-    if (document.getElementById("superapp-painel-viagem")) return;
+    const existente = document.getElementById("superapp-painel-viagem");
+    if (existente) {
+      renderizarPainel(existente);
+      return;
+    }
 
     const botaoAntigo = Array.from(document.querySelectorAll("button")).find((b) =>
       /pagar\s*&\s*pedir\s*viagem|pedir\s*viagem/i.test(b.textContent || "")
     );
     if (!botaoAntigo) return;
 
-    // Sobe até o bloco que contém rota, cartões de veículo e botão de pedir viagem
     let alvo = botaoAntigo.parentElement;
     for (let i = 0; i < 6 && alvo && alvo.parentElement; i++) {
       const txt = alvo.textContent || "";
