@@ -1278,8 +1278,8 @@ Total: ${valorFormatado}`
   });
 })();
 (function () {
-  if (window.__superAppMobilidadeV5) return;
-  window.__superAppMobilidadeV5 = true;
+  if (window.__superAppMobilidadeV6) return;
+  window.__superAppMobilidadeV6 = true;
 
   const GRUPOS_ROTAS_DGVTT = [
     {
@@ -1357,6 +1357,13 @@ Total: ${valorFormatado}`
     { id: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", emoji: "🏍️", mult: 1.4 }
   ];
 
+  const METODOS_PAGAMENTO = [
+    "Orange Money",
+    "Telecel",
+    "Cartão",
+    "Dinheiro Vivo"
+  ];
+
   let rotaAtual = TODAS_ROTAS[0];
   let veiculoAtual = VEICULOS[0];
   let metodoAtual = "Orange Money";
@@ -1423,14 +1430,27 @@ Total: ${valorFormatado}`
   }
 
   function renderizarCamposPagamento() {
+    if (metodoAtual === "Dinheiro Vivo") {
+      return `
+        <div id="bloco-dinheiro-v6" style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f0fdf4;border:1px solid #86efac;">
+          <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">
+            💵 Pagamento em Dinheiro Vivo ao condutor
+          </div>
+          <div style="font-size:12px;color:#374151;">
+            Não precisa de número de conta nem cartão. O valor final será pago em dinheiro vivo (XOF) diretamente ao condutor no início/fim da viagem.
+          </div>
+        </div>
+      `;
+    }
+
     if (metodoAtual === "Cartão") {
       return `
-        <div id="bloco-cartao-v5" style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
+        <div id="bloco-cartao-v6" style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
           <label style="display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;">
             Número do cartão (16 dígitos)
           </label>
           <input
-            id="input-cartao-numero-v5"
+            id="input-cartao-numero-v6"
             type="text"
             inputmode="numeric"
             maxlength="19"
@@ -1443,7 +1463,7 @@ Total: ${valorFormatado}`
                 Validade (MM/AA)
               </label>
               <input
-                id="input-cartao-validade-v5"
+                id="input-cartao-validade-v6"
                 type="text"
                 inputmode="numeric"
                 maxlength="5"
@@ -1456,7 +1476,7 @@ Total: ${valorFormatado}`
                 Código secreto (3 dígitos)
               </label>
               <input
-                id="input-cartao-cvv-v5"
+                id="input-cartao-cvv-v6"
                 type="password"
                 inputmode="numeric"
                 maxlength="3"
@@ -1465,7 +1485,7 @@ Total: ${valorFormatado}`
               />
             </div>
           </div>
-          <div id="aviso-cartao-v5" style="font-size:11px;color:#b45309;margin-top:8px;">
+          <div id="aviso-cartao-v6" style="font-size:11px;color:#b45309;margin-top:8px;">
             Modo Demonstração: simulação local de cartão de débito/crédito (não introduza dados reais de cartão).
           </div>
         </div>
@@ -1474,7 +1494,7 @@ Total: ${valorFormatado}`
 
     return `
       <input
-        id="input-tel-v5"
+        id="input-tel-v6"
         type="tel"
         placeholder="+245 955..."
         style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;"
@@ -1514,10 +1534,10 @@ Total: ${valorFormatado}`
               faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"
             };font-weight:700;">3. Viagem em curso</span>
           </div>
-          <div id="cronometro-viagem-v5" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(
+          <div id="cronometro-viagem-v6" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(
             segundos
           )}</div>
-          <button type="button" id="btn-cancelar-v5" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
+          <button type="button" id="btn-cancelar-v6" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
             Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)
           </button>
           <div style="font-size:11px;color:#6b7280;margin-top:8px;">
@@ -1562,11 +1582,11 @@ Total: ${valorFormatado}`
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
           1. Escolha para onde quer ir e o ponto de referência
         </label>
-        <select id="select-rota-v5" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">
+        <select id="select-rota-v6" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">
           ${renderizarOpcoesRotas()}
         </select>
 
-        <input id="input-ref-v5" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
+        <input id="input-ref-v6" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
           2. Escolha o veículo (preço final do veículo selecionado)
@@ -1576,7 +1596,7 @@ Total: ${valorFormatado}`
             const ativo = v.id === veiculoAtual.id;
             const p = Math.round(rotaAtual.baseXOF * v.mult);
             return `
-              <button type="button" data-veiculo-v5="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${
+              <button type="button" data-veiculo-v6="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${
                 ativo ? "2px solid #16a34a" : "1px solid #d1d5db"
               };background:${ativo ? "#f0fdf4" : "#ffffff"};">
                 <div style="font-size:18px;">${v.emoji}</div>
@@ -1600,15 +1620,15 @@ Total: ${valorFormatado}`
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
           3. Método e dados para confirmar o pedido
         </label>
-        <select id="select-metodo-v5" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
-          <option value="Orange Money" ${metodoAtual === "Orange Money" ? "selected" : ""}>Orange Money</option>
-          <option value="Telecel" ${metodoAtual === "Telecel" ? "selected" : ""}>Telecel</option>
-          <option value="Cartão" ${metodoAtual === "Cartão" ? "selected" : ""}>Cartão</option>
+        <select id="select-metodo-v6" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
+          ${METODOS_PAGAMENTO.map(
+            (m) => `<option value="${m}" ${metodoAtual === m ? "selected" : ""}>${m}</option>`
+          ).join("")}
         </select>
 
         ${renderizarCamposPagamento()}
 
-        <button type="button" id="btn-pedir-v5" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">
+        <button type="button" id="btn-pedir-v6" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">
           Pedir ${veiculoAtual.nome} · ${preco} XOF
         </button>
 
@@ -1616,7 +1636,7 @@ Total: ${valorFormatado}`
       </div>
     `;
 
-    const selRota = container.querySelector("#select-rota-v5");
+    const selRota = container.querySelector("#select-rota-v6");
     if (selRota) {
       selRota.addEventListener("change", () => {
         const opt = selRota.options[selRota.selectedIndex];
@@ -1626,15 +1646,15 @@ Total: ${valorFormatado}`
       });
     }
 
-    container.querySelectorAll("[data-veiculo-v5]").forEach((btn) => {
+    container.querySelectorAll("[data-veiculo-v6]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-veiculo-v5");
+        const id = btn.getAttribute("data-veiculo-v6");
         veiculoAtual = VEICULOS.find((v) => v.id === id) || VEICULOS[0];
         renderizarPainel(container);
       });
     });
 
-    const selMetodo = container.querySelector("#select-metodo-v5");
+    const selMetodo = container.querySelector("#select-metodo-v6");
     if (selMetodo) {
       selMetodo.addEventListener("change", () => {
         metodoAtual = selMetodo.value || "Orange Money";
@@ -1642,7 +1662,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputNumCartao = container.querySelector("#input-cartao-numero-v5");
+    const inputNumCartao = container.querySelector("#input-cartao-numero-v6");
     if (inputNumCartao) {
       inputNumCartao.addEventListener("input", () => {
         const digitos = inputNumCartao.value.replace(/\D/g, "").slice(0, 16);
@@ -1650,7 +1670,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputValidade = container.querySelector("#input-cartao-validade-v5");
+    const inputValidade = container.querySelector("#input-cartao-validade-v6");
     if (inputValidade) {
       inputValidade.addEventListener("input", () => {
         const digitos = inputValidade.value.replace(/\D/g, "").slice(0, 4);
@@ -1658,22 +1678,24 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputCvv = container.querySelector("#input-cartao-cvv-v5");
+    const inputCvv = container.querySelector("#input-cartao-cvv-v6");
     if (inputCvv) {
       inputCvv.addEventListener("input", () => {
         inputCvv.value = inputCvv.value.replace(/\D/g, "").slice(0, 3);
       });
     }
 
-    const btnPedir = container.querySelector("#btn-pedir-v5");
+    const btnPedir = container.querySelector("#btn-pedir-v6");
     if (btnPedir) {
       btnPedir.addEventListener("click", () => {
-        let referenciaCliente = (container.querySelector("#input-tel-v5")?.value || "").trim();
+        let referenciaCliente = (container.querySelector("#input-tel-v6")?.value || "").trim();
 
-        if (metodoAtual === "Cartão") {
-          const numLimpo = (container.querySelector("#input-cartao-numero-v5")?.value || "").replace(/\D/g, "");
-          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v5")?.value || "").replace(/\D/g, "");
-          const aviso = container.querySelector("#aviso-cartao-v5");
+        if (metodoAtual === "Dinheiro Vivo") {
+          referenciaCliente = "Dinheiro Vivo ao condutor";
+        } else if (metodoAtual === "Cartão") {
+          const numLimpo = (container.querySelector("#input-cartao-numero-v6")?.value || "").replace(/\D/g, "");
+          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v6")?.value || "").replace(/\D/g, "");
+          const aviso = container.querySelector("#aviso-cartao-v6");
 
           if (numLimpo.length !== 16 || cvvLimpo.length !== 3) {
             if (aviso) {
@@ -1690,7 +1712,7 @@ Total: ${valorFormatado}`
         segundos = 0;
         renderizarPainel(container);
 
-        const ref = (container.querySelector("#input-ref-v5")?.value || "").trim();
+        const ref = (container.querySelector("#input-ref-v6")?.value || "").trim();
         const valor = calcularPrecoXOF();
 
         if (typeof window.iniciarPagamentoComComissao === "function") {
@@ -1710,7 +1732,7 @@ Total: ${valorFormatado}`
 
         timerCrono = setInterval(() => {
           segundos += 1;
-          const elCrono = container.querySelector("#cronometro-viagem-v5");
+          const elCrono = container.querySelector("#cronometro-viagem-v6");
           if (elCrono) elCrono.textContent = formatarTempo(segundos);
         }, 1000);
 
@@ -1729,7 +1751,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnCancelar = container.querySelector("#btn-cancelar-v5");
+    const btnCancelar = container.querySelector("#btn-cancelar-v6");
     if (btnCancelar) {
       btnCancelar.addEventListener("click", () => {
         limparTimers();
