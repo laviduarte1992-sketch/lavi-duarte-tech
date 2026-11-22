@@ -1277,3 +1277,98 @@ Total: ${valorFormatado}`
     }, 150);
   });
 })();
+(function () {
+  let selecionado = {
+    tipo: "TAXI",
+    nome: "Táxi Oficial",
+    valorXOF: 1050
+  };
+
+  function extrairValorXOF(texto) {
+    const limpo = (texto || "").replace(/\s+/g, " ");
+    const m = limpo.match(/(\d[\d\s.]*)\s*XOF/i);
+    if (!m) return null;
+    const num = Number(m[1].replace(/[^\d]/g, ""));
+    return num > 0 ? num : null;
+  }
+
+  function identificarVeiculo(texto) {
+    const t = (texto || "").toLowerCase();
+    if (t.includes("moto")) return { tipo: "MOTO-TAXI", nome: "Moto-Táxi" };
+    if (t.includes("privado") || t.includes("carro")) return { tipo: "CARRO PRIVADO", nome: "Carro Privado" };
+    return { tipo: "TAXI", nome: "Táxi Oficial" };
+  }
+
+  function encontrarCartoes() {
+    const todos = Array.from(document.querySelectorAll("div, button, label"));
+    return todos.filter((el) => {
+      const txt = (el.textContent || "").trim();
+      if (!txt || txt.length > 80) return false;
+      const temVeiculo = /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(txt);
+      const temPreco = /\d+\s*XOF/i.test(txt);
+      const temFilhoCartao = Array.from(el.children).some((c) =>
+        /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(c.textContent || "")
+      );
+      return temVeiculo && temPreco && !temFilhoCartao;
+    });
+  }
+
+  function destacarCartao(cartaoAtivo) {
+    encontrarCartoes().forEach((c) => {
+      c.style.border = "1px solid #d1d5db";
+      c.style.backgroundColor = "#ffffff";
+      c.style.boxShadow = "none";
+    });
+    if (cartaoAtivo) {
+      cartaoAtivo.style.border = "2px solid #16a34a";
+      cartaoAtivo.style.backgroundColor = "#f0fdf4";
+      cartaoAtivo.style.boxShadow = "0 0 0 2px rgba(22, 163, 74, 0.15)";
+    }
+  }
+
+  document.addEventListener("click", (e) => {
+    const cartoes = encontrarCartoes();
+    const cartaoClicado = cartoes.find((c) => c === e.target || c.contains(e.target));
+
+    if (cartaoClicado) {
+      const texto = cartaoClicado.textContent || "";
+      const valor = extrairValorXOF(texto);
+      const info = identificarVeiculo(texto);
+
+      if (valor) {
+        selecionado = {
+          tipo: info.tipo,
+          nome: info.nome,
+          valorXOF: valor
+        };
+        window.__veiculoSelecionado = selecionado;
+        destacarCartao(cartaoClicado);
+      }
+      return;
+    }
+
+    const btnPagar = e.target.closest("button");
+    if (btnPagar && /pagar\s*&\s*pedir\s*viagem/i.test(btnPagar.textContent || "")) {
+      // Se nenhum cartão foi clicado manualmente, lê o valor do 1.º cartão visível ou o já selecionado
+      if (!window.__veiculoSelecionado && cartoes[0]) {
+        const v0 = extrairValorXOF(cartoes[0].textContent || "");
+        const i0 = identificarVeiculo(cartoes[0].textContent || "");
+        if (v0) selecionado = { tipo: i0.tipo, nome: i0.nome, valorXOF: v0 };
+      }
+
+      const valorFinal = (window.__veiculoSelecionado && window.__veiculoSelecionado.valorXOF) || selecionado.valorXOF;
+      const tipoFinal = (window.__veiculoSelecionado && window.__veiculoSelecionado.tipo) || selecionado.tipo;
+
+      const aplicarValorNoAviso = () => {
+        document.querySelectorAll("p, div, span").forEach((el) => {
+          if (el.children.length === 0 && /Valor:\s*\d+\s*XOF/i.test(el.textContent || "")) {
+            el.textContent = `Valor: ${valorFinal} XOF (Orange Money - ${tipoFinal})`;
+          }
+        });
+      };
+
+      setTimeout(aplicarValorNoAviso, 80);
+      setTimeout(aplicarValorNoAviso, 300);
+    }
+  });
+})();
