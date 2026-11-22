@@ -403,61 +403,48 @@
                         <input type="text" id="pontoReferencia" placeholder="Ponto de Referência (Ex: Perto do Mercado, portão...)">
                     </div>
 
-                    <div class="service-options" style="display: flex; gap: 6px; margin: 8px 0;">
-    <!-- Cartão 1: Táxi Oficial (O dobro exato da base) -->
-    <div class="service-card" style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center;">
-        <div>🚕 Táxi Oficial</div>
-        <div id="precoTaxi" style="font-weight: bold; font-size: 16px;">225 XOF</div>
-    </div>
-
-    <!-- Cartão 2: Carro Privado -->
-    <div class="service-card" style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center;">
-        <div>🚗 Carro Privado</div>
-        <div id="precoPrivado" style="font-weight: bold; font-size: 16px;">293 XOF</div>
-    </div>
-
-    <!-- Cartão 3: Moto-Táxi -->
-    <div class="service-card" style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center;">
-        <div>🏍️ Moto-Táxi</div>
-        <div id="precoMoto" style="font-weight: bold; font-size: 16px;">158 XOF</div>
-    </div>
-</div>                   
-<div class="form-group" style="margin-top: 6px;">
-                        <label>FORMA DE PAGAMENTO DA VIAGEM (PAGO ANTES DE PEDIR)</label>
-                        <select id="ridePaymentMethod" onchange="alternarCamposPagamentoCorrida()">
-                            <option value="Orange Money">Orange Money</option>
-                            <option value="Telecel Cash">Telecel Cash</option>
-                            <option value="Cartão de Débito / Crédito">Cartão de Débito / Crédito</option>
-                            <option value="Dinheiro Vivo (Ao Condutor)">Dinheiro Vivo (Ao Condutor)</option>
-                        </select>
-                    </div>
-
-                    <div id="campoMobileCorrida" style="margin-top: 6px;">
-                        <input type="text" id="numMobileCorrida" placeholder="Número da Conta Orange / Telecel (+245...)">
-                    </div>
-
-                    <div id="camposCartaoCorrida" style="display:none; margin-top: 6px;">
-                        <div class="form-group" style="margin-bottom:6px;">
-                            <input type="text" id="numCartaoCorrida" maxlength="16" placeholder="Número do Cartão (16 dígitos)">
-                        </div>
-                        <div class="form-group">
-                            <input type="password" id="cvvCartaoCorrida" maxlength="3" placeholder="CVV (3 dígitos)">
-                        </div>
-                    </div>
-
-                    <button type="button" onclick="pedirViagemComPagamentoPrevio()" class="btn-primary" style="background:#00e676; color:#000; margin-top:10px; width:100%; padding:12px; border-radius:10px; border:none; font-weight:bold; cursor:pointer;">
-                        Pagar & Pedir Viagem Agora
-                    </button>
+                <div class="service-options" style="margin-top: 8px;">
+                <div class="service-card selected" id="card-taxi" onclick="selectService(this, 1)">
+                    <div class="service-title">🚖 Táxi Oficial</div>
+                    <div class="service-price" id="price-taxi">750 XOF</div>
                 </div>
-
-                <div class="waiting-card" id="waitingPanel">
-                    <div class="waiting-title">A procurar condutor ROTA GB...</div>
-                    <div style="font-size: 11px; color: #555; margin-top: 2px;">Valor: <strong id="reservedAmount">225 XOF</strong></div>
-                    <div class="timer-text" id="waitingTimer">00:00</div>
-                    <button type="button" class="btn-cancel" onclick="cancelarViagem()">Cancelar Viagem & Pedir Reembolso</button>
+                <div class="service-card" id="card-privado" onclick="selectService(this, 1.3)">
+                    <div class="service-title">🚘 Carro Privado</div>
+                    <div class="service-price" id="price-privado">975 XOF</div>
+                </div>
+                <div class="service-card" id="card-moto" onclick="selectService(this, 0.7)">
+                    <div class="service-title">🛵 Moto-Táxi</div>
+                    <div class="service-price" id="price-moto">525 XOF</div>
                 </div>
             </div>
 
+            <div class="form-group" style="margin-top: 10px;">
+                <label>FORMA DE PAGAMENTO DA VIAGEM</label>
+                <select id="paymentSelect">
+                    <option value="Dinheiro Vivo">💵 Dinheiro Vivo (Ao Condutor)</option>
+                    <option value="Orange Money">🟧 Orange Money</option>
+                    <option value="Telecel">🟥 Telecel Mobile Money</option>
+                    <option value="Cartao Debito">💳 Cartão de Débito / Bancário</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="requestRide()">Pedir Viagem Agora</button>
+        </div>
+
+        <!-- Painel de Espera / Cancelamento -->
+        <div class="waiting-card" id="waitingPanel">
+            <div class="waiting-title">⏳ A procurar condutor ROTA GB mais próximo...</div>
+            <div style="font-size: 11px; color: #666;">Tempo de espera decorrido:</div>
+            <div class="timer-text" id="waitingTimer">00:00</div>
+            <div style="font-size: 11px; color: #555; margin-bottom: 2px;">
+                Preço reservado: <strong id="reservedAmount">750 XOF</strong>
+            </div>
+            <div style="font-size: 11px; color: #333; margin-bottom: 6px;">
+                Pagamento via: <strong id="selectedPaymentMethod">Dinheiro Vivo</strong>
+            </div>
+            <button type="button" class="btn-cancel" onclick="cancelRide()">Cancelar Viagem & Pedir Reembolso</button>
+        </div>
+    </div>
             <!-- REGISTO / CONTA CLIENTE -->
             <div id="conteudoRegistoConta" style="display:none;">
                 <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #111;">Registo de Conta & Pagamento do Cliente</div>
