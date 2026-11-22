@@ -1278,174 +1278,217 @@ Total: ${valorFormatado}`
   });
 })();
 (function () {
-  if (window.__fixMobilidadeInstalado) return;
-  window.__fixMobilidadeInstalado = true;
+  if (window.__fluxoUberBissauAtivo) return;
+  window.__fluxoUberBissauAtivo = true;
 
-  const MULTIPLICADORES = {
+  const MULT = {
     TAXI: 2,
     PRIVADO: 2.6,
     MOTO: 1.4
   };
 
-  let estadoViagem = {
+  let estado = {
     tipo: "TAXI",
     rotulo: "TAXI",
     nome: "Táxi Oficial",
     valor: 0
   };
 
-  function numeroLimpo(texto) {
+  function extrairXOF(texto) {
     const m = (texto || "").replace(/\s+/g, " ").match(/(\d[\d\s.]*)\s*XOF/i);
     if (!m) return 0;
     const n = Number(m[1].replace(/[^\d]/g, ""));
     return Number.isFinite(n) && n > 0 ? n : 0;
   }
 
-  function obterPrecoBaseRota() {
-    const selects = Array.from(document.querySelectorAll("select"));
-    for (const sel of selects) {
+  function baseRotaAtual() {
+    for (const sel of document.querySelectorAll("select")) {
       const opt = sel.options && sel.options[sel.selectedIndex];
       const txt = (opt ? opt.text : sel.value) || "";
-      const val = numeroLimpo(txt);
-      if (val > 0 && (/→|->|rota|cidade|guimetal|cristo/i.test(txt) || /rota/i.test(sel.id || sel.name || ""))) {
-        return val;
+      const v = extrairXOF(txt);
+      if (v > 0 && /→|->|rota|cidade|bandim|guimetal|cristo/i.test(txt)) {
+        return v;
       }
     }
     return 0;
   }
 
-  function identificarVeiculo(texto) {
+  function infoVeiculo(texto) {
     const t = (texto || "").toLowerCase();
     if (t.includes("moto")) {
-      return { tipo: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", mult: MULTIPLICADORES.MOTO };
+      return { tipo: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", mult: MULT.MOTO };
     }
     if (t.includes("privado") || t.includes("carro")) {
-      return { tipo: "PRIVADO", rotulo: "CARRO PRIVADO", nome: "Carro Privado", mult: MULTIPLICADORES.PRIVADO };
+      return { tipo: "PRIVADO", rotulo: "CARRO PRIVADO", nome: "Carro Privado", mult: MULT.PRIVADO };
     }
-    return { tipo: "TAXI", rotulo: "TAXI", nome: "Táxi Oficial", mult: MULTIPLICADORES.TAXI };
+    return { tipo: "TAXI", rotulo: "TAXI", nome: "Táxi Oficial", mult: MULT.TAXI };
   }
 
-  function listarCartoesVeiculo() {
+  function cartoesVeiculo() {
     return Array.from(document.querySelectorAll("div, button, label")).filter((el) => {
       if (el.children.length > 4) return false;
       const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
       if (!txt || txt.length > 90) return false;
-      const temVeiculo = /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(txt);
+      const temTipo = /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(txt);
       const temXof = /\d+\s*XOF/i.test(txt);
       const temFilhoCartao = Array.from(el.children).some((c) =>
         /t[áa]xi\s*oficial|carro\s*privado|moto-?t[áa]xi/i.test(c.textContent || "")
       );
-      return temVeiculo && temXof && !temFilhoCartao;
+      return temTipo && temXof && !temFilhoCartao;
     });
   }
 
-  function definirValorEmCartao(cartao, novoValor) {
-    if (!cartao || !novoValor) return;
-    const nodes = Array.from(cartao.querySelectorAll("*")).filter((n) => n.children.length === 0);
-    const alvoPreco = nodes.find((n) => /^\s*\d[\d\s.]*\s*XOF\s*$/i.test(n.textContent || ""));
-    if (alvoPreco) {
-      alvoPreco.textContent = `${novoValor} XOF`;
+  function escreverPrecoNoCartao(cartao, preco) {
+    if (!cartao || !preco) return;
+    const folhas = Array.from(cartao.querySelectorAll("*")).filter((n) => n.children.length === 0);
+    const exato = folhas.find((n) => /^\s*\d[\d\s.]*\s*XOF\s*$/i.test(n.textContent || ""));
+    if (exato) {
+      exato.textContent = `${preco} XOF`;
       return;
     }
-    const alvoComXof = nodes.find((n) => /\d+\s*XOF/i.test(n.textContent || ""));
-    if (alvoComXof) {
-      alvoComXof.textContent = alvoComXof.textContent.replace(/\d[\d\s.]*\s*XOF/i, `${novoValor} XOF`);
+    const parcial = folhas.find((n) => /\d+\s*XOF/i.test(n.textContent || ""));
+    if (parcial) {
+      parcial.textContent = parcial.textContent.replace(/\d[\d\s.]*\s*XOF/i, `${preco} XOF`);
     }
   }
 
-  function sincronizarPrecosEVisual() {
-    const baseRota = obterPrecoBaseRota();
-    const cartoes = listarCartoesVeiculo();
+  function sincronizarCartoes() {
+    const base = baseRotaAtual();
+    const cartoes = cartoesVeiculo();
 
     cartoes.forEach((cartao) => {
-      const info = identificarVeiculo(cartao.textContent || "");
-      const precoCalculado = baseRota > 0 ? Math.round(baseRota * info.mult) : numeroLimpo(cartao.textContent || "");
-      if (precoCalculado > 0) {
-        definirValorEmCartao(cartao, precoCalculado);
-      }
+      const info = infoVeiculo(cartao.textContent || "");
+      const preco = base > 0 ? Math.round(base * info.mult) : extrairXOF(cartao.textContent || "");
+      if (preco > 0) escreverPrecoNoCartao(cartao, preco);
 
-      const ativo = info.tipo === estadoViagem.tipo;
+      const ativo = info.tipo === estado.tipo;
       cartao.style.border = ativo ? "2px solid #16a34a" : "1px solid #d1d5db";
       cartao.style.backgroundColor = ativo ? "#f0fdf4" : "#ffffff";
-      cartao.style.boxShadow = ativo ? "0 0 0 2px rgba(22, 163, 74, 0.15)" : "none";
       cartao.style.cursor = "pointer";
 
-      if (ativo && precoCalculado > 0) {
-        estadoViagem.valor = precoCalculado;
+      if (ativo && preco > 0) {
+        estado.valor = preco;
       }
     });
 
-    if (!estadoViagem.valor && cartoes[0]) {
-      const info0 = identificarVeiculo(cartoes[0].textContent || "");
-      estadoViagem = {
-        tipo: info0.tipo,
-        rotulo: info0.rotulo,
-        nome: info0.nome,
-        valor: numeroLimpo(cartoes[0].textContent || "") || (baseRota ? Math.round(baseRota * info0.mult) : 0)
+    if (!estado.valor && cartoes[0]) {
+      const i0 = infoVeiculo(cartoes[0].textContent || "");
+      estado = {
+        tipo: i0.tipo,
+        rotulo: i0.rotulo,
+        nome: i0.nome,
+        valor: extrairXOF(cartoes[0].textContent || "") || (base ? Math.round(base * i0.mult) : 0)
       };
     }
 
     window.__veiculoSelecionado = {
-      nome: estadoViagem.nome,
-      tipo: estadoViagem.rotulo,
-      precoXOF: estadoViagem.valor
+      nome: estado.nome,
+      tipo: estado.rotulo,
+      precoXOF: estado.valor
     };
   }
 
-  function atualizarEcraConfirmacao() {
-    sincronizarPrecosEVisual();
-    const valorFinal = estadoViagem.valor;
+  function melhorarBuscaMotorista() {
+    sincronizarCartoes();
+    const valorFinal = estado.valor || baseRotaAtual();
     if (!valorFinal) return;
 
     document.querySelectorAll("p, div, span, strong").forEach((el) => {
       if (el.children.length === 0 && /Valor:\s*\d+\s*XOF/i.test(el.textContent || "")) {
         const atual = el.textContent || "";
-        const parenteses = atual.match(/\(([^)]+)\)/);
+        const m = atual.match(/\(([^)]+)\)/);
         let metodo = "Orange Money";
-        if (parenteses && parenteses[1]) {
-          metodo = parenteses[1].replace(/\s*-\s*(TAXI|CARRO PRIVADO|MOTO-?TAXI)/i, "").trim() || metodo;
+        if (m && m[1]) {
+          metodo = m[1].replace(/\s*-\s*(TAXI|CARRO PRIVADO|MOTO-?TAXI)/i, "").trim() || metodo;
         }
-        el.textContent = `Valor: ${valorFinal} XOF (${metodo} - ${estadoViagem.rotulo})`;
+        el.textContent = `Valor: ${valorFinal} XOF (${metodo} - ${estado.rotulo})`;
       }
     });
+
+    // Adiciona mensagem de busca estilo Uber se ainda não existir no bloco de procura
+    const alvoBusca = Array.from(document.querySelectorAll("div, p")).find((el) =>
+      /a procurar condutor/i.test(el.textContent || "") && el.children.length <= 4
+    );
+    if (alvoBusca && !alvoBusca.querySelector("[data-uber-status]")) {
+      const badge = document.createElement("div");
+      badge.setAttribute("data-uber-status", "1");
+      badge.style.marginTop = "6px";
+      badge.style.fontSize = "13px";
+      badge.style.fontWeight = "600";
+      badge.style.color = "#374151";
+      badge.textContent = `A localizar ${estado.nome} disponível em Bissau...`;
+      alvoBusca.appendChild(badge);
+    }
+  }
+
+  function dispararCobrancaRealSeDisponivel() {
+    const valorFinal = estado.valor || baseRotaAtual();
+    if (!valorFinal || typeof window.iniciarPagamentoComComissao !== "function") return;
+
+    const telInput = Array.from(document.querySelectorAll("input")).find((i) =>
+      /orange|telecel|\+245|telefone|conta/i.test(i.placeholder || i.name || i.id || "")
+    );
+    const telefone = (telInput?.value || "").trim();
+    if (!telefone) return;
+
+    const metodoSelect = Array.from(document.querySelectorAll("select")).find((s) =>
+      /orange|telecel|cart[aã]o|mtn|wave/i.test(s.textContent || "")
+    );
+    const metodo = metodoSelect?.options?.[metodoSelect.selectedIndex]?.text || "Orange Money";
+
+    const rotaSelect = Array.from(document.querySelectorAll("select")).find((s) =>
+      /→|->|rota|bandim|guimetal|cristo/i.test(s.textContent || "")
+    );
+    const rota = rotaSelect?.options?.[rotaSelect.selectedIndex]?.text || "Rota Bissau";
+
+    window
+      .iniciarPagamentoComComissao({
+        categoria: "mobilidade",
+        servico: estado.nome,
+        clienteNome: "Cliente App Bissau",
+        clienteEmail: "",
+        clienteTelefone: telefone,
+        detalhes: rota,
+        valorBaseXOF: valorFinal,
+        metodoPagamento: metodo
+      })
+      .catch((err) => console.warn("Aviso pagamento viagem:", err?.message || err));
   }
 
   document.addEventListener("click", (e) => {
-    const cartoes = listarCartoesVeiculo();
-    const cartaoClicado = cartoes.find((c) => c === e.target || c.contains(e.target));
+    const cartoes = cartoesVeiculo();
+    const clicado = cartoes.find((c) => c === e.target || c.contains(e.target));
 
-    if (cartaoClicado) {
-      const info = identificarVeiculo(cartaoClicado.textContent || "");
-      const baseRota = obterPrecoBaseRota();
-      const valor = baseRota > 0 ? Math.round(baseRota * info.mult) : numeroLimpo(cartaoClicado.textContent || "");
-      estadoViagem = {
+    if (clicado) {
+      const info = infoVeiculo(clicado.textContent || "");
+      const base = baseRotaAtual();
+      const preco = base > 0 ? Math.round(base * info.mult) : extrairXOF(clicado.textContent || "");
+      estado = {
         tipo: info.tipo,
         rotulo: info.rotulo,
         nome: info.nome,
-        valor: valor || estadoViagem.valor
+        valor: preco || estado.valor
       };
-      sincronizarPrecosEVisual();
+      sincronizarCartoes();
       return;
     }
 
-    const botao = e.target.closest("button");
-    if (botao && /pagar\s*&\s*pedir\s*viagem|pedir\s*viagem/i.test(botao.textContent || "")) {
-      sincronizarPrecosEVisual();
-      [40, 120, 250, 500, 900, 1500].forEach((ms) => {
-        setTimeout(atualizarEcraConfirmacao, ms);
+    const btn = e.target.closest("button");
+    if (btn && /pagar\s*&\s*pedir\s*viagem|pedir\s*viagem/i.test(btn.textContent || "")) {
+      sincronizarCartoes();
+      dispararCobrancaRealSeDisponivel();
+      [50, 150, 350, 700, 1200, 2000].forEach((ms) => {
+        setTimeout(melhorarBuscaMotorista, ms);
       });
     }
   });
 
   document.addEventListener("change", (e) => {
     if (e.target && e.target.tagName === "SELECT") {
-      setTimeout(sincronizarPrecosEVisual, 50);
+      setTimeout(sincronizarCartoes, 60);
     }
   });
 
-  window.addEventListener("load", () => {
-    setTimeout(sincronizarPrecosEVisual, 200);
-  });
-
-  setTimeout(sincronizarPrecosEVisual, 250);
+  window.addEventListener("load", () => setTimeout(sincronizarCartoes, 200));
+  setTimeout(sincronizarCartoes, 250);
 })();
