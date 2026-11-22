@@ -1278,12 +1278,12 @@ Total: ${valorFormatado}`
   });
 })();
 (function () {
-  if (window.__superAppMobilidadeV3) return;
-  window.__superAppMobilidadeV3 = true;
+  if (window.__superAppMobilidadeFinal) return;
+  window.__superAppMobilidadeFinal = true;
 
-  const ZONAS_ROTAS = [
+  const GRUPOS_ROTAS_DGVTT = [
     {
-      zona: "📍 Partidas: Centro da Cidade (Praça / Centro)",
+      grupo: "📍 Partidas: Centro da Cidade (Praça / Centro)",
       rotas: [
         { nome: "Cidade → Mercado de Bandim", baseXOF: 225 },
         { nome: "Cidade → Cristo Redentor", baseXOF: 250 },
@@ -1331,7 +1331,7 @@ Total: ${valorFormatado}`
       ]
     },
     {
-      zona: "📍 Partidas: Mercado de Bandim",
+      grupo: "📍 Partidas: Mercado de Bandim",
       rotas: [
         { nome: "Mercado Bandim → SHEL / Palmeiras", baseXOF: 225 },
         { nome: "Mercado Bandim → Chapa de Bissau", baseXOF: 275 },
@@ -1349,22 +1349,39 @@ Total: ${valorFormatado}`
     }
   ];
 
+  const TODAS_ROTAS = GRUPOS_ROTAS_DGVTT.flatMap((g) => g.rotas);
+
   const VEICULOS = [
     { id: "TAXI", rotulo: "TAXI", nome: "Táxi Oficial", emoji: "🚕", mult: 2.0 },
     { id: "PRIVADO", rotulo: "CARRO PRIVADO", nome: "Carro Privado", emoji: "🚗", mult: 2.6 },
     { id: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", emoji: "🏍️", mult: 1.4 }
   ];
 
-  let zonaIdx = 0;
-  let rotaAtual = ZONAS_ROTAS[0].rotas[0];
+  let rotaAtual = TODAS_ROTAS[0];
   let veiculoAtual = VEICULOS[0];
   let faseViagem = "IDLE"; // IDLE | PROCURANDO | ENCONTRADO | EM_CURSO | CANCELADA
-  let timerBusca = null;
-  let timerEtapas = null;
-  let segundosCorridos = 0;
+  let timerCrono = null;
+  let timerEtapa1 = null;
+  let timerEtapa2 = null;
+  let segundos = 0;
 
-  function precoFinalXOF() {
+  function calcularPrecoXOF() {
     return Math.round(rotaAtual.baseXOF * veiculoAtual.mult);
+  }
+
+  function limparTimers() {
+    if (timerCrono) clearInterval(timerCrono);
+    if (timerEtapa1) clearTimeout(timerEtapa1);
+    if (timerEtapa2) clearTimeout(timerEtapa2);
+    timerCrono = null;
+    timerEtapa1 = null;
+    timerEtapa2 = null;
+  }
+
+  function formatarTempo(seg) {
+    const mm = String(Math.floor(seg / 60)).padStart(2, "0");
+    const ss = String(seg % 60).padStart(2, "0");
+    return `${mm}:${ss}`;
   }
 
   function refrescarMapaBissau() {
@@ -1387,51 +1404,59 @@ Total: ${valorFormatado}`
     });
   }
 
-  function limparTimers() {
-    if (timerBusca) clearInterval(timerBusca);
-    if (timerEtapas) clearTimeout(timerEtapas);
-    timerBusca = null;
-    timerEtapas = null;
+  function renderizarOpcoesRotas() {
+    return GRUPOS_ROTAS_DGVTT.map(
+      (grupo) => `
+        <optgroup label="${grupo.grupo}">
+          ${grupo.rotas
+            .map(
+              (r) =>
+                `<option value="${r.baseXOF}" data-rota="${r.nome.replace(/"/g, "&quot;")}" ${
+                  r.nome === rotaAtual.nome ? "selected" : ""
+                }>${r.nome} (${r.baseXOF} XOF)</option>`
+            )
+            .join("")}
+        </optgroup>
+      `
+    ).join("");
   }
 
-  function renderizarPainel(container) {
-    const preco = precoFinalXOF();
-    const comissaoEstimada = Math.round(preco * 0.1);
-    const rotasDaZona = ZONAS_ROTAS[zonaIdx]?.rotas || ZONAS_ROTAS[0].rotas;
-
-    let blocoEstado = "";
+  function renderizarBlocoEstado(preco) {
     if (faseViagem === "PROCURANDO" || faseViagem === "ENCONTRADO" || faseViagem === "EM_CURSO") {
-      const mm = String(Math.floor(segundosCorridos / 60)).padStart(2, "0");
-      const ss = String(segundosCorridos % 60).padStart(2, "0");
-
-      const tituloEstado =
+      const titulo =
         faseViagem === "PROCURANDO"
           ? `A procurar ${veiculoAtual.nome} em Bissau...`
           : faseViagem === "ENCONTRADO"
           ? `Motorista encontrado! ${veiculoAtual.nome} a caminho...`
           : `Viagem em curso (${veiculoAtual.nome})`;
 
-      const corFundo = faseViagem === "EM_CURSO" ? "#ecfdf5" : "#fffbeb";
-      const corBorda = faseViagem === "EM_CURSO" ? "#10b981" : "#f59e0b";
+      const fundo = faseViagem === "EM_CURSO" ? "#ecfdf5" : "#fffbeb";
+      const borda = faseViagem === "EM_CURSO" ? "#10b981" : "#f59e0b";
 
-      blocoEstado = `
-        <div style="margin-top:16px;padding:16px;border-radius:12px;background:${corFundo};border:1.5px solid ${corBorda};">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#92400e;margin-bottom:6px;">
+      return `
+        <div style="margin-top:16px;padding:16px;border-radius:12px;background:${fundo};border:1.5px solid ${borda};">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#92400e;margin-bottom:6px;">
             Modo Demonstração / Parcerias em Ativação
           </div>
           <div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:6px;">
-            ${tituloEstado}
+            ${titulo}
           </div>
           <div style="font-size:14px;color:#374151;margin-bottom:8px;">
             <strong>Valor do veículo:</strong> ${preco} XOF (${veiculoAtual.rotulo}) · <strong>Rota:</strong> ${rotaAtual.nome}
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;">
             <span style="padding:4px 8px;border-radius:999px;background:#fef3c7;font-weight:700;">1. A procurar motorista</span>
-            <span style="padding:4px 8px;border-radius:999px;background:${faseViagem !== "PROCURANDO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">2. A caminho</span>
-            <span style="padding:4px 8px;border-radius:999px;background:${faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">3. Viagem em curso</span>
+            <span style="padding:4px 8px;border-radius:999px;background:${
+              faseViagem !== "PROCURANDO" ? "#d1fae5" : "#f3f4f6"
+            };font-weight:700;">2. A caminho</span>
+            <span style="padding:4px 8px;border-radius:999px;background:${
+              faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"
+            };font-weight:700;">3. Viagem em curso</span>
           </div>
-          <div style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${mm}:${ss}</div>
-          <button type="button" id="btn-cancelar-viagem-v3" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
+          <div id="cronometro-viagem-v4" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(
+            segundos
+          )}</div>
+          <button type="button" id="btn-cancelar-v4" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
             Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)
           </button>
           <div style="font-size:11px;color:#6b7280;margin-top:8px;">
@@ -1439,13 +1464,28 @@ Total: ${valorFormatado}`
           </div>
         </div>
       `;
-    } else if (faseViagem === "CANCELADA") {
-      blocoEstado = `
+    }
+
+    if (faseViagem === "CANCELADA") {
+      return `
         <div style="margin-top:16px;padding:14px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;font-size:14px;">
           <strong>Viagem cancelada.</strong> Nenhum valor real foi cobrado (Modo Demonstração / Parcerias em Ativação). Pode escolher outro veículo ou rota acima.
         </div>
       `;
     }
+
+    return "";
+  }
+
+  function renderizarPainel(container) {
+    const preco = calcularPrecoXOF();
+    const comissaoEstimada = Math.round(preco * 0.1);
+
+    window.__veiculoSelecionado = {
+      nome: veiculoAtual.nome,
+      tipo: veiculoAtual.rotulo,
+      precoXOF: preco
+    };
 
     container.innerHTML = `
       <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
@@ -1459,22 +1499,13 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
-          1. Escolha a zona de partida, a rota e o ponto de referência
+          1. Escolha para onde quer ir e o ponto de referência
         </label>
-        <select id="select-zona-v3" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;font-weight:600;margin-bottom:8px;background:#f9fafb;">
-          ${ZONAS_ROTAS.map(
-            (z, i) => `<option value="${i}" ${i === zonaIdx ? "selected" : ""}>${z.zona} (${z.rotas.length} rotas)</option>`
-          ).join("")}
+        <select id="select-rota-v4" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">
+          ${renderizarOpcoesRotas()}
         </select>
 
-        <select id="select-rota-v3" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">
-          ${rotasDaZona.map(
-            (r) =>
-              `<option value="${r.baseXOF}" ${r.nome === rotaAtual.nome ? "selected" : ""}>${r.nome} (${r.baseXOF} XOF)</option>`
-          ).join("")}
-        </select>
-
-        <input id="input-ref-v3" type="text" placeholder="Ponto de referência (ex: Mercado de Bandim, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
+        <input id="input-ref-v4" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
           2. Escolha o veículo (preço final do veículo selecionado)
@@ -1484,7 +1515,9 @@ Total: ${valorFormatado}`
             const ativo = v.id === veiculoAtual.id;
             const p = Math.round(rotaAtual.baseXOF * v.mult);
             return `
-              <button type="button" data-veiculo-v3="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
+              <button type="button" data-veiculo-v4="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${
+                ativo ? "2px solid #16a34a" : "1px solid #d1d5db"
+              };background:${ativo ? "#f0fdf4" : "#ffffff"};">
                 <div style="font-size:18px;">${v.emoji}</div>
                 <div style="font-size:12px;font-weight:700;color:#111827;margin-top:2px;">${v.nome}</div>
                 <div style="font-size:15px;font-weight:800;color:#111827;margin-top:4px;">${p} XOF</div>
@@ -1496,7 +1529,7 @@ Total: ${valorFormatado}`
         <div style="padding:12px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;margin-bottom:14px;">
           <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#111827;">
             <span>Total (${veiculoAtual.nome}):</span>
-            <span id="resumo-preco-v3" style="color:#15803d;font-size:17px;">${preco} XOF</span>
+            <span style="color:#15803d;font-size:17px;">${preco} XOF</span>
           </div>
           <div style="font-size:11px;color:#6b7280;margin-top:4px;">
             Rota base: ${rotaAtual.nome} (${rotaAtual.baseXOF} XOF) · Comissão estimada da plataforma: ~${comissaoEstimada} XOF. Débito automático real será ativado após acordo com operadoras/parceiros.
@@ -1507,71 +1540,52 @@ Total: ${valorFormatado}`
           3. Método e número apenas para confirmar o pedido
         </label>
         <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:8px;margin-bottom:12px;">
-          <select id="select-metodo-v3" style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;background:#fff;">
+          <select id="select-metodo-v4" style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;background:#fff;">
             <option value="Orange Money">Orange Money</option>
             <option value="Telecel">Telecel</option>
             <option value="Cartão">Cartão</option>
           </select>
-          <input id="input-tel-v3" type="tel" placeholder="+245 955..." style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;box-sizing:border-box;" />
+          <input id="input-tel-v4" type="tel" placeholder="+245 955..." style="padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;box-sizing:border-box;" />
         </div>
 
-        <button type="button" id="btn-pedir-v3" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">
+        <button type="button" id="btn-pedir-v4" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">
           Pedir ${veiculoAtual.nome} · ${preco} XOF
         </button>
 
-        ${blocoEstado}
+        ${renderizarBlocoEstado(preco)}
       </div>
     `;
 
-    const selZona = container.querySelector("#select-zona-v3");
-    if (selZona) {
-      selZona.addEventListener("change", () => {
-        zonaIdx = Number(selZona.value) || 0;
-        rotaAtual = (ZONAS_ROTAS[zonaIdx] && ZONAS_ROTAS[zonaIdx].rotas[0]) || ZONAS_ROTAS[0].rotas[0];
-        renderizarPainel(container);
-      });
-    }
-
-    const selRota = container.querySelector("#select-rota-v3");
+    const selRota = container.querySelector("#select-rota-v4");
     if (selRota) {
       selRota.addEventListener("change", () => {
-        const lista = (ZONAS_ROTAS[zonaIdx] && ZONAS_ROTAS[zonaIdx].rotas) || ZONAS_ROTAS[0].rotas;
-        rotaAtual = lista[selRota.selectedIndex] || lista[0];
+        const opt = selRota.options[selRota.selectedIndex];
+        const nomeRota = opt ? opt.getAttribute("data-rota") : "";
+        rotaAtual = TODAS_ROTAS.find((r) => r.nome === nomeRota) || TODAS_ROTAS[0];
         renderizarPainel(container);
       });
     }
 
-    container.querySelectorAll("[data-veiculo-v3]").forEach((btn) => {
+    container.querySelectorAll("[data-veiculo-v4]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-veiculo-v3");
+        const id = btn.getAttribute("data-veiculo-v4");
         veiculoAtual = VEICULOS.find((v) => v.id === id) || VEICULOS[0];
-        window.__veiculoSelecionado = {
-          nome: veiculoAtual.nome,
-          tipo: veiculoAtual.rotulo,
-          precoXOF: precoFinalXOF()
-        };
         renderizarPainel(container);
       });
     });
 
-    const btnPedir = container.querySelector("#btn-pedir-v3");
+    const btnPedir = container.querySelector("#btn-pedir-v4");
     if (btnPedir) {
       btnPedir.addEventListener("click", () => {
         limparTimers();
         faseViagem = "PROCURANDO";
-        segundosCorridos = 0;
+        segundos = 0;
         renderizarPainel(container);
 
-        const tel = (container.querySelector("#input-tel-v3")?.value || "").trim();
-        const metodo = container.querySelector("#select-metodo-v3")?.value || "Orange Money";
-        const ref = (container.querySelector("#input-ref-v3")?.value || "").trim();
-        const valor = precoFinalXOF();
-
-        window.__veiculoSelecionado = {
-          nome: veiculoAtual.nome,
-          tipo: veiculoAtual.rotulo,
-          precoXOF: valor
-        };
+        const tel = (container.querySelector("#input-tel-v4")?.value || "").trim();
+        const metodo = container.querySelector("#select-metodo-v4")?.value || "Orange Money";
+        const ref = (container.querySelector("#input-ref-v4")?.value || "").trim();
+        const valor = calcularPrecoXOF();
 
         if (typeof window.iniciarPagamentoComComissao === "function") {
           window
@@ -1588,21 +1602,17 @@ Total: ${valorFormatado}`
             .catch(() => {});
         }
 
-        timerBusca = setInterval(() => {
-          segundosCorridos += 1;
-          const crono = container.querySelector("#superapp-painel-viagem div[style*='font-size:22px']");
-          if (crono) {
-            const m = String(Math.floor(segundosCorridos / 60)).padStart(2, "0");
-            const s = String(segundosCorridos % 60).padStart(2, "0");
-            crono.textContent = `${m}:${s}`;
-          }
+        timerCrono = setInterval(() => {
+          segundos += 1;
+          const elCrono = container.querySelector("#cronometro-viagem-v4");
+          if (elCrono) elCrono.textContent = formatarTempo(segundos);
         }, 1000);
 
-        timerEtapas = setTimeout(() => {
+        timerEtapa1 = setTimeout(() => {
           if (faseViagem === "PROCURANDO") {
             faseViagem = "ENCONTRADO";
             renderizarPainel(container);
-            timerEtapas = setTimeout(() => {
+            timerEtapa2 = setTimeout(() => {
               if (faseViagem === "ENCONTRADO") {
                 faseViagem = "EM_CURSO";
                 renderizarPainel(container);
@@ -1613,7 +1623,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnCancelar = container.querySelector("#btn-cancelar-viagem-v3");
+    const btnCancelar = container.querySelector("#btn-cancelar-v4");
     if (btnCancelar) {
       btnCancelar.addEventListener("click", () => {
         limparTimers();
@@ -1623,7 +1633,7 @@ Total: ${valorFormatado}`
     }
   }
 
-  function montarSubstituicaoLimpa() {
+  function montarPainel() {
     refrescarMapaBissau();
     const existente = document.getElementById("superapp-painel-viagem");
     if (existente) {
@@ -1656,7 +1666,7 @@ Total: ${valorFormatado}`
   }
 
   window.addEventListener("load", () => {
-    setTimeout(montarSubstituicaoLimpa, 300);
+    setTimeout(montarPainel, 300);
     setTimeout(refrescarMapaBissau, 600);
   });
 
@@ -1664,5 +1674,5 @@ Total: ${valorFormatado}`
     setTimeout(refrescarMapaBissau, 200);
   });
 
-  setTimeout(montarSubstituicaoLimpa, 350);
+  setTimeout(montarPainel, 350);
 })();
