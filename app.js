@@ -1278,8 +1278,8 @@ Total: ${valorFormatado}`
   });
 })();
 (function () {
-  if (window.__superAppMobilidadeV6) return;
-  window.__superAppMobilidadeV6 = true;
+  if (window.__superAppMobilidadeV7) return;
+  window.__superAppMobilidadeV7 = true;
 
   const GRUPOS_ROTAS_DGVTT = [
     {
@@ -1357,16 +1357,37 @@ Total: ${valorFormatado}`
     { id: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", emoji: "🏍️", mult: 1.4 }
   ];
 
-  const METODOS_PAGAMENTO = [
-    "Orange Money",
-    "Telecel",
-    "Cartão",
-    "Dinheiro Vivo"
-  ];
+  const METODOS_PAGAMENTO = ["Orange Money", "Telecel", "Cartão", "Dinheiro Vivo"];
+
+  const MOTORISTA_DEMO_POR_TIPO = {
+    TAXI: {
+      nomeCompleto: "Amadu Baldé (Demo)",
+      modeloVeiculo: "Toyota Corolla Azul/Branco",
+      placaVeiculo: "GB-204-TX",
+      telefone: "+245955000101",
+      origem: "Demo"
+    },
+    PRIVADO: {
+      nomeCompleto: "Fátima Djassi (Demo)",
+      modeloVeiculo: "Hyundai i10 Cinza",
+      placaVeiculo: "GB-819-PR",
+      telefone: "+245955000202",
+      origem: "Demo"
+    },
+    MOTO: {
+      nomeCompleto: "Braima Camará (Demo)",
+      modeloVeiculo: "Haojue 125cc Vermelha",
+      placaVeiculo: "GB-441-MT",
+      telefone: "+245955000303",
+      origem: "Demo"
+    }
+  };
 
   let rotaAtual = TODAS_ROTAS[0];
   let veiculoAtual = VEICULOS[0];
   let metodoAtual = "Orange Money";
+  let motoristaAtribuido = null;
+  let mensagemRapida = "Olá! Estou no ponto de referência em Bissau.";
   let faseViagem = "IDLE"; // IDLE | PROCURANDO | ENCONTRADO | EM_CURSO | CANCELADA
   let timerCrono = null;
   let timerEtapa1 = null;
@@ -1390,6 +1411,58 @@ Total: ${valorFormatado}`
     const mm = String(Math.floor(seg / 60)).padStart(2, "0");
     const ss = String(seg % 60).padStart(2, "0");
     return `${mm}:${ss}`;
+  }
+
+  function normalizarMotoristaLinha(row, fallbackTipo) {
+    if (!row || typeof row !== "object") return null;
+    const nomeCompleto =
+      row.nome_completo || row.nome || row.full_name || row.motorista_nome || "Condutor Registado";
+    const modeloVeiculo =
+      row.modelo_veiculo || row.modelo_carro || row.veiculo_modelo || row.modelo || "Veículo Registado";
+    const placaVeiculo =
+      row.placa_veiculo || row.matricula || row.numero_matricula || row.placa || "Sem matrícula";
+    const telefone = row.telefone || row.phone || row.telemovel || "";
+
+    return {
+      nomeCompleto: String(nomeCompleto).trim(),
+      modeloVeiculo: String(modeloVeiculo).trim(),
+      placaVeiculo: String(placaVeiculo).trim(),
+      telefone: String(telefone).trim(),
+      origem: "Supabase"
+    };
+  }
+
+  async function buscarMotoristaNoSupabase(tipoVeiculoId) {
+    const demoPadrao = MOTORISTA_DEMO_POR_TIPO[tipoVeiculoId] || MOTORISTA_DEMO_POR_TIPO.TAXI;
+    try {
+      const client =
+        window.supabaseClient ||
+        window.sb ||
+        (window.supabase && typeof window.supabase.from === "function" ? window.supabase : null);
+
+      if (client && typeof client.from === "function") {
+        const { data, error } = await client.from("motoristas").select("*").limit(25);
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const filtrados = data.filter((m) => {
+            const dispOk = m.disponivel === undefined || m.disponivel === null || m.disponivel === true;
+            const aprovOk = m.aprovado === undefined || m.aprovado === null || m.aprovado === true;
+            const serv = String(m.tipo_servico || m.tipo_veiculo || m.categoria || "").toUpperCase();
+            if (!dispOk || !aprovOk) return false;
+            if (!serv) return true;
+            if (tipoVeiculoId === "MOTO") return serv.includes("MOTO");
+            if (tipoVeiculoId === "PRIVADO") return serv.includes("PRIV") || serv.includes("CARRO");
+            return serv.includes("TAXI") && !serv.includes("MOTO");
+          });
+
+          const escolhido = filtrados[0] || data[0];
+          const normalizado = normalizarMotoristaLinha(escolhido, tipoVeiculoId);
+          if (normalizado) return normalizado;
+        }
+      }
+    } catch (_) {
+      // Fallback seguro para modo demonstração caso ainda não haja sessão/registo
+    }
+    return demoPadrao;
   }
 
   function refrescarMapaBissau() {
@@ -1432,12 +1505,12 @@ Total: ${valorFormatado}`
   function renderizarCamposPagamento() {
     if (metodoAtual === "Dinheiro Vivo") {
       return `
-        <div id="bloco-dinheiro-v6" style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f0fdf4;border:1px solid #86efac;">
+        <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f0fdf4;border:1px solid #86efac;">
           <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">
             💵 Pagamento em Dinheiro Vivo ao condutor
           </div>
           <div style="font-size:12px;color:#374151;">
-            Não precisa de número de conta nem cartão. O valor final será pago em dinheiro vivo (XOF) diretamente ao condutor no início/fim da viagem.
+            Não precisa de número de conta nem cartão. O valor final será pago em dinheiro vivo (XOF) diretamente ao condutor.
           </div>
         </div>
       `;
@@ -1445,12 +1518,12 @@ Total: ${valorFormatado}`
 
     if (metodoAtual === "Cartão") {
       return `
-        <div id="bloco-cartao-v6" style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
+        <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
           <label style="display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;">
             Número do cartão (16 dígitos)
           </label>
           <input
-            id="input-cartao-numero-v6"
+            id="input-cartao-numero-v7"
             type="text"
             inputmode="numeric"
             maxlength="19"
@@ -1463,7 +1536,7 @@ Total: ${valorFormatado}`
                 Validade (MM/AA)
               </label>
               <input
-                id="input-cartao-validade-v6"
+                id="input-cartao-validade-v7"
                 type="text"
                 inputmode="numeric"
                 maxlength="5"
@@ -1476,7 +1549,7 @@ Total: ${valorFormatado}`
                 Código secreto (3 dígitos)
               </label>
               <input
-                id="input-cartao-cvv-v6"
+                id="input-cartao-cvv-v7"
                 type="password"
                 inputmode="numeric"
                 maxlength="3"
@@ -1485,7 +1558,7 @@ Total: ${valorFormatado}`
               />
             </div>
           </div>
-          <div id="aviso-cartao-v6" style="font-size:11px;color:#b45309;margin-top:8px;">
+          <div id="aviso-cartao-v7" style="font-size:11px;color:#b45309;margin-top:8px;">
             Modo Demonstração: simulação local de cartão de débito/crédito (não introduza dados reais de cartão).
           </div>
         </div>
@@ -1494,7 +1567,7 @@ Total: ${valorFormatado}`
 
     return `
       <input
-        id="input-tel-v6"
+        id="input-tel-v7"
         type="tel"
         placeholder="+245 955..."
         style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;"
@@ -1502,14 +1575,71 @@ Total: ${valorFormatado}`
     `;
   }
 
+  function renderizarCartaoMotorista() {
+    const mot = motoristaAtribuido || MOTORISTA_DEMO_POR_TIPO[veiculoAtual.id] || MOTORISTA_DEMO_POR_TIPO.TAXI;
+    const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
+    const telDigitos = (mot.telefone || "").replace(/\D/g, "");
+    const textoMsg = encodeURIComponent(
+      `Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`
+    );
+
+    const linkLigar = telLimpo ? `tel:${telLimpo}` : "javascript:void(0)";
+    const linkSms = telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)";
+    const linkWhatsApp = telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg;
+
+    return `
+      <div style="margin-top:12px;margin-bottom:12px;padding:12px;border-radius:12px;background:#ffffff;border:1px solid #d1d5db;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px;">
+          <span style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;">
+            Dados do Motorista (${mot.origem})
+          </span>
+          <span style="font-size:11px;font-weight:700;color:#111827;background:#f3f4f6;padding:2px 8px;border-radius:999px;">
+            ${mot.placaVeiculo}
+          </span>
+        </div>
+        <div style="font-size:15px;font-weight:800;color:#111827;">${mot.nomeCompleto}</div>
+        <div style="font-size:13px;color:#374151;margin-top:2px;">
+          <strong>Veículo:</strong> ${mot.modeloVeiculo} · <strong>Matrícula:</strong> ${mot.placaVeiculo}
+        </div>
+        <div style="font-size:12px;color:#6b7280;margin-top:2px;">
+          <strong>Telefone:</strong> ${mot.telefone || "Não informado"}
+        </div>
+
+        <div style="margin-top:10px;">
+          <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">
+            Mensagem caso o motorista atrase ou não encontre si:
+          </label>
+          <input
+            id="input-msg-motorista-v7"
+            type="text"
+            value="${mensagemRapida.replace(/"/g, "&quot;")}"
+            style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;"
+          />
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+            <a href="${linkLigar}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;">
+              📞 Ligar
+            </a>
+            <a id="link-wa-v7" href="${linkWhatsApp}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">
+              💬 WhatsApp
+            </a>
+            <a id="link-sms-v7" href="${linkSms}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:999px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">
+              ✉️ SMS
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   function renderizarBlocoEstado(preco) {
     if (faseViagem === "PROCURANDO" || faseViagem === "ENCONTRADO" || faseViagem === "EM_CURSO") {
+      const mot = motoristaAtribuido || MOTORISTA_DEMO_POR_TIPO[veiculoAtual.id] || MOTORISTA_DEMO_POR_TIPO.TAXI;
       const titulo =
         faseViagem === "PROCURANDO"
           ? `A procurar ${veiculoAtual.nome} em Bissau...`
           : faseViagem === "ENCONTRADO"
-          ? `Motorista encontrado! ${veiculoAtual.nome} a caminho...`
-          : `Viagem em curso (${veiculoAtual.nome})`;
+          ? `Motorista encontrado: ${mot.nomeCompleto} (${mot.placaVeiculo}) · A caminho...`
+          : `Viagem em curso com ${mot.nomeCompleto} (${veiculoAtual.nome})`;
 
       const fundo = faseViagem === "EM_CURSO" ? "#ecfdf5" : "#fffbeb";
       const borda = faseViagem === "EM_CURSO" ? "#10b981" : "#f59e0b";
@@ -1519,11 +1649,11 @@ Total: ${valorFormatado}`
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#92400e;margin-bottom:6px;">
             Modo Demonstração / Parcerias em Ativação
           </div>
-          <div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:6px;">
+          <div style="font-size:16px;font-weight:800;color:#111827;margin-bottom:6px;">
             ${titulo}
           </div>
-          <div style="font-size:14px;color:#374151;margin-bottom:8px;">
-            <strong>Valor do veículo:</strong> ${preco} XOF (${veiculoAtual.rotulo} · ${metodoAtual}) · <strong>Rota:</strong> ${rotaAtual.nome}
+          <div style="font-size:13px;color:#374151;margin-bottom:8px;">
+            <strong>Valor:</strong> ${preco} XOF (${veiculoAtual.rotulo} · ${metodoAtual}) · <strong>Rota:</strong> ${rotaAtual.nome}
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;">
             <span style="padding:4px 8px;border-radius:999px;background:#fef3c7;font-weight:700;">1. A procurar motorista</span>
@@ -1534,10 +1664,13 @@ Total: ${valorFormatado}`
               faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"
             };font-weight:700;">3. Viagem em curso</span>
           </div>
-          <div id="cronometro-viagem-v6" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(
+
+          ${faseViagem !== "PROCURANDO" ? renderizarCartaoMotorista() : ""}
+
+          <div id="cronometro-viagem-v7" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(
             segundos
           )}</div>
-          <button type="button" id="btn-cancelar-v6" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
+          <button type="button" id="btn-cancelar-v7" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
             Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)
           </button>
           <div style="font-size:11px;color:#6b7280;margin-top:8px;">
@@ -1582,11 +1715,11 @@ Total: ${valorFormatado}`
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
           1. Escolha para onde quer ir e o ponto de referência
         </label>
-        <select id="select-rota-v6" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">
+        <select id="select-rota-v7" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">
           ${renderizarOpcoesRotas()}
         </select>
 
-        <input id="input-ref-v6" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
+        <input id="input-ref-v7" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
           2. Escolha o veículo (preço final do veículo selecionado)
@@ -1596,7 +1729,7 @@ Total: ${valorFormatado}`
             const ativo = v.id === veiculoAtual.id;
             const p = Math.round(rotaAtual.baseXOF * v.mult);
             return `
-              <button type="button" data-veiculo-v6="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${
+              <button type="button" data-veiculo-v7="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${
                 ativo ? "2px solid #16a34a" : "1px solid #d1d5db"
               };background:${ativo ? "#f0fdf4" : "#ffffff"};">
                 <div style="font-size:18px;">${v.emoji}</div>
@@ -1620,7 +1753,7 @@ Total: ${valorFormatado}`
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
           3. Método e dados para confirmar o pedido
         </label>
-        <select id="select-metodo-v6" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
+        <select id="select-metodo-v7" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
           ${METODOS_PAGAMENTO.map(
             (m) => `<option value="${m}" ${metodoAtual === m ? "selected" : ""}>${m}</option>`
           ).join("")}
@@ -1628,7 +1761,7 @@ Total: ${valorFormatado}`
 
         ${renderizarCamposPagamento()}
 
-        <button type="button" id="btn-pedir-v6" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">
+        <button type="button" id="btn-pedir-v7" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">
           Pedir ${veiculoAtual.nome} · ${preco} XOF
         </button>
 
@@ -1636,7 +1769,7 @@ Total: ${valorFormatado}`
       </div>
     `;
 
-    const selRota = container.querySelector("#select-rota-v6");
+    const selRota = container.querySelector("#select-rota-v7");
     if (selRota) {
       selRota.addEventListener("change", () => {
         const opt = selRota.options[selRota.selectedIndex];
@@ -1646,15 +1779,15 @@ Total: ${valorFormatado}`
       });
     }
 
-    container.querySelectorAll("[data-veiculo-v6]").forEach((btn) => {
+    container.querySelectorAll("[data-veiculo-v7]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-veiculo-v6");
+        const id = btn.getAttribute("data-veiculo-v7");
         veiculoAtual = VEICULOS.find((v) => v.id === id) || VEICULOS[0];
         renderizarPainel(container);
       });
     });
 
-    const selMetodo = container.querySelector("#select-metodo-v6");
+    const selMetodo = container.querySelector("#select-metodo-v7");
     if (selMetodo) {
       selMetodo.addEventListener("change", () => {
         metodoAtual = selMetodo.value || "Orange Money";
@@ -1662,7 +1795,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputNumCartao = container.querySelector("#input-cartao-numero-v6");
+    const inputNumCartao = container.querySelector("#input-cartao-numero-v7");
     if (inputNumCartao) {
       inputNumCartao.addEventListener("input", () => {
         const digitos = inputNumCartao.value.replace(/\D/g, "").slice(0, 16);
@@ -1670,7 +1803,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputValidade = container.querySelector("#input-cartao-validade-v6");
+    const inputValidade = container.querySelector("#input-cartao-validade-v7");
     if (inputValidade) {
       inputValidade.addEventListener("input", () => {
         const digitos = inputValidade.value.replace(/\D/g, "").slice(0, 4);
@@ -1678,24 +1811,41 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputCvv = container.querySelector("#input-cartao-cvv-v6");
+    const inputCvv = container.querySelector("#input-cartao-cvv-v7");
     if (inputCvv) {
       inputCvv.addEventListener("input", () => {
         inputCvv.value = inputCvv.value.replace(/\D/g, "").slice(0, 3);
       });
     }
 
-    const btnPedir = container.querySelector("#btn-pedir-v6");
+    const inputMsg = container.querySelector("#input-msg-motorista-v7");
+    if (inputMsg) {
+      inputMsg.addEventListener("input", () => {
+        mensagemRapida = inputMsg.value;
+        const mot = motoristaAtribuido || MOTORISTA_DEMO_POR_TIPO[veiculoAtual.id] || MOTORISTA_DEMO_POR_TIPO.TAXI;
+        const telDigitos = (mot.telefone || "").replace(/\D/g, "");
+        const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
+        const textoEncoded = encodeURIComponent(
+          `Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`
+        );
+        const wa = container.querySelector("#link-wa-v7");
+        const sms = container.querySelector("#link-sms-v7");
+        if (wa) wa.href = telDigitos ? `https://wa.me/${telDigitos}?text=${textoEncoded}` : "https://wa.me/?text=" + textoEncoded;
+        if (sms && telLimpo) sms.href = `sms:${telLimpo}?body=${textoEncoded}`;
+      });
+    }
+
+    const btnPedir = container.querySelector("#btn-pedir-v7");
     if (btnPedir) {
-      btnPedir.addEventListener("click", () => {
-        let referenciaCliente = (container.querySelector("#input-tel-v6")?.value || "").trim();
+      btnPedir.addEventListener("click", async () => {
+        let referenciaCliente = (container.querySelector("#input-tel-v7")?.value || "").trim();
 
         if (metodoAtual === "Dinheiro Vivo") {
           referenciaCliente = "Dinheiro Vivo ao condutor";
         } else if (metodoAtual === "Cartão") {
-          const numLimpo = (container.querySelector("#input-cartao-numero-v6")?.value || "").replace(/\D/g, "");
-          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v6")?.value || "").replace(/\D/g, "");
-          const aviso = container.querySelector("#aviso-cartao-v6");
+          const numLimpo = (container.querySelector("#input-cartao-numero-v7")?.value || "").replace(/\D/g, "");
+          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v7")?.value || "").replace(/\D/g, "");
+          const aviso = container.querySelector("#aviso-cartao-v7");
 
           if (numLimpo.length !== 16 || cvvLimpo.length !== 3) {
             if (aviso) {
@@ -1710,9 +1860,10 @@ Total: ${valorFormatado}`
         limparTimers();
         faseViagem = "PROCURANDO";
         segundos = 0;
+        motoristaAtribuido = await buscarMotoristaNoSupabase(veiculoAtual.id);
         renderizarPainel(container);
 
-        const ref = (container.querySelector("#input-ref-v6")?.value || "").trim();
+        const ref = (container.querySelector("#input-ref-v7")?.value || "").trim();
         const valor = calcularPrecoXOF();
 
         if (typeof window.iniciarPagamentoComComissao === "function") {
@@ -1732,7 +1883,7 @@ Total: ${valorFormatado}`
 
         timerCrono = setInterval(() => {
           segundos += 1;
-          const elCrono = container.querySelector("#cronometro-viagem-v6");
+          const elCrono = container.querySelector("#cronometro-viagem-v7");
           if (elCrono) elCrono.textContent = formatarTempo(segundos);
         }, 1000);
 
@@ -1751,7 +1902,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnCancelar = container.querySelector("#btn-cancelar-v6");
+    const btnCancelar = container.querySelector("#btn-cancelar-v7");
     if (btnCancelar) {
       btnCancelar.addEventListener("click", () => {
         limparTimers();
