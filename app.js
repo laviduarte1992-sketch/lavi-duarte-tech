@@ -2027,14 +2027,25 @@ Total: ${valorFormatado}`
   setTimeout(montarPainel, 350);
 })();
 (function () {
-  if (window.__superAppCompletoV9) return;
-  window.__superAppCompletoV9 = true;
+  if (window.__superAppCompletoV10) return;
+  window.__superAppCompletoV10 = true;
 
   // =========================================================================
-  // 1. PROTEÇÃO DE PRIVACIDADE DO PAINEL DO MOTORISTA
+  // CONFIGURAÇÃO DA CONTA COMERCIANTE (ALTERE AQUI OS SEUS DADOS REAIS)
   // =========================================================================
+  const MERCHANT_ORANGE = "955 00 00 00 (Código Merchant: 000000)";
+  const MERCHANT_TELECEL = "966 00 00 00 (Conta Comerciante)";
+  const WHATSAPP_SUPORTE = "245955000000"; // Apenas dígitos, com indicativo 245
   const PIN_CONDUTOR_PADRAO = "2450";
+
+  // =========================================================================
+  // 1. PAINEL DO CONDUTOR: PRIVACIDADE DE GANHOS + RECARGA MERCHANT ACCOUNT
+  // =========================================================================
   let ganhosDesbloqueados = false;
+  let painelRecargaAberto = false;
+  let valorRecargaEscolhido = "2.000 XOF";
+  let operadoraRecarga = "Orange Money";
+  let idTransacaoSms = "";
 
   function verificarSessaoMotorista() {
     if (ganhosDesbloqueados) return true;
@@ -2047,7 +2058,160 @@ Total: ${valorFormatado}`
     return false;
   }
 
-  function protegerCartaoGanhos() {
+  function lerDadosCondutorNaTela() {
+    const bodyTxt = document.body ? document.body.innerText || "" : "";
+    const nomeMatch = bodyTxt.match(/Nome:\s*([^\n\r]+)/i);
+    const placaMatch = bodyTxt.match(/Matr[íi]cula\s*\(?Placa\)?:\s*([^\n\r]+)/i);
+    return {
+      nome: nomeMatch ? nomeMatch[1].trim() : "Condutor RotaGB",
+      placa: placaMatch ? placaMatch[1].trim() : "Sem matrícula"
+    };
+  }
+
+  function montarBlocoRecargaMerchant() {
+    const condutor = lerDadosCondutorNaTela();
+    const numeroAtivo = operadoraRecarga === "Orange Money" ? MERCHANT_ORANGE : MERCHANT_TELECEL;
+    const msgComprovativo = encodeURIComponent(
+      `Olá Suporte RotaGB! Fiz uma recarga de saldo de comissão (${valorRecargaEscolhido}) via ${operadoraRecarga}.\n` +
+        `Motorista: ${condutor.nome}\n` +
+        `Matrícula: ${condutor.placa}\n` +
+        `ID Transação / Ref: ${idTransacaoSms || "Em anexo"}`
+    );
+
+    return `
+      <div id="cartao-recarga-merchant" style="margin-top:12px;margin-bottom:12px;padding:16px;border-radius:14px;background:#f0fdf4;border:1.5px solid #86efac;text-align:left;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:800;color:#14532d;">💳 Carteira &amp; Saldo de Comissão</span>
+          <span style="font-size:11px;font-weight:700;color:#166534;background:#dcfce7;padding:2px 8px;border-radius:999px;">Cadastro 100% Gratuito</span>
+        </div>
+        <div style="font-size:12px;color:#374151;margin-bottom:10px;">
+          O registo na plataforma é gratuito. Carregue saldo apenas quando precisar de cobrir a comissão das corridas pagas em dinheiro vivo.
+        </div>
+
+        <button
+          type="button"
+          id="btn-toggle-recarga-merchant"
+          style="width:100%;padding:11px;border:none;border-radius:10px;background:#15803d;color:#fff;font-size:13px;font-weight:800;cursor:pointer;"
+        >
+          ${painelRecargaAberto ? "▲ Fechar Dados de Pagamento Merchant" : "➕ Carregar Saldo via Merchant Account"}
+        </button>
+
+        ${
+          painelRecargaAberto
+            ? `
+          <div style="margin-top:12px;padding:12px;border-radius:11px;background:#ffffff;border:1px solid #bbf7d0;">
+            <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">
+              1. Escolha a operadora Merchant
+            </label>
+            <select id="select-operadora-merchant" style="width:100%;padding:9px;border-radius:8px;border:1px solid #d1d5db;font-size:13px;margin-bottom:8px;background:#fff;">
+              <option value="Orange Money" ${operadoraRecarga === "Orange Money" ? "selected" : ""}>Orange Money (Merchant)</option>
+              <option value="Telecel" ${operadoraRecarga === "Telecel" ? "selected" : ""}>Telecel (Merchant)</option>
+            </select>
+
+            <div style="padding:10px;border-radius:9px;background:#f8fafc;border:1px dashed #94a3b8;margin-bottom:10px;">
+              <div style="font-size:11px;color:#475569;font-weight:700;">Conta Oficial RotaGB (${operadoraRecarga}):</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px;">
+                <span style="font-size:13px;font-weight:800;color:#0f172a;">${numeroAtivo}</span>
+                <button type="button" id="btn-copiar-merchant" style="padding:5px 9px;border:none;border-radius:6px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">
+                  Copiar
+                </button>
+              </div>
+              <div id="aviso-copia-merchant" style="font-size:11px;color:#15803d;margin-top:4px;"></div>
+            </div>
+
+            <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">
+              2. Valor carregado &amp; ID da transação SMS
+            </label>
+            <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:6px;margin-bottom:10px;">
+              <select id="select-valor-merchant" style="padding:9px;border-radius:8px;border:1px solid #d1d5db;font-size:12px;background:#fff;">
+                <option value="2.000 XOF" ${valorRecargaEscolhido === "2.000 XOF" ? "selected" : ""}>2.000 XOF</option>
+                <option value="5.000 XOF" ${valorRecargaEscolhido === "5.000 XOF" ? "selected" : ""}>5.000 XOF</option>
+                <option value="10.000 XOF" ${valorRecargaEscolhido === "10.000 XOF" ? "selected" : ""}>10.000 XOF</option>
+              </select>
+              <input
+                id="input-id-transacao-merchant"
+                type="text"
+                value="${idTransacaoSms.replace(/"/g, "&quot;")}"
+                placeholder="ID SMS (ex: PP2611...)"
+                style="padding:9px;border-radius:8px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;"
+              />
+            </div>
+
+            <a
+              id="link-comprovativo-merchant"
+              href="https://wa.me/${WHATSAPP_SUPORTE}?text=${msgComprovativo}"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="display:block;text-align:center;text-decoration:none;padding:11px;border-radius:9px;background:#16a34a;color:#fff;font-size:13px;font-weight:800;"
+            >
+              📲 Enviar Comprovativo no WhatsApp
+            </a>
+          </div>
+        `
+            : ""
+        }
+      </div>
+    `;
+  }
+
+  function ligarEventosRecargaMerchant(wrapper) {
+    const btnToggle = wrapper.querySelector("#btn-toggle-recarga-merchant");
+    if (btnToggle) {
+      btnToggle.addEventListener("click", () => {
+        painelRecargaAberto = !painelRecargaAberto;
+        wrapper.innerHTML = montarBlocoRecargaMerchant();
+        ligarEventosRecargaMerchant(wrapper);
+      });
+    }
+
+    const selOp = wrapper.querySelector("#select-operadora-merchant");
+    if (selOp) {
+      selOp.addEventListener("change", () => {
+        operadoraRecarga = selOp.value;
+        wrapper.innerHTML = montarBlocoRecargaMerchant();
+        ligarEventosRecargaMerchant(wrapper);
+      });
+    }
+
+    const selVal = wrapper.querySelector("#select-valor-merchant");
+    if (selVal) {
+      selVal.addEventListener("change", () => {
+        valorRecargaEscolhido = selVal.value;
+        wrapper.innerHTML = montarBlocoRecargaMerchant();
+        ligarEventosRecargaMerchant(wrapper);
+      });
+    }
+
+    const inputId = wrapper.querySelector("#input-id-transacao-merchant");
+    if (inputId) {
+      inputId.addEventListener("input", () => {
+        idTransacaoSms = inputId.value;
+        const condutor = lerDadosCondutorNaTela();
+        const msg = encodeURIComponent(
+          `Olá Suporte RotaGB! Fiz uma recarga de saldo de comissão (${valorRecargaEscolhido}) via ${operadoraRecarga}.\n` +
+            `Motorista: ${condutor.nome}\n` +
+            `Matrícula: ${condutor.placa}\n` +
+            `ID Transação / Ref: ${idTransacaoSms || "Em anexo"}`
+        );
+        const link = wrapper.querySelector("#link-comprovativo-merchant");
+        if (link) link.href = `https://wa.me/${WHATSAPP_SUPORTE}?text=${msg}`;
+      });
+    }
+
+    const btnCopiar = wrapper.querySelector("#btn-copiar-merchant");
+    if (btnCopiar) {
+      btnCopiar.addEventListener("click", () => {
+        const texto = operadoraRecarga === "Orange Money" ? MERCHANT_ORANGE : MERCHANT_TELECEL;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(texto).catch(() => {});
+        }
+        const aviso = wrapper.querySelector("#aviso-copia-merchant");
+        if (aviso) aviso.textContent = "Número/código copiado! Cole na aplicação Orange Money ou Telecel.";
+      });
+    }
+  }
+
+  function atualizarPainelCondutor() {
     const candidatos = Array.from(document.querySelectorAll("div, section, article"));
     const cartao = candidatos.find((el) => {
       if (el.getAttribute("data-ganhos-protegidos") === "1") return false;
@@ -2059,10 +2223,20 @@ Total: ${valorFormatado}`
       );
     });
 
-    if (!cartao) return;
+    if (!cartao || !cartao.parentElement) return;
 
+    // 1) Garante o bloco de recarga Merchant no Painel do Condutor
+    if (!cartao.parentElement.querySelector("#wrapper-recarga-merchant")) {
+      const wrapperRecarga = document.createElement("div");
+      wrapperRecarga.id = "wrapper-recarga-merchant";
+      wrapperRecarga.innerHTML = montarBlocoRecargaMerchant();
+      cartao.parentElement.insertBefore(wrapperRecarga, cartao.nextSibling);
+      ligarEventosRecargaMerchant(wrapperRecarga);
+    }
+
+    // 2) Protege o Resumo de Ganhos Hoje com PIN
     if (verificarSessaoMotorista()) {
-      const bloqueio = cartao.parentElement?.querySelector("#bloqueio-ganhos-motorista");
+      const bloqueio = cartao.parentElement.querySelector("#bloqueio-ganhos-motorista");
       if (bloqueio) bloqueio.remove();
       cartao.style.display = "";
       return;
@@ -2071,7 +2245,7 @@ Total: ${valorFormatado}`
     cartao.style.display = "none";
     cartao.setAttribute("data-ganhos-protegidos", "1");
 
-    if (cartao.parentElement?.querySelector("#bloqueio-ganhos-motorista")) return;
+    if (cartao.parentElement.querySelector("#bloqueio-ganhos-motorista")) return;
 
     const aviso = document.createElement("div");
     aviso.id = "bloqueio-ganhos-motorista";
@@ -2118,7 +2292,7 @@ Total: ${valorFormatado}`
   }
 
   // =========================================================================
-  // 2. SISTEMA DE MOBILIDADE E PEDIDO DE VIAGEM (3 PASSOS + SUPABASE)
+  // 2. SISTEMA DE MOBILIDADE E PEDIDO DE VIAGEM (55 ROTAS DGVTT + SUPABASE)
   // =========================================================================
   const GRUPOS_ROTAS_DGVTT = [
     {
@@ -2291,7 +2465,7 @@ Total: ${valorFormatado}`
 
     timerCrono = setInterval(() => {
       segundos += 1;
-      const elCrono = container.querySelector("#cronometro-viagem-v9");
+      const elCrono = container.querySelector("#cronometro-viagem-v10");
       if (elCrono) elCrono.textContent = formatarTempo(segundos);
     }, 1000);
 
@@ -2347,22 +2521,22 @@ Total: ${valorFormatado}`
       return `
         <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
           <label style="display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;">Número do cartão (16 dígitos)</label>
-          <input id="input-cartao-numero-v9" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
+          <input id="input-cartao-numero-v10" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Validade (MM/AA)</label>
-              <input id="input-cartao-validade-v9" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-validade-v10" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Código secreto (3 dígitos)</label>
-              <input id="input-cartao-cvv-v9" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-cvv-v10" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
           </div>
-          <div id="aviso-cartao-v9" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
+          <div id="aviso-cartao-v10" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
         </div>
       `;
     }
-    return `<input id="input-tel-v9" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
+    return `<input id="input-tel-v10" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
   }
 
   function renderizarCartaoMotorista() {
@@ -2385,13 +2559,13 @@ Total: ${valorFormatado}`
 
         <div style="margin-top:10px;">
           <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">Mensagem caso o motorista atrase ou não encontre si:</label>
-          <input id="input-msg-motorista-v9" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
+          <input id="input-msg-motorista-v10" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
             <a href="${telLimpo ? `tel:${telLimpo}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;">📞 Ligar</a>
-            <a id="link-wa-v9" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
-            <a id="link-sms-v9" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
+            <a id="link-wa-v10" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
+            <a id="link-sms-v10" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
           </div>
-          <button type="button" id="btn-trocar-motorista-v9" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
+          <button type="button" id="btn-trocar-motorista-v10" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
           ${avisoTrocaMotorista ? `<div style="font-size:11px;color:#b45309;margin-top:6px;">${avisoTrocaMotorista}</div>` : ""}
         </div>
       </div>
@@ -2417,8 +2591,8 @@ Total: ${valorFormatado}`
             <span style="padding:4px 8px;border-radius:999px;background:${faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">3. Viagem em curso</span>
           </div>
           ${faseViagem !== "PROCURANDO" ? renderizarCartaoMotorista() : ""}
-          <div id="cronometro-viagem-v9" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
-          <button type="button" id="btn-cancelar-v9" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
+          <div id="cronometro-viagem-v10" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
+          <button type="button" id="btn-cancelar-v10" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
           <div style="font-size:11px;color:#6b7280;margin-top:8px;">Regra de reembolso: cancelamento antes da chegada ou sem motorista disponível devolve 100% do valor simulado sem taxa.</div>
         </div>
       `;
@@ -2443,8 +2617,8 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">1. Escolha para onde quer ir e o ponto de referência</label>
-        <select id="select-rota-v9" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
-        <input id="input-ref-v9" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
+        <select id="select-rota-v10" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
+        <input id="input-ref-v10" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">2. Escolha o veículo (preço final do veículo selecionado)</label>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
@@ -2452,7 +2626,7 @@ Total: ${valorFormatado}`
             const ativo = v.id === veiculoAtual.id;
             const p = Math.round(rotaAtual.baseXOF * v.mult);
             return `
-              <button type="button" data-veiculo-v9="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
+              <button type="button" data-veiculo-v10="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
                 <div style="font-size:18px;">${v.emoji}</div>
                 <div style="font-size:12px;font-weight:700;color:#111827;margin-top:2px;">${v.nome}</div>
                 <div style="font-size:15px;font-weight:800;color:#111827;margin-top:4px;">${p} XOF</div>
@@ -2470,19 +2644,19 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">3. Método e dados para confirmar o pedido</label>
-        <select id="select-metodo-v9" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
+        <select id="select-metodo-v10" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
           ${METODOS_PAGAMENTO.map((m) => `<option value="${m}" ${metodoAtual === m ? "selected" : ""}>${m}</option>`).join("")}
         </select>
 
         ${renderizarCamposPagamento()}
 
-        <button type="button" id="btn-pedir-v9" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
+        <button type="button" id="btn-pedir-v10" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
 
         ${renderizarBlocoEstado(preco)}
       </div>
     `;
 
-    const selRota = container.querySelector("#select-rota-v9");
+    const selRota = container.querySelector("#select-rota-v10");
     if (selRota) {
       selRota.addEventListener("change", () => {
         const opt = selRota.options[selRota.selectedIndex];
@@ -2491,14 +2665,14 @@ Total: ${valorFormatado}`
       });
     }
 
-    container.querySelectorAll("[data-veiculo-v9]").forEach((btn) => {
+    container.querySelectorAll("[data-veiculo-v10]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v9")) || VEICULOS[0];
+        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v10")) || VEICULOS[0];
         renderizarPainel(container);
       });
     });
 
-    const selMetodo = container.querySelector("#select-metodo-v9");
+    const selMetodo = container.querySelector("#select-metodo-v10");
     if (selMetodo) {
       selMetodo.addEventListener("change", () => {
         metodoAtual = selMetodo.value || "Orange Money";
@@ -2506,7 +2680,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputNumCartao = container.querySelector("#input-cartao-numero-v9");
+    const inputNumCartao = container.querySelector("#input-cartao-numero-v10");
     if (inputNumCartao) {
       inputNumCartao.addEventListener("input", () => {
         const digitos = inputNumCartao.value.replace(/\D/g, "").slice(0, 16);
@@ -2514,7 +2688,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputValidade = container.querySelector("#input-cartao-validade-v9");
+    const inputValidade = container.querySelector("#input-cartao-validade-v10");
     if (inputValidade) {
       inputValidade.addEventListener("input", () => {
         const digitos = inputValidade.value.replace(/\D/g, "").slice(0, 4);
@@ -2522,14 +2696,14 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputCvv = container.querySelector("#input-cartao-cvv-v9");
+    const inputCvv = container.querySelector("#input-cartao-cvv-v10");
     if (inputCvv) {
       inputCvv.addEventListener("input", () => {
         inputCvv.value = inputCvv.value.replace(/\D/g, "").slice(0, 3);
       });
     }
 
-    const inputMsg = container.querySelector("#input-msg-motorista-v9");
+    const inputMsg = container.querySelector("#input-msg-motorista-v10");
     if (inputMsg) {
       inputMsg.addEventListener("input", () => {
         mensagemRapida = inputMsg.value;
@@ -2538,14 +2712,14 @@ Total: ${valorFormatado}`
         const telDigitos = (mot.telefone || "").replace(/\D/g, "");
         const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
         const textoEncoded = encodeURIComponent(`Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`);
-        const wa = container.querySelector("#link-wa-v9");
-        const sms = container.querySelector("#link-sms-v9");
+        const wa = container.querySelector("#link-wa-v10");
+        const sms = container.querySelector("#link-sms-v10");
         if (wa) wa.href = telDigitos ? `https://wa.me/${telDigitos}?text=${textoEncoded}` : "https://wa.me/?text=" + textoEncoded;
         if (sms && telLimpo) sms.href = `sms:${telLimpo}?body=${textoEncoded}`;
       });
     }
 
-    const btnTrocar = container.querySelector("#btn-trocar-motorista-v9");
+    const btnTrocar = container.querySelector("#btn-trocar-motorista-v10");
     if (btnTrocar) {
       btnTrocar.addEventListener("click", () => {
         if (!listaMotoristasDisponiveis.length) return;
@@ -2561,17 +2735,17 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnPedir = container.querySelector("#btn-pedir-v9");
+    const btnPedir = container.querySelector("#btn-pedir-v10");
     if (btnPedir) {
       btnPedir.addEventListener("click", async () => {
-        let referenciaCliente = (container.querySelector("#input-tel-v9")?.value || "").trim();
+        let referenciaCliente = (container.querySelector("#input-tel-v10")?.value || "").trim();
 
         if (metodoAtual === "Dinheiro Vivo") {
           referenciaCliente = "Dinheiro Vivo ao condutor";
         } else if (metodoAtual === "Cartão") {
-          const numLimpo = (container.querySelector("#input-cartao-numero-v9")?.value || "").replace(/\D/g, "");
-          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v9")?.value || "").replace(/\D/g, "");
-          const aviso = container.querySelector("#aviso-cartao-v9");
+          const numLimpo = (container.querySelector("#input-cartao-numero-v10")?.value || "").replace(/\D/g, "");
+          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v10")?.value || "").replace(/\D/g, "");
+          const aviso = container.querySelector("#aviso-cartao-v10");
 
           if (numLimpo.length !== 16 || cvvLimpo.length !== 3) {
             if (aviso) {
@@ -2588,7 +2762,7 @@ Total: ${valorFormatado}`
         indiceMotoristaAtual = 0;
         motoristaAtribuido = listaMotoristasDisponiveis[0];
 
-        const ref = (container.querySelector("#input-ref-v9")?.value || "").trim();
+        const ref = (container.querySelector("#input-ref-v10")?.value || "").trim();
         const valor = calcularPrecoXOF();
 
         if (typeof window.iniciarPagamentoComComissao === "function") {
@@ -2608,7 +2782,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnCancelar = container.querySelector("#btn-cancelar-v9");
+    const btnCancelar = container.querySelector("#btn-cancelar-v10");
     if (btnCancelar) {
       btnCancelar.addEventListener("click", () => {
         limparTimers();
@@ -2647,11 +2821,8 @@ Total: ${valorFormatado}`
     renderizarPainel(painel);
   }
 
-  // =========================================================================
-  // 3. INICIALIZAÇÃO CONJUNTA (GARANTE QUE NENHUM MÓDULO FALHA)
-  // =========================================================================
   function executarTudo() {
-    protegerCartaoGanhos();
+    atualizarPainelCondutor();
     montarPainel();
   }
 
