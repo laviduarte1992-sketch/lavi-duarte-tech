@@ -2027,15 +2027,15 @@ Total: ${valorFormatado}`
   setTimeout(montarPainel, 350);
 })();
 (function () {
-  if (window.__superAppCompletoV10) return;
-  window.__superAppCompletoV10 = true;
+  if (window.__superAppCompletoV11) return;
+  window.__superAppCompletoV11 = true;
 
   // =========================================================================
   // CONFIGURAÇÃO DA CONTA COMERCIANTE (ALTERE AQUI OS SEUS DADOS REAIS)
   // =========================================================================
   const MERCHANT_ORANGE = "955 00 00 00 (Código Merchant: 000000)";
   const MERCHANT_TELECEL = "966 00 00 00 (Conta Comerciante)";
-  const WHATSAPP_SUPORTE = "245955000000"; // Apenas dígitos, com indicativo 245
+  const WHATSAPP_SUPORTE = "245955000000";
   const PIN_CONDUTOR_PADRAO = "2450";
 
   // =========================================================================
@@ -2087,63 +2087,36 @@ Total: ${valorFormatado}`
         <div style="font-size:12px;color:#374151;margin-bottom:10px;">
           O registo na plataforma é gratuito. Carregue saldo apenas quando precisar de cobrir a comissão das corridas pagas em dinheiro vivo.
         </div>
-
-        <button
-          type="button"
-          id="btn-toggle-recarga-merchant"
-          style="width:100%;padding:11px;border:none;border-radius:10px;background:#15803d;color:#fff;font-size:13px;font-weight:800;cursor:pointer;"
-        >
+        <button type="button" id="btn-toggle-recarga-merchant" style="width:100%;padding:11px;border:none;border-radius:10px;background:#15803d;color:#fff;font-size:13px;font-weight:800;cursor:pointer;">
           ${painelRecargaAberto ? "▲ Fechar Dados de Pagamento Merchant" : "➕ Carregar Saldo via Merchant Account"}
         </button>
-
         ${
           painelRecargaAberto
             ? `
           <div style="margin-top:12px;padding:12px;border-radius:11px;background:#ffffff;border:1px solid #bbf7d0;">
-            <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">
-              1. Escolha a operadora Merchant
-            </label>
+            <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">1. Escolha a operadora Merchant</label>
             <select id="select-operadora-merchant" style="width:100%;padding:9px;border-radius:8px;border:1px solid #d1d5db;font-size:13px;margin-bottom:8px;background:#fff;">
               <option value="Orange Money" ${operadoraRecarga === "Orange Money" ? "selected" : ""}>Orange Money (Merchant)</option>
               <option value="Telecel" ${operadoraRecarga === "Telecel" ? "selected" : ""}>Telecel (Merchant)</option>
             </select>
-
             <div style="padding:10px;border-radius:9px;background:#f8fafc;border:1px dashed #94a3b8;margin-bottom:10px;">
               <div style="font-size:11px;color:#475569;font-weight:700;">Conta Oficial RotaGB (${operadoraRecarga}):</div>
               <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px;">
                 <span style="font-size:13px;font-weight:800;color:#0f172a;">${numeroAtivo}</span>
-                <button type="button" id="btn-copiar-merchant" style="padding:5px 9px;border:none;border-radius:6px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">
-                  Copiar
-                </button>
+                <button type="button" id="btn-copiar-merchant" style="padding:5px 9px;border:none;border-radius:6px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">Copiar</button>
               </div>
               <div id="aviso-copia-merchant" style="font-size:11px;color:#15803d;margin-top:4px;"></div>
             </div>
-
-            <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">
-              2. Valor carregado &amp; ID da transação SMS
-            </label>
+            <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">2. Valor carregado &amp; ID da transação SMS</label>
             <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:6px;margin-bottom:10px;">
               <select id="select-valor-merchant" style="padding:9px;border-radius:8px;border:1px solid #d1d5db;font-size:12px;background:#fff;">
                 <option value="2.000 XOF" ${valorRecargaEscolhido === "2.000 XOF" ? "selected" : ""}>2.000 XOF</option>
                 <option value="5.000 XOF" ${valorRecargaEscolhido === "5.000 XOF" ? "selected" : ""}>5.000 XOF</option>
                 <option value="10.000 XOF" ${valorRecargaEscolhido === "10.000 XOF" ? "selected" : ""}>10.000 XOF</option>
               </select>
-              <input
-                id="input-id-transacao-merchant"
-                type="text"
-                value="${idTransacaoSms.replace(/"/g, "&quot;")}"
-                placeholder="ID SMS (ex: PP2611...)"
-                style="padding:9px;border-radius:8px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;"
-              />
+              <input id="input-id-transacao-merchant" type="text" value="${idTransacaoSms.replace(/"/g, "&quot;")}" placeholder="ID SMS (ex: PP2611...)" style="padding:9px;border-radius:8px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;" />
             </div>
-
-            <a
-              id="link-comprovativo-merchant"
-              href="https://wa.me/${WHATSAPP_SUPORTE}?text=${msgComprovativo}"
-              target="_blank"
-              rel="noopener noreferrer"
-              style="display:block;text-align:center;text-decoration:none;padding:11px;border-radius:9px;background:#16a34a;color:#fff;font-size:13px;font-weight:800;"
-            >
+            <a id="link-comprovativo-merchant" href="https://wa.me/${WHATSAPP_SUPORTE}?text=${msgComprovativo}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;padding:11px;border-radius:9px;background:#16a34a;color:#fff;font-size:13px;font-weight:800;">
               📲 Enviar Comprovativo no WhatsApp
             </a>
           </div>
@@ -2163,7 +2136,6 @@ Total: ${valorFormatado}`
         ligarEventosRecargaMerchant(wrapper);
       });
     }
-
     const selOp = wrapper.querySelector("#select-operadora-merchant");
     if (selOp) {
       selOp.addEventListener("change", () => {
@@ -2172,7 +2144,6 @@ Total: ${valorFormatado}`
         ligarEventosRecargaMerchant(wrapper);
       });
     }
-
     const selVal = wrapper.querySelector("#select-valor-merchant");
     if (selVal) {
       selVal.addEventListener("change", () => {
@@ -2181,7 +2152,6 @@ Total: ${valorFormatado}`
         ligarEventosRecargaMerchant(wrapper);
       });
     }
-
     const inputId = wrapper.querySelector("#input-id-transacao-merchant");
     if (inputId) {
       inputId.addEventListener("input", () => {
@@ -2197,7 +2167,6 @@ Total: ${valorFormatado}`
         if (link) link.href = `https://wa.me/${WHATSAPP_SUPORTE}?text=${msg}`;
       });
     }
-
     const btnCopiar = wrapper.querySelector("#btn-copiar-merchant");
     if (btnCopiar) {
       btnCopiar.addEventListener("click", () => {
@@ -2216,16 +2185,11 @@ Total: ${valorFormatado}`
     const cartao = candidatos.find((el) => {
       if (el.getAttribute("data-ganhos-protegidos") === "1") return false;
       const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
-      return (
-        /resumo\s*de\s*ganhos\s*hoje/i.test(txt) &&
-        /comiss[aã]o\s*retida/i.test(txt) &&
-        txt.length < 220
-      );
+      return /resumo\s*de\s*ganhos\s*hoje/i.test(txt) && /comiss[aã]o\s*retida/i.test(txt) && txt.length < 220;
     });
 
     if (!cartao || !cartao.parentElement) return;
 
-    // 1) Garante o bloco de recarga Merchant no Painel do Condutor
     if (!cartao.parentElement.querySelector("#wrapper-recarga-merchant")) {
       const wrapperRecarga = document.createElement("div");
       wrapperRecarga.id = "wrapper-recarga-merchant";
@@ -2234,7 +2198,6 @@ Total: ${valorFormatado}`
       ligarEventosRecargaMerchant(wrapperRecarga);
     }
 
-    // 2) Protege o Resumo de Ganhos Hoje com PIN
     if (verificarSessaoMotorista()) {
       const bloqueio = cartao.parentElement.querySelector("#bloqueio-ganhos-motorista");
       if (bloqueio) bloqueio.remove();
@@ -2292,7 +2255,439 @@ Total: ${valorFormatado}`
   }
 
   // =========================================================================
-  // 2. SISTEMA DE MOBILIDADE E PEDIDO DE VIAGEM (55 ROTAS DGVTT + SUPABASE)
+  // 2. SISTEMA DE FARMÁCIAS EM BISSAU (LOJA + CATÁLOGO DE MEDICAMENTOS + PAGAMENTO)
+  // =========================================================================
+  const FARMACIAS_BISSAU = [
+    {
+      id: "farm-mocambique",
+      nome: "Farmácia Moçambique",
+      bairro: "Rua Moçambique × Angola, Bissau",
+      telefone: "+245 955 131 313",
+      horario: "Seg-Sex: 08h-21h · Sáb: 08h-14h",
+      destaque: "Teste de paludismo na hora · Amplo stock",
+      imagem: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      id: "farm-municipal",
+      nome: "Farmácia Municipal",
+      bairro: "Av. Pansau Na Isna, Bissau",
+      telefone: "+245 955 850 085",
+      horario: "Seg-Sex: 08h-19h · Sáb: 08h-13h",
+      destaque: "Próxima ao Hospital Simão Mendes",
+      imagem: "https://images.unsplash.com/photo-1576602976047-174e57a47881?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      id: "farm-moderna",
+      nome: "Farmácia Moderna",
+      bairro: "Rua 2 / Bissau Velho",
+      telefone: "+245 966 663 128",
+      horario: "Seg-Sáb: 08h-19h",
+      destaque: "Atendimento no Centro Histórico",
+      imagem: "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      id: "farm-portuguesa",
+      nome: "Farmácia Portuguesa",
+      bairro: "Av. Amílcar Cabral / Rua Justino Lopes",
+      telefone: "+245 955 942 994",
+      horario: "Seg-Sáb: 08h-20h",
+      destaque: "Medicamentos importados & dermocosmética",
+      imagem: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      id: "farm-nurdin",
+      nome: "Farmácia Nur-Din",
+      bairro: "Praça / Rotunda de Amura, Bissau",
+      telefone: "+245 955 924 145",
+      horario: "Seg-Sex: 08h-21h · Sáb: 08h-13h",
+      destaque: "Atendimento rápido no Centro",
+      imagem: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      id: "farm-caracol",
+      nome: "Farmácia de Caracol",
+      bairro: "Rotunda de Caracol, Bissau",
+      telefone: "+245 956 330 015",
+      horario: "Todos os dias: 08h-23h",
+      destaque: "Horário noturno até às 23h",
+      imagem: "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?auto=format&fit=crop&w=900&q=80"
+    }
+  ];
+
+  const MEDICAMENTOS_CATALOGO = [
+    { id: "med-paracetamol", nome: "Paracetamol 500mg (20 comp.)", categoria: "Dor & Febre", precoXOF: 1000, receita: false },
+    { id: "med-coartem", nome: "Antipalúdico Arteméter + Lumefantrina", categoria: "Paludismo", precoXOF: 3500, receita: true },
+    { id: "med-ibuprofeno", nome: "Ibuprofeno 400mg (10 comp.)", categoria: "Anti-inflamatório", precoXOF: 1500, receita: false },
+    { id: "med-amoxicilina", nome: "Amoxicilina 500mg (12 cáps.)", categoria: "Antibiótico", precoXOF: 2500, receita: true },
+    { id: "med-soro", nome: "Sais de Reidratação Oral (3 saquetas)", categoria: "Hidratação", precoXOF: 900, receita: false },
+    { id: "med-vitc", nome: "Vitamina C 1000mg Efervescente", categoria: "Vitaminas", precoXOF: 2200, receita: false },
+    { id: "med-alcool", nome: "Álcool Etílico 70% + Algodão + Pensos", categoria: "Primeiros Socorros", precoXOF: 1800, receita: false },
+    { id: "med-omeprazol", nome: "Omeprazol 20mg (14 cáps.)", categoria: "Estômago", precoXOF: 2000, receita: false }
+  ];
+
+  let farmaciaSelecionada = null;
+  let buscaMedicamento = "";
+  let carrinhoFarmacia = {};
+  let observacaoFarmacia = "";
+  let metodoPagFarmacia = "Orange Money";
+  let estadoPedidoFarmacia = "IDLE"; // IDLE | CONFIRMADO
+
+  function calcularTotalFarmacia() {
+    let subtotal = 0;
+    let qtdTotal = 0;
+    Object.keys(carrinhoFarmacia).forEach((id) => {
+      const qtd = carrinhoFarmacia[id] || 0;
+      const item = MEDICAMENTOS_CATALOGO.find((m) => m.id === id);
+      if (item && qtd > 0) {
+        subtotal += item.precoXOF * qtd;
+        qtdTotal += qtd;
+      }
+    });
+    const taxaEntrega = qtdTotal > 0 ? 500 : 0;
+    return { subtotal, taxaEntrega, total: subtotal + taxaEntrega, qtdTotal };
+  }
+
+  function renderizarFarmaciaUI(wrapper) {
+    const { subtotal, taxaEntrega, total, qtdTotal } = calcularTotalFarmacia();
+
+    // TELA 1: LISTA DE FARMÁCIAS EM BISSAU
+    if (!farmaciaSelecionada) {
+      wrapper.innerHTML = `
+        <div style="text-align:left;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+            <span style="font-size:11px;font-weight:800;color:#065f46;background:#d1fae5;padding:4px 10px;border-radius:999px;">
+              ENTREGA RÁPIDA EM BISSAU · ESCOLHA A FARMÁCIA
+            </span>
+            <span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;padding:3px 9px;border-radius:999px;">
+              Modo Demonstração
+            </span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr;gap:12px;max-height:66vh;overflow-y:auto;padding-right:2px;">
+            ${FARMACIAS_BISSAU.map(
+              (f) => `
+              <div style="border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#ffffff;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                <div style="position:relative;height:132px;background:#e2e8f0;">
+                  <img src="${f.imagem}" alt="${f.nome}" style="width:100%;height:100%;object-fit:cover;display:block;" />
+                  <span style="position:absolute;top:10px;left:10px;background:rgba(15,23,42,0.85);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;">
+                    ${f.horario}
+                  </span>
+                </div>
+                <div style="padding:12px;">
+                  <div style="font-size:16px;font-weight:800;color:#111827;">${f.nome}</div>
+                  <div style="font-size:12px;color:#4b5563;margin-top:2px;">📍 ${f.bairro}</div>
+                  <div style="font-size:12px;color:#0f766e;font-weight:600;margin-top:4px;">✓ ${f.destaque}</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;">
+                    <a href="tel:${f.telefone.replace(/\s+/g, "")}" style="font-size:12px;font-weight:700;color:#2563eb;text-decoration:none;">
+                      📞 ${f.telefone}
+                    </a>
+                    <button type="button" data-entrar-farmacia="${f.id}" style="padding:9px 14px;border:none;border-radius:10px;background:#16a34a;color:#fff;font-size:13px;font-weight:800;cursor:pointer;">
+                      Entrar na Farmácia →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `
+            ).join("")}
+          </div>
+        </div>
+      `;
+
+      wrapper.querySelectorAll("[data-entrar-farmacia]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-entrar-farmacia");
+          farmaciaSelecionada = FARMACIAS_BISSAU.find((f) => f.id === id) || FARMACIAS_BISSAU[0];
+          estadoPedidoFarmacia = "IDLE";
+          renderizarFarmaciaUI(wrapper);
+        });
+      });
+      return;
+    }
+
+    // TELA 2: DENTRO DA FARMÁCIA (MEDICAMENTOS + CARRINHO + PAGAMENTO)
+    const filtrados = MEDICAMENTOS_CATALOGO.filter(
+      (m) =>
+        m.nome.toLowerCase().includes(buscaMedicamento.toLowerCase()) ||
+        m.categoria.toLowerCase().includes(buscaMedicamento.toLowerCase())
+    );
+
+    wrapper.innerHTML = `
+      <div style="text-align:left;max-height:74vh;overflow-y:auto;padding-right:2px;">
+        <button type="button" id="btn-voltar-farmacias" style="margin-bottom:10px;padding:7px 12px;border:1px solid #d1d5db;border-radius:9px;background:#f9fafb;color:#111827;font-size:12px;font-weight:700;cursor:pointer;">
+          ← Voltar às Farmácias de Bissau
+        </button>
+
+        <div style="border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;margin-bottom:12px;background:#fff;">
+          <img src="${farmaciaSelecionada.imagem}" alt="${farmaciaSelecionada.nome}" style="width:100%;height:115px;object-fit:cover;display:block;" />
+          <div style="padding:10px 12px;">
+            <div style="font-size:16px;font-weight:800;color:#111827;">${farmaciaSelecionada.nome}</div>
+            <div style="font-size:12px;color:#4b5563;">📍 ${farmaciaSelecionada.bairro} · 📞 ${farmaciaSelecionada.telefone}</div>
+          </div>
+        </div>
+
+        <label style="display:block;font-size:12px;font-weight:800;color:#111827;margin-bottom:6px;">
+          1. Escolha os medicamentos ou produtos
+        </label>
+        <input
+          id="input-busca-med"
+          type="text"
+          value="${buscaMedicamento.replace(/"/g, "&quot;")}"
+          placeholder="Pesquisar medicamento (ex: Paracetamol, Paludismo, Soro...)"
+          style="width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;box-sizing:border-box;"
+        />
+
+        <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:12px;">
+          ${filtrados
+            .map((m) => {
+              const qtd = carrinhoFarmacia[m.id] || 0;
+              return `
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;border-radius:11px;border:1px solid ${
+                qtd > 0 ? "#16a34a" : "#e5e7eb"
+              };background:${qtd > 0 ? "#f0fdf4" : "#fff"};">
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:#111827;">${m.nome}</div>
+                  <div style="font-size:11px;color:#6b7280;">
+                    ${m.categoria} ${m.receita ? "· ⚠️ Pode exigir receita médica" : ""}
+                  </div>
+                  <div style="font-size:13px;font-weight:800;color:#15803d;margin-top:2px;">${m.precoXOF} XOF</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <button type="button" data-menos-med="${m.id}" style="width:30px;height:30px;border-radius:8px;border:1px solid #d1d5db;background:#fff;font-weight:800;cursor:pointer;">-</button>
+                  <span style="min-width:18px;text-align:center;font-size:13px;font-weight:800;">${qtd}</span>
+                  <button type="button" data-mais-med="${m.id}" style="width:30px;height:30px;border-radius:8px;border:none;background:#16a34a;color:#fff;font-weight:800;cursor:pointer;">+</button>
+                </div>
+              </div>
+            `;
+            })
+            .join("")}
+        </div>
+
+        <input
+          id="input-obs-farmacia"
+          type="text"
+          value="${observacaoFarmacia.replace(/"/g, "&quot;")}"
+          placeholder="Outro medicamento, receita ou ponto de entrega em Bissau..."
+          style="width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;"
+        />
+
+        <div style="padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#475569;">
+            <span>Medicamentos (${qtdTotal} itens):</span>
+            <span>${subtotal} XOF</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#475569;margin-top:4px;">
+            <span>Entrega Moto-Estafeta Bissau:</span>
+            <span>${taxaEntrega} XOF</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;color:#111827;margin-top:6px;padding-top:6px;border-top:1px solid #cbd5e1;">
+            <span>Total a Pagar:</span>
+            <span style="color:#15803d;">${total} XOF</span>
+          </div>
+        </div>
+
+        <label style="display:block;font-size:12px;font-weight:800;color:#111827;margin-bottom:6px;">
+          2. Método de Pagamento
+        </label>
+        <select id="select-pag-farmacia" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
+          <option value="Orange Money" ${metodoPagFarmacia === "Orange Money" ? "selected" : ""}>Orange Money</option>
+          <option value="Telecel" ${metodoPagFarmacia === "Telecel" ? "selected" : ""}>Telecel</option>
+          <option value="Cartão de Débito" ${metodoPagFarmacia === "Cartão de Débito" ? "selected" : ""}>Cartão de Débito / Crédito</option>
+        </select>
+
+        ${
+          metodoPagFarmacia === "Cartão de Débito"
+            ? `
+          <div style="padding:10px;border-radius:10px;background:#f8fafc;border:1px solid #cbd5e1;margin-bottom:10px;">
+            <input id="farm-cartao-num" type="text" inputmode="numeric" maxlength="19" placeholder="Número do Cartão (16 dígitos)" style="width:100%;padding:9px;border-radius:8px;border:1px solid #cbd5e1;font-size:13px;margin-bottom:8px;box-sizing:border-box;" />
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <input id="farm-cartao-val" type="text" inputmode="numeric" maxlength="5" placeholder="Validade (MM/AA)" style="padding:9px;border-radius:8px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;" />
+              <input id="farm-cartao-cvv" type="password" inputmode="numeric" maxlength="3" placeholder="CVV (3 dígitos)" style="padding:9px;border-radius:8px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;" />
+            </div>
+          </div>
+        `
+            : `
+          <input id="farm-tel-pag" type="tel" placeholder="Número ${metodoPagFarmacia} (+245...)" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;box-sizing:border-box;" />
+        `
+        }
+
+        <div id="aviso-erro-farmacia" style="font-size:12px;color:#dc2626;margin-bottom:8px;"></div>
+
+        <button type="button" id="btn-confirmar-farmacia" style="width:100%;padding:13px;border:none;border-radius:12px;background:#16a34a;color:#fff;font-size:15px;font-weight:800;cursor:pointer;">
+          Confirmar &amp; Pagar · ${total} XOF
+        </button>
+
+        ${
+          estadoPedidoFarmacia === "CONFIRMADO"
+            ? `
+          <div style="margin-top:12px;padding:12px;border-radius:12px;background:#ecfdf5;border:1.5px solid #10b981;color:#065f46;font-size:13px;">
+            <strong>✅ Pedido enviado para ${farmaciaSelecionada.nome}!</strong><br/>
+            Total: <strong>${total} XOF</strong> via <strong>${metodoPagFarmacia}</strong> (Modo Demonstração). Um estafeta em Bissau fará a recolha e entrega.
+          </div>
+        `
+            : ""
+        }
+      </div>
+    `;
+
+    const btnVoltar = wrapper.querySelector("#btn-voltar-farmacias");
+    if (btnVoltar) {
+      btnVoltar.addEventListener("click", () => {
+        farmaciaSelecionada = null;
+        renderizarFarmaciaUI(wrapper);
+      });
+    }
+
+    const inputBusca = wrapper.querySelector("#input-busca-med");
+    if (inputBusca) {
+      inputBusca.addEventListener("input", () => {
+        buscaMedicamento = inputBusca.value;
+        renderizarFarmaciaUI(wrapper);
+        const novoInput = wrapper.querySelector("#input-busca-med");
+        if (novoInput) {
+          novoInput.focus();
+          novoInput.setSelectionRange(novoInput.value.length, novoInput.value.length);
+        }
+      });
+    }
+
+    wrapper.querySelectorAll("[data-mais-med]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-mais-med");
+        carrinhoFarmacia[id] = (carrinhoFarmacia[id] || 0) + 1;
+        renderizarFarmaciaUI(wrapper);
+      });
+    });
+
+    wrapper.querySelectorAll("[data-menos-med]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-menos-med");
+        if ((carrinhoFarmacia[id] || 0) > 0) {
+          carrinhoFarmacia[id] -= 1;
+        }
+        renderizarFarmaciaUI(wrapper);
+      });
+    });
+
+    const inputObs = wrapper.querySelector("#input-obs-farmacia");
+    if (inputObs) {
+      inputObs.addEventListener("input", () => {
+        observacaoFarmacia = inputObs.value;
+      });
+    }
+
+    const selPag = wrapper.querySelector("#select-pag-farmacia");
+    if (selPag) {
+      selPag.addEventListener("change", () => {
+        metodoPagFarmacia = selPag.value;
+        renderizarFarmaciaUI(wrapper);
+      });
+    }
+
+    const cNum = wrapper.querySelector("#farm-cartao-num");
+    if (cNum) {
+      cNum.addEventListener("input", () => {
+        const d = cNum.value.replace(/\D/g, "").slice(0, 16);
+        cNum.value = d.replace(/(\d{4})(?=\d)/g, "$1 ");
+      });
+    }
+
+    const cVal = wrapper.querySelector("#farm-cartao-val");
+    if (cVal) {
+      cVal.addEventListener("input", () => {
+        const d = cVal.value.replace(/\D/g, "").slice(0, 4);
+        cVal.value = d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+      });
+    }
+
+    const cCvv = wrapper.querySelector("#farm-cartao-cvv");
+    if (cCvv) {
+      cCvv.addEventListener("input", () => {
+        cCvv.value = cCvv.value.replace(/\D/g, "").slice(0, 3);
+      });
+    }
+
+    const btnConfirmar = wrapper.querySelector("#btn-confirmar-farmacia");
+    if (btnConfirmar) {
+      btnConfirmar.addEventListener("click", () => {
+        const avisoErro = wrapper.querySelector("#aviso-erro-farmacia");
+        const { total: totalFinal, qtdTotal: qtd } = calcularTotalFarmacia();
+
+        if (qtd === 0 && !observacaoFarmacia.trim()) {
+          if (avisoErro) avisoErro.textContent = "Selecione pelo menos 1 medicamento ou escreva o pedido no campo acima.";
+          return;
+        }
+
+        let telRef = (wrapper.querySelector("#farm-tel-pag")?.value || "").trim();
+        if (metodoPagFarmacia === "Cartão de Débito") {
+          const n = (wrapper.querySelector("#farm-cartao-num")?.value || "").replace(/\D/g, "");
+          const cv = (wrapper.querySelector("#farm-cartao-cvv")?.value || "").replace(/\D/g, "");
+          if (n.length !== 16 || cv.length !== 3) {
+            if (avisoErro) avisoErro.textContent = "Preencha os 16 dígitos do cartão de débito e o CVV de 3 dígitos.";
+            return;
+          }
+          telRef = `Cartão **** ${n.slice(-4)}`;
+        }
+
+        const resumoItens = Object.keys(carrinhoFarmacia)
+          .filter((id) => carrinhoFarmacia[id] > 0)
+          .map((id) => {
+            const m = MEDICAMENTOS_CATALOGO.find((x) => x.id === id);
+            return `${carrinhoFarmacia[id]}x ${m ? m.nome : id}`;
+          })
+          .join(", ");
+
+        if (typeof window.iniciarPagamentoComComissao === "function") {
+          window.iniciarPagamentoComComissao({
+            categoria: "farmacia",
+            servico: farmaciaSelecionada.nome,
+            clienteNome: "Cliente Farmácia Bissau",
+            clienteEmail: "",
+            clienteTelefone: telRef || "+245000000000",
+            detalhes: `${resumoItens}${observacaoFarmacia ? " | Obs: " + observacaoFarmacia : ""}`,
+            valorBaseXOF: totalFinal || 1500,
+            metodoPagamento: `${metodoPagFarmacia} [DEMO]`
+          }).catch(() => {});
+        }
+
+        estadoPedidoFarmacia = "CONFIRMADO";
+        renderizarFarmaciaUI(wrapper);
+      });
+    }
+  }
+
+  function modernizarModalFarmacias() {
+    const titulos = Array.from(document.querySelectorAll("h1, h2, h3, h4, div, span"));
+    const tituloModal = titulos.find(
+      (el) => /farm[áa]cias\s+principais\s+em\s+bissau/i.test((el.textContent || "").trim()) && (el.textContent || "").trim().length < 45
+    );
+    if (!tituloModal) return;
+
+    let modalBox = tituloModal.parentElement;
+    for (let i = 0; i < 5 && modalBox && modalBox.parentElement; i++) {
+      if (modalBox.querySelector("select") || /confirmar\s*&\s*pagar/i.test(modalBox.textContent || "")) {
+        break;
+      }
+      modalBox = modalBox.parentElement;
+    }
+    if (!modalBox || modalBox.getAttribute("data-farmacia-modernizada") === "1") return;
+
+    modalBox.setAttribute("data-farmacia-modernizada", "1");
+
+    // Esconde os elementos antigos do carrossel dentro do modal (mantendo o cabeçalho e o botão X)
+    Array.from(modalBox.children).forEach((child) => {
+      if (child.contains(tituloModal)) return;
+      if (/^cancelar$/i.test((child.textContent || "").trim())) return;
+      child.style.display = "none";
+    });
+
+    const wrapper = document.createElement("div");
+    wrapper.id = "superapp-farmacia-moderna";
+    modalBox.insertBefore(wrapper, modalBox.children[1] || null);
+    renderizarFarmaciaUI(wrapper);
+  }
+
+  // =========================================================================
+  // 3. SISTEMA DE MOBILIDADE E PEDIDO DE VIAGEM (55 ROTAS DGVTT + SUPABASE)
   // =========================================================================
   const GRUPOS_ROTAS_DGVTT = [
     {
@@ -2465,7 +2860,7 @@ Total: ${valorFormatado}`
 
     timerCrono = setInterval(() => {
       segundos += 1;
-      const elCrono = container.querySelector("#cronometro-viagem-v10");
+      const elCrono = container.querySelector("#cronometro-viagem-v11");
       if (elCrono) elCrono.textContent = formatarTempo(segundos);
     }, 1000);
 
@@ -2521,22 +2916,22 @@ Total: ${valorFormatado}`
       return `
         <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
           <label style="display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;">Número do cartão (16 dígitos)</label>
-          <input id="input-cartao-numero-v10" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
+          <input id="input-cartao-numero-v11" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Validade (MM/AA)</label>
-              <input id="input-cartao-validade-v10" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-validade-v11" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Código secreto (3 dígitos)</label>
-              <input id="input-cartao-cvv-v10" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-cvv-v11" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
           </div>
-          <div id="aviso-cartao-v10" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
+          <div id="aviso-cartao-v11" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
         </div>
       `;
     }
-    return `<input id="input-tel-v10" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
+    return `<input id="input-tel-v11" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
   }
 
   function renderizarCartaoMotorista() {
@@ -2559,13 +2954,13 @@ Total: ${valorFormatado}`
 
         <div style="margin-top:10px;">
           <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">Mensagem caso o motorista atrase ou não encontre si:</label>
-          <input id="input-msg-motorista-v10" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
+          <input id="input-msg-motorista-v11" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
             <a href="${telLimpo ? `tel:${telLimpo}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;">📞 Ligar</a>
-            <a id="link-wa-v10" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
-            <a id="link-sms-v10" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
+            <a id="link-wa-v11" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
+            <a id="link-sms-v11" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
           </div>
-          <button type="button" id="btn-trocar-motorista-v10" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
+          <button type="button" id="btn-trocar-motorista-v11" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
           ${avisoTrocaMotorista ? `<div style="font-size:11px;color:#b45309;margin-top:6px;">${avisoTrocaMotorista}</div>` : ""}
         </div>
       </div>
@@ -2591,8 +2986,8 @@ Total: ${valorFormatado}`
             <span style="padding:4px 8px;border-radius:999px;background:${faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">3. Viagem em curso</span>
           </div>
           ${faseViagem !== "PROCURANDO" ? renderizarCartaoMotorista() : ""}
-          <div id="cronometro-viagem-v10" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
-          <button type="button" id="btn-cancelar-v10" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
+          <div id="cronometro-viagem-v11" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
+          <button type="button" id="btn-cancelar-v11" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
           <div style="font-size:11px;color:#6b7280;margin-top:8px;">Regra de reembolso: cancelamento antes da chegada ou sem motorista disponível devolve 100% do valor simulado sem taxa.</div>
         </div>
       `;
@@ -2617,8 +3012,8 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">1. Escolha para onde quer ir e o ponto de referência</label>
-        <select id="select-rota-v10" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
-        <input id="input-ref-v10" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
+        <select id="select-rota-v11" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
+        <input id="input-ref-v11" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">2. Escolha o veículo (preço final do veículo selecionado)</label>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
@@ -2626,7 +3021,7 @@ Total: ${valorFormatado}`
             const ativo = v.id === veiculoAtual.id;
             const p = Math.round(rotaAtual.baseXOF * v.mult);
             return `
-              <button type="button" data-veiculo-v10="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
+              <button type="button" data-veiculo-v11="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
                 <div style="font-size:18px;">${v.emoji}</div>
                 <div style="font-size:12px;font-weight:700;color:#111827;margin-top:2px;">${v.nome}</div>
                 <div style="font-size:15px;font-weight:800;color:#111827;margin-top:4px;">${p} XOF</div>
@@ -2644,19 +3039,19 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">3. Método e dados para confirmar o pedido</label>
-        <select id="select-metodo-v10" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
+        <select id="select-metodo-v11" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
           ${METODOS_PAGAMENTO.map((m) => `<option value="${m}" ${metodoAtual === m ? "selected" : ""}>${m}</option>`).join("")}
         </select>
 
         ${renderizarCamposPagamento()}
 
-        <button type="button" id="btn-pedir-v10" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
+        <button type="button" id="btn-pedir-v11" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
 
         ${renderizarBlocoEstado(preco)}
       </div>
     `;
 
-    const selRota = container.querySelector("#select-rota-v10");
+    const selRota = container.querySelector("#select-rota-v11");
     if (selRota) {
       selRota.addEventListener("change", () => {
         const opt = selRota.options[selRota.selectedIndex];
@@ -2665,14 +3060,14 @@ Total: ${valorFormatado}`
       });
     }
 
-    container.querySelectorAll("[data-veiculo-v10]").forEach((btn) => {
+    container.querySelectorAll("[data-veiculo-v11]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v10")) || VEICULOS[0];
+        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v11")) || VEICULOS[0];
         renderizarPainel(container);
       });
     });
 
-    const selMetodo = container.querySelector("#select-metodo-v10");
+    const selMetodo = container.querySelector("#select-metodo-v11");
     if (selMetodo) {
       selMetodo.addEventListener("change", () => {
         metodoAtual = selMetodo.value || "Orange Money";
@@ -2680,7 +3075,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputNumCartao = container.querySelector("#input-cartao-numero-v10");
+    const inputNumCartao = container.querySelector("#input-cartao-numero-v11");
     if (inputNumCartao) {
       inputNumCartao.addEventListener("input", () => {
         const digitos = inputNumCartao.value.replace(/\D/g, "").slice(0, 16);
@@ -2688,7 +3083,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputValidade = container.querySelector("#input-cartao-validade-v10");
+    const inputValidade = container.querySelector("#input-cartao-validade-v11");
     if (inputValidade) {
       inputValidade.addEventListener("input", () => {
         const digitos = inputValidade.value.replace(/\D/g, "").slice(0, 4);
@@ -2696,14 +3091,14 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputCvv = container.querySelector("#input-cartao-cvv-v10");
+    const inputCvv = container.querySelector("#input-cartao-cvv-v11");
     if (inputCvv) {
       inputCvv.addEventListener("input", () => {
         inputCvv.value = inputCvv.value.replace(/\D/g, "").slice(0, 3);
       });
     }
 
-    const inputMsg = container.querySelector("#input-msg-motorista-v10");
+    const inputMsg = container.querySelector("#input-msg-motorista-v11");
     if (inputMsg) {
       inputMsg.addEventListener("input", () => {
         mensagemRapida = inputMsg.value;
@@ -2712,14 +3107,14 @@ Total: ${valorFormatado}`
         const telDigitos = (mot.telefone || "").replace(/\D/g, "");
         const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
         const textoEncoded = encodeURIComponent(`Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`);
-        const wa = container.querySelector("#link-wa-v10");
-        const sms = container.querySelector("#link-sms-v10");
+        const wa = container.querySelector("#link-wa-v11");
+        const sms = container.querySelector("#link-sms-v11");
         if (wa) wa.href = telDigitos ? `https://wa.me/${telDigitos}?text=${textoEncoded}` : "https://wa.me/?text=" + textoEncoded;
         if (sms && telLimpo) sms.href = `sms:${telLimpo}?body=${textoEncoded}`;
       });
     }
 
-    const btnTrocar = container.querySelector("#btn-trocar-motorista-v10");
+    const btnTrocar = container.querySelector("#btn-trocar-motorista-v11");
     if (btnTrocar) {
       btnTrocar.addEventListener("click", () => {
         if (!listaMotoristasDisponiveis.length) return;
@@ -2735,17 +3130,17 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnPedir = container.querySelector("#btn-pedir-v10");
+    const btnPedir = container.querySelector("#btn-pedir-v11");
     if (btnPedir) {
       btnPedir.addEventListener("click", async () => {
-        let referenciaCliente = (container.querySelector("#input-tel-v10")?.value || "").trim();
+        let referenciaCliente = (container.querySelector("#input-tel-v11")?.value || "").trim();
 
         if (metodoAtual === "Dinheiro Vivo") {
           referenciaCliente = "Dinheiro Vivo ao condutor";
         } else if (metodoAtual === "Cartão") {
-          const numLimpo = (container.querySelector("#input-cartao-numero-v10")?.value || "").replace(/\D/g, "");
-          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v10")?.value || "").replace(/\D/g, "");
-          const aviso = container.querySelector("#aviso-cartao-v10");
+          const numLimpo = (container.querySelector("#input-cartao-numero-v11")?.value || "").replace(/\D/g, "");
+          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v11")?.value || "").replace(/\D/g, "");
+          const aviso = container.querySelector("#aviso-cartao-v11");
 
           if (numLimpo.length !== 16 || cvvLimpo.length !== 3) {
             if (aviso) {
@@ -2762,7 +3157,7 @@ Total: ${valorFormatado}`
         indiceMotoristaAtual = 0;
         motoristaAtribuido = listaMotoristasDisponiveis[0];
 
-        const ref = (container.querySelector("#input-ref-v10")?.value || "").trim();
+        const ref = (container.querySelector("#input-ref-v11")?.value || "").trim();
         const valor = calcularPrecoXOF();
 
         if (typeof window.iniciarPagamentoComComissao === "function") {
@@ -2782,7 +3177,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnCancelar = container.querySelector("#btn-cancelar-v10");
+    const btnCancelar = container.querySelector("#btn-cancelar-v11");
     if (btnCancelar) {
       btnCancelar.addEventListener("click", () => {
         limparTimers();
@@ -2821,9 +3216,13 @@ Total: ${valorFormatado}`
     renderizarPainel(painel);
   }
 
+  // =========================================================================
+  // 4. INICIALIZAÇÃO CONJUNTA (MOBILIDADE + CONDUTOR + FARMÁCIAS)
+  // =========================================================================
   function executarTudo() {
     atualizarPainelCondutor();
     montarPainel();
+    modernizarModalFarmacias();
   }
 
   window.addEventListener("load", () => {
