@@ -2027,8 +2027,8 @@ Total: ${valorFormatado}`
   setTimeout(montarPainel, 350);
 })();
 (function () {
-  if (window.__superAppCompletoV13) return;
-  window.__superAppCompletoV13 = true;
+  if (window.__superAppCompletoV16) return;
+  window.__superAppCompletoV16 = true;
 
   // =========================================================================
   // CONFIGURAÇÃO DA CONTA COMERCIANTE (ALTERE AQUI OS SEUS DADOS REAIS)
@@ -2073,9 +2073,8 @@ Total: ${valorFormatado}`
     const condutor = lerDadosCondutorNaTela();
     const numeroAtivo = operadoraRecarga === "Orange Money" ? MERCHANT_ORANGE : MERCHANT_TELECEL;
     const msgComprovativo = encodeURIComponent(
-      `Olá Suporte RotaGB! Fiz uma recarga de saldo de comissão (${valorRecargaEscolhido}) via ${operadoraRecarga}.\n` +
-        `Motorista: ${condutor.nome}\n` +
-        `Matrícula: ${condutor.placa}\n` +
+      `Olá Suporte RotaGB! Fiz uma recarga de saldo de comissão (${valorRecargaEscolhido}) via${operadoraRecarga}.\n` +
+        `Motorista: ${condutor.nome}\n` + `Matrícula: ${condutor.placa}\n` +
         `ID Transação / Ref: ${idTransacaoSms || "Em anexo"}`
     );
 
@@ -2159,9 +2158,8 @@ Total: ${valorFormatado}`
         idTransacaoSms = inputId.value;
         const condutor = lerDadosCondutorNaTela();
         const msg = encodeURIComponent(
-          `Olá Suporte RotaGB! Fiz uma recarga de saldo de comissão (${valorRecargaEscolhido}) via ${operadoraRecarga}.\n` +
-            `Motorista: ${condutor.nome}\n` +
-            `Matrícula: ${condutor.placa}\n` +
+          `Olá Suporte RotaGB! Fiz uma recarga de saldo de comissão (${valorRecargaEscolhido}) via${operadoraRecarga}.\n` +
+            `Motorista: ${condutor.nome}\n` + `Matrícula: ${condutor.placa}\n` +
             `ID Transação / Ref: ${idTransacaoSms || "Em anexo"}`
         );
         const link = wrapper.querySelector("#link-comprovativo-merchant");
@@ -2256,7 +2254,7 @@ Total: ${valorFormatado}`
   }
 
   // =========================================================================
-  // 2. SISTEMA DE FARMÁCIAS EM BISSAU (TODAS AS FARMÁCIAS + CATÁLOGO + PAGAMENTO)
+  // 2. SISTEMA DE FARMÁCIAS EM BISSAU (ISOLADO APENAS PARA O MODAL FARMÁCIAS)
   // =========================================================================
   const FARMACIAS_BISSAU = [
     {
@@ -2333,7 +2331,7 @@ Total: ${valorFormatado}`
     }
   ];
 
-  function obterFotosGuardadas() {
+  function obterFotosGuardadasLocalmente() {
     try {
       const raw = localStorage.getItem(STORAGE_FOTOS_FARMACIAS);
       return raw ? JSON.parse(raw) : {};
@@ -2342,17 +2340,9 @@ Total: ${valorFormatado}`
     }
   }
 
-  function guardarFotoFarmacia(farmId, dataUrl) {
-    try {
-      const mapa = obterFotosGuardadas();
-      mapa[farmId] = dataUrl;
-      localStorage.setItem(STORAGE_FOTOS_FARMACIAS, JSON.stringify(mapa));
-    } catch (_) {}
-  }
-
   function getImagemFarmacia(farm) {
-    const mapa = obterFotosGuardadas();
-    return mapa[farm.id] || farm.imagem;
+    const guardadas = obterFotosGuardadasLocalmente();
+    return guardadas[farm.id] || farm.imagem;
   }
 
   const MEDICAMENTOS_CATALOGO = [
@@ -2405,18 +2395,14 @@ Total: ${valorFormatado}`
 
           <div style="display:grid;grid-template-columns:1fr;gap:12px;max-height:66vh;overflow-y:auto;padding-right:2px;">
             ${FARMACIAS_BISSAU.map((f) => {
-              const imgSrc = getImagemFarmacia(f);
+              const imgUrl = getImagemFarmacia(f);
               return `
               <div style="border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#ffffff;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
                 <div style="position:relative;height:132px;background:#e2e8f0;">
-                  <img src="${imgSrc}" alt="${f.nome}" style="width:100%;height:100%;object-fit:cover;display:block;" />
+                  <img src="${imgUrl}" alt="${f.nome}" style="width:100%;height:100%;object-fit:cover;display:block;" />
                   <span style="position:absolute;top:10px;left:10px;background:rgba(15,23,42,0.85);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;">
                     ${f.horario}
                   </span>
-                  <label style="position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,0.92);color:#0f172a;font-size:10px;font-weight:700;padding:4px 8px;border-radius:7px;cursor:pointer;border:1px solid #cbd5e1;">
-                    📷 Foto Real
-                    <input type="file" accept="image/*" data-upload-farm="${f.id}" style="display:none;" />
-                  </label>
                 </div>
                 <div style="padding:12px;">
                   <div style="font-size:16px;font-weight:800;color:#111827;">${f.nome}</div>
@@ -2437,22 +2423,6 @@ Total: ${valorFormatado}`
           </div>
         </div>
       `;
-
-      wrapper.querySelectorAll("[data-upload-farm]").forEach((inp) => {
-        inp.addEventListener("change", (ev) => {
-          const file = ev.target.files && ev.target.files[0];
-          const farmId = inp.getAttribute("data-upload-farm");
-          if (!file || !farmId) return;
-          const reader = new FileReader();
-          reader.onload = () => {
-            if (typeof reader.result === "string") {
-              guardarFotoFarmacia(farmId, reader.result);
-              renderizarFarmaciaUI(wrapper);
-            }
-          };
-          reader.readAsDataURL(file);
-        });
-      });
 
       wrapper.querySelectorAll("[data-entrar-farmacia]").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -2685,27 +2655,7 @@ Total: ${valorFormatado}`
             if (avisoErro) avisoErro.textContent = "Preencha os 16 dígitos do cartão de débito e o CVV de 3 dígitos.";
             return;
           }
-          telRef = `Cartão **** ${n.slice(-4)}`;
-        }
-
-        const resumoItens = Object.keys(carrinhoFarmacia)
-          .filter((id) => carrinhoFarmacia[id] > 0)
-          .map((id) => {
-            const m = MEDICAMENTOS_CATALOGO.find((x) => x.id === id);
-            return `${carrinhoFarmacia[id]}x ${m ? m.nome : id}`;
-          })
-          .join(", ");
-
-        if (typeof window.iniciarPagamentoComComissao === "function") {
-          window.iniciarPagamentoComComissao({
-            categoria: "farmacia",
-            servico: farmaciaSelecionada.nome,
-            clienteNome: "Cliente Farmácia Bissau",
-            clienteEmail: "",
-            clienteTelefone: telRef || "+245000000000",
-            detalhes: `${resumoItens}${observacaoFarmacia ? " | Obs: " + observacaoFarmacia : ""}`,
-            valorBaseXOF: totalFinal || 1500,
-            metodoPagamento: `${metodoPagFarmacia} [DEMO]`
+          telRef = `Cartão **** ${n.slice(-4)}`; }  const resumoItens = Object.keys(carrinhoFarmacia) .filter((id) => carrinhoFarmacia[id] > 0) .map((id) => { const m = MEDICAMENTOS_CATALOGO.find((x) => x.id === id); return `${carrinhoFarmacia[id]}x ${m ? m.nome : id}`; }) .join(", ");  if (typeof window.iniciarPagamentoComComissao === "function") { window.iniciarPagamentoComComissao({ categoria: "farmacia", servico: farmaciaSelecionada.nome, clienteNome: "Cliente Farmácia Bissau", clienteEmail: "", clienteTelefone: telRef \vert{}\vert{} "+245000000000", detalhes: `${resumoItens}${observacaoFarmacia ? " \vert{} Obs: " + observacaoFarmacia : ""}`, valorBaseXOF: totalFinal \vert{}\vert{} 1500, metodoPagamento: `${metodoPagFarmacia} [DEMO]`
           }).catch(() => {});
         }
 
@@ -2715,39 +2665,50 @@ Total: ${valorFormatado}`
     }
   }
 
-  function modernizarModalFarmacias() {
+  function limparFarmaciaDeOutrosModais() {
     document.querySelectorAll("#superapp-farmacia-moderna").forEach((el) => {
-      const boxTxt = (el.parentElement?.textContent || "").toLowerCase();
-      if (/mercado|loja|restaurante|conveni[eê]ncia/.test(boxTxt) && !/farm[áa]cias\s+principais/i.test(boxTxt)) {
-        Array.from(el.parentElement.children).forEach((ch) => {
+      const box = el.parentElement;
+      if (!box) {
+        el.remove();
+        return;
+      }
+      const cabecalho = box.children[0] ? (box.children[0].textContent || "").trim() : "";
+      const ehModalFarmacia = /farm[áa]cias\s+principais\s+em\s+bissau/i.test(cabecalho);
+      if (!ehModalFarmacia) {
+        Array.from(box.children).forEach((ch) => {
           if (ch !== el) ch.style.display = "";
         });
+        box.removeAttribute("data-farmacia-modernizada");
         el.remove();
       }
     });
+  }
+
+  function modernizarModalFarmacias() {
+    limparFarmaciaDeOutrosModais();
 
     const elementos = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span, button"));
     const tituloModal = elementos.find((el) => {
       if (el.id === "superapp-farmacia-moderna" || el.closest("#superapp-farmacia-moderna")) return false;
       const t = (el.textContent || "").replace(/\s+/g, " ").trim();
       if (!t || t.length > 60) return false;
-      if (/mercado|loja|restaurante|conveni[eê]ncia/i.test(t)) return false;
+      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel/i.test(t)) return false;
       return /farm[áa]cias\s+principais\s+em\s+bissau/i.test(t);
     });
     if (!tituloModal) return;
 
     let modalBox = tituloModal.parentElement;
     for (let i = 0; i < 6 && modalBox && modalBox.parentElement; i++) {
-      const txt = modalBox.textContent || "";
-      if (/mercado|loja|restaurante|conveni[eê]ncia/i.test(txt) && !/farm[áa]cias\s+principais\s+em\s+bissau/i.test(txt)) {
+      const cabecalho = modalBox.children[0] ? (modalBox.children[0].textContent || "").trim() : "";
+      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel/i.test(cabecalho)) {
         return;
       }
-      if (modalBox.querySelector("select") || /confirmar\s*&\s*pagar|anterior|seguinte/i.test(txt)) {
+      if (modalBox.querySelector("select") || /confirmar\s*&\s*pagar|anterior|seguinte/i.test(modalBox.textContent || "")) {
         break;
       }
       modalBox = modalBox.parentElement;
     }
-    if (!modalBox || modalBox.getAttribute("data-farmacia-modernizada") === "1") return;
+    if (!modalBox || modalBox.querySelector("#superapp-farmacia-moderna")) return;
 
     modalBox.setAttribute("data-farmacia-modernizada", "1");
 
@@ -2937,7 +2898,7 @@ Total: ${valorFormatado}`
 
     timerCrono = setInterval(() => {
       segundos += 1;
-      const elCrono = container.querySelector("#cronometro-viagem-v13");
+      const elCrono = container.querySelector("#cronometro-viagem-v16");
       if (elCrono) elCrono.textContent = formatarTempo(segundos);
     }, 1000);
 
@@ -2993,22 +2954,22 @@ Total: ${valorFormatado}`
       return `
         <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
           <label style="display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;">Número do cartão (16 dígitos)</label>
-          <input id="input-cartao-numero-v13" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
+          <input id="input-cartao-numero-v16" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Validade (MM/AA)</label>
-              <input id="input-cartao-validade-v13" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-validade-v16" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Código secreto (3 dígitos)</label>
-              <input id="input-cartao-cvv-v13" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-cvv-v16" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
           </div>
-          <div id="aviso-cartao-v13" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
+          <div id="aviso-cartao-v16" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
         </div>
       `;
     }
-    return `<input id="input-tel-v13" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
+    return `<input id="input-tel-v16" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
   }
 
   function renderizarCartaoMotorista() {
@@ -3017,7 +2978,7 @@ Total: ${valorFormatado}`
     const totalDisponiveis = listaMotoristasDisponiveis.length || 1;
     const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
     const telDigitos = (mot.telefone || "").replace(/\D/g, "");
-    const textoMsg = encodeURIComponent(`Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`);
+    const textoMsg = encodeURIComponent(`Olá ${mot.nomeCompleto}, estou na rota${rotaAtual.nome} (${veiculoAtual.nome}).${mensagemRapida}`);
 
     return `
       <div style="margin-top:12px;margin-bottom:12px;padding:12px;border-radius:12px;background:#ffffff;border:1px solid #d1d5db;">
@@ -3031,13 +2992,13 @@ Total: ${valorFormatado}`
 
         <div style="margin-top:10px;">
           <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">Mensagem caso o motorista atrase ou não encontre si:</label>
-          <input id="input-msg-motorista-v13" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
+          <input id="input-msg-motorista-v16" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
             <a href="${telLimpo ? `tel:${telLimpo}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;">📞 Ligar</a>
-            <a id="link-wa-v13" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
-            <a id="link-sms-v13" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
+            <a id="link-wa-v16" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
+            <a id="link-sms-v16" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
           </div>
-          <button type="button" id="btn-trocar-motorista-v13" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
+          <button type="button" id="btn-trocar-motorista-v16" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
           ${avisoTrocaMotorista ? `<div style="font-size:11px;color:#b45309;margin-top:6px;">${avisoTrocaMotorista}</div>` : ""}
         </div>
       </div>
@@ -3053,18 +3014,18 @@ Total: ${valorFormatado}`
       const borda = faseViagem === "EM_CURSO" ? "#10b981" : "#f59e0b";
 
       return `
-        <div style="margin-top:16px;padding:16px;border-radius:12px;background:${fundo};border:1.5px solid ${borda};">
+        <div style="margin-top:16px;padding:16px;border-radius:12px;background:${fundo};border:1.5px solid${borda};">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#92400e;margin-bottom:6px;">Modo Demonstração / Parcerias em Ativação</div>
           <div style="font-size:16px;font-weight:800;color:#111827;margin-bottom:6px;">${titulo}</div>
-          <div style="font-size:13px;color:#374151;margin-bottom:8px;"><strong>Valor:</strong> ${preco} XOF (${veiculoAtual.rotulo} · ${metodoAtual}) · <strong>Rota:</strong> ${rotaAtual.nome}</div>
+          <div style="font-size:13px;color:#374151;margin-bottom:8px;"><strong>Valor:</strong> ${preco} XOF (${veiculoAtual.rotulo} · ${metodoAtual}) · <strong>Rota:</strong>${rotaAtual.nome}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;">
             <span style="padding:4px 8px;border-radius:999px;background:#fef3c7;font-weight:700;">1. A procurar motorista</span>
             <span style="padding:4px 8px;border-radius:999px;background:${faseViagem !== "PROCURANDO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">2. A caminho</span>
             <span style="padding:4px 8px;border-radius:999px;background:${faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">3. Viagem em curso</span>
           </div>
           ${faseViagem !== "PROCURANDO" ? renderizarCartaoMotorista() : ""}
-          <div id="cronometro-viagem-v13" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
-          <button type="button" id="btn-cancelar-v13" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
+          <div id="cronometro-viagem-v16" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
+          <button type="button" id="btn-cancelar-v16" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
           <div style="font-size:11px;color:#6b7280;margin-top:8px;">Regra de reembolso: cancelamento antes da chegada ou sem motorista disponível devolve 100% do valor simulado sem taxa.</div>
         </div>
       `;
@@ -3084,232 +3045,4 @@ Total: ${valorFormatado}`
     container.innerHTML = `
       <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-          <span style="font-size:12px;font-weight:700;color:#065f46;background:#d1fae5;padding:4px 10px;border-radius:999px;">3 PASSOS RÁPIDOS · ROTA OFICIAL DGVTT BISSAU</span>
-          <span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;padding:4px 10px;border-radius:999px;">Modo Demonstração / Parcerias em Ativação</span>
-        </div>
-
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">1. Escolha para onde quer ir e o ponto de referência</label>
-        <select id="select-rota-v13" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
-        <input id="input-ref-v13" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
-
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">2. Escolha o veículo (preço final do veículo selecionado)</label>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
-          ${VEICULOS.map((v) => {
-            const ativo = v.id === veiculoAtual.id;
-            const p = Math.round(rotaAtual.baseXOF * v.mult);
-            return `
-              <button type="button" data-veiculo-v13="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
-                <div style="font-size:18px;">${v.emoji}</div>
-                <div style="font-size:12px;font-weight:700;color:#111827;margin-top:2px;">${v.nome}</div>
-                <div style="font-size:15px;font-weight:800;color:#111827;margin-top:4px;">${p} XOF</div>
-              </button>
-            `;
-          }).join("")}
-        </div>
-
-        <div style="padding:12px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#111827;">
-            <span>Total (${veiculoAtual.nome}):</span>
-            <span style="color:#15803d;font-size:17px;">${preco} XOF</span>
-          </div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px;">Rota base: ${rotaAtual.nome} (${rotaAtual.baseXOF} XOF) · Comissão estimada da plataforma: ~${comissaoEstimada} XOF.</div>
-        </div>
-
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">3. Método e dados para confirmar o pedido</label>
-        <select id="select-metodo-v13" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
-          ${METODOS_PAGAMENTO.map((m) => `<option value="${m}" ${metodoAtual === m ? "selected" : ""}>${m}</option>`).join("")}
-        </select>
-
-        ${renderizarCamposPagamento()}
-
-        <button type="button" id="btn-pedir-v13" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
-
-        ${renderizarBlocoEstado(preco)}
-      </div>
-    `;
-
-    const selRota = container.querySelector("#select-rota-v13");
-    if (selRota) {
-      selRota.addEventListener("change", () => {
-        const opt = selRota.options[selRota.selectedIndex];
-        rotaAtual = TODAS_ROTAS.find((r) => r.nome === opt?.getAttribute("data-rota")) || TODAS_ROTAS[0];
-        renderizarPainel(container);
-      });
-    }
-
-    container.querySelectorAll("[data-veiculo-v13]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v13")) || VEICULOS[0];
-        renderizarPainel(container);
-      });
-    });
-
-    const selMetodo = container.querySelector("#select-metodo-v13");
-    if (selMetodo) {
-      selMetodo.addEventListener("change", () => {
-        metodoAtual = selMetodo.value || "Orange Money";
-        renderizarPainel(container);
-      });
-    }
-
-    const inputNumCartao = container.querySelector("#input-cartao-numero-v13");
-    if (inputNumCartao) {
-      inputNumCartao.addEventListener("input", () => {
-        const digitos = inputNumCartao.value.replace(/\D/g, "").slice(0, 16);
-        inputNumCartao.value = digitos.replace(/(\d{4})(?=\d)/g, "$1 ");
-      });
-    }
-
-    const inputValidade = container.querySelector("#input-cartao-validade-v13");
-    if (inputValidade) {
-      inputValidade.addEventListener("input", () => {
-        const digitos = inputValidade.value.replace(/\D/g, "").slice(0, 4);
-        inputValidade.value = digitos.length > 2 ? `${digitos.slice(0, 2)}/${digitos.slice(2)}` : digitos;
-      });
-    }
-
-    const inputCvv = container.querySelector("#input-cartao-cvv-v13");
-    if (inputCvv) {
-      inputCvv.addEventListener("input", () => {
-        inputCvv.value = inputCvv.value.replace(/\D/g, "").slice(0, 3);
-      });
-    }
-
-    const inputMsg = container.querySelector("#input-msg-motorista-v13");
-    if (inputMsg) {
-      inputMsg.addEventListener("input", () => {
-        mensagemRapida = inputMsg.value;
-        const fallback = (MOTORISTAS_DEMO_POR_TIPO[veiculoAtual.id] || MOTORISTAS_DEMO_POR_TIPO.TAXI)[0];
-        const mot = motoristaAtribuido || fallback;
-        const telDigitos = (mot.telefone || "").replace(/\D/g, "");
-        const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
-        const textoEncoded = encodeURIComponent(`Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`);
-        const wa = container.querySelector("#link-wa-v13");
-        const sms = container.querySelector("#link-sms-v13");
-        if (wa) wa.href = telDigitos ? `https://wa.me/${telDigitos}?text=${textoEncoded}` : "https://wa.me/?text=" + textoEncoded;
-        if (sms && telLimpo) sms.href = `sms:${telLimpo}?body=${textoEncoded}`;
-      });
-    }
-
-    const btnTrocar = container.querySelector("#btn-trocar-motorista-v13");
-    if (btnTrocar) {
-      btnTrocar.addEventListener("click", () => {
-        if (!listaMotoristasDisponiveis.length) return;
-        if (listaMotoristasDisponiveis.length === 1) {
-          avisoTrocaMotorista = "Só existe 1 motorista disponível nesta categoria neste momento.";
-          renderizarPainel(container);
-          return;
-        }
-        indiceMotoristaAtual = (indiceMotoristaAtual + 1) % listaMotoristasDisponiveis.length;
-        motoristaAtribuido = listaMotoristasDisponiveis[indiceMotoristaAtual];
-        avisoTrocaMotorista = `Novo motorista solicitado (${indiceMotoristaAtual + 1} de ${listaMotoristasDisponiveis.length}).`;
-        iniciarSequenciaEtapas(container);
-      });
-    }
-
-    const btnPedir = container.querySelector("#btn-pedir-v13");
-    if (btnPedir) {
-      btnPedir.addEventListener("click", async () => {
-        let referenciaCliente = (container.querySelector("#input-tel-v13")?.value || "").trim();
-
-        if (metodoAtual === "Dinheiro Vivo") {
-          referenciaCliente = "Dinheiro Vivo ao condutor";
-        } else if (metodoAtual === "Cartão") {
-          const numLimpo = (container.querySelector("#input-cartao-numero-v13")?.value || "").replace(/\D/g, "");
-          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v13")?.value || "").replace(/\D/g, "");
-          const aviso = container.querySelector("#aviso-cartao-v13");
-
-          if (numLimpo.length !== 16 || cvvLimpo.length !== 3) {
-            if (aviso) {
-              aviso.style.color = "#dc2626";
-              aviso.textContent = "Preencha os 16 dígitos do cartão e o código secreto de 3 dígitos (CVV).";
-            }
-            return;
-          }
-          referenciaCliente = `Cartão **** ${numLimpo.slice(-4)}`;
-        }
-
-        avisoTrocaMotorista = "";
-        listaMotoristasDisponiveis = await carregarListaMotoristas(veiculoAtual.id);
-        indiceMotoristaAtual = 0;
-        motoristaAtribuido = listaMotoristasDisponiveis[0];
-
-        const ref = (container.querySelector("#input-ref-v13")?.value || "").trim();
-        const valor = calcularPrecoXOF();
-
-        if (typeof window.iniciarPagamentoComComissao === "function") {
-          window.iniciarPagamentoComComissao({
-            categoria: "mobilidade",
-            servico: veiculoAtual.nome,
-            clienteNome: "Cliente App Bissau",
-            clienteEmail: "",
-            clienteTelefone: referenciaCliente || "+245000000000",
-            detalhes: `${rotaAtual.nome}${ref ? " (" + ref + ")" : ""}`,
-            valorBaseXOF: valor,
-            metodoPagamento: `${metodoAtual} [DEMO]`
-          }).catch(() => {});
-        }
-
-        iniciarSequenciaEtapas(container);
-      });
-    }
-
-    const btnCancelar = container.querySelector("#btn-cancelar-v13");
-    if (btnCancelar) {
-      btnCancelar.addEventListener("click", () => {
-        limparTimers();
-        faseViagem = "CANCELADA";
-        renderizarPainel(container);
-      });
-    }
-  }
-
-  function montarPainel() {
-    refrescarMapaBissau();
-    const existente = document.getElementById("superapp-painel-viagem");
-    if (existente) return;
-
-    const botaoAntigo = Array.from(document.querySelectorAll("button")).find((b) =>
-      /pagar\s*&\s*pedir\s*viagem|pedir\s*viagem/i.test(b.textContent || "")
-    );
-    if (!botaoAntigo) return;
-
-    let alvo = botaoAntigo.parentElement;
-    for (let i = 0; i < 6 && alvo && alvo.parentElement; i++) {
-      const txt = alvo.textContent || "";
-      if (/t[áa]xi\s*oficial/i.test(txt) && /moto-?t[áa]xi/i.test(txt) && /rota/i.test(txt)) {
-        break;
-      }
-      alvo = alvo.parentElement;
-    }
-
-    if (!alvo || !alvo.parentElement) return;
-
-    const painel = document.createElement("div");
-    painel.id = "superapp-painel-viagem";
-    alvo.parentElement.insertBefore(painel, alvo);
-    alvo.style.display = "none";
-
-    renderizarPainel(painel);
-  }
-
-  // =========================================================================
-  // 4. INICIALIZAÇÃO CONJUNTA (MOBILIDADE + CONDUTOR + FARMÁCIAS)
-  // =========================================================================
-  function executarTudo() {
-    atualizarPainelCondutor();
-    montarPainel();
-    modernizarModalFarmacias();
-  }
-
-  window.addEventListener("load", () => {
-    setTimeout(executarTudo, 300);
-    setTimeout(refrescarMapaBissau, 600);
-  });
-
-  document.addEventListener("click", () => {
-    setTimeout(executarTudo, 200);
-  });
-
-  setTimeout(executarTudo, 350);
-})();
+          <span style="font-size:12px;
