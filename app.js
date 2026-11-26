@@ -2027,11 +2027,11 @@ Total: ${valorFormatado}`
   setTimeout(montarPainel, 350);
 })();
 (function () {
-  if (window.__superAppCompletoV18) return;
-  window.__superAppCompletoV18 = true;
+  if (window.__superAppCompletoV19) return;
+  window.__superAppCompletoV19 = true;
 
   // =========================================================================
-  // CONFIGURAÇÃO DA CONTA COMERCIANTE (ALTERE AQUI OS SEUS DADOS REAIS)
+  // CONFIGURAÇÃO GERAL (ALTERE AQUI OS SEUS DADOS REAIS)
   // =========================================================================
   const MERCHANT_ORANGE = "955 00 00 00 (Código Merchant: 000000)";
   const MERCHANT_TELECEL = "966 00 00 00 (Conta Comerciante)";
@@ -2039,8 +2039,12 @@ Total: ${valorFormatado}`
   const PIN_CONDUTOR_PADRAO = "2450";
   const STORAGE_FOTOS_FARMACIAS = "rotagb_fotos_reais_farmacias_v1";
 
+  // Opcional: coloque aqui o URL do seu backend que consulta API real de voos
+  // Ex.: "/api/voos-bissau" (deve devolver { voos: [{ companhia, rota, preco, moeda, duracao, escalas }] })
+  const ENDPOINT_API_VOOS_REAIS = "";
+
   // =========================================================================
-  // 0. VISUAL MODERNO ESTILO UBER / BOOKING NOS BOTÕES DE SERVIÇO
+  // 0. VISUAL MODERNO NOS BOTÕES DE SERVIÇO
   // =========================================================================
   const AJUSTES_SERVICOS_UI = {
     "trip / táxi": {
@@ -2205,118 +2209,111 @@ Total: ${valorFormatado}`
   }
 
   // =========================================================================
-  // 0B. EXPERIÊNCIA MODERNA DE VOOS (ESTILO BOOKING / COMPANHIA AÉREA)
+  // 0B. PESQUISA DE VOOS PARA GUINÉ-BISSAU (PREÇOS DINÂMICOS VIA API)
   // =========================================================================
-  const VOOS_OFERTAS = [
-    {
-      id: "voo-lisboa",
-      companhia: "Atlantic Express",
-      codigo: "AX 412",
-      origem: "Bissau (OXB)",
-      destino: "Lisboa (LIS)",
-      duracao: "5h 15m",
-      escala: "1 escala · Sal / Cabo Verde",
-      precoIdaVoltaXOF: 320000,
-      guiche: "+245 955 700 800"
-    },
-    {
-      id: "voo-dakar",
-      companhia: "Senegal Air",
-      codigo: "HC 208",
-      origem: "Bissau (OXB)",
-      destino: "Dakar (DSS)",
-      duracao: "1h 10m",
-      escala: "Voo direto",
-      precoIdaVoltaXOF: 145000,
-      guiche: "+245 955 700 810"
-    },
-    {
-      id: "voo-casablanca",
-      companhia: "Royal Air Maroc",
-      codigo: "AT 564",
-      origem: "Bissau (OXB)",
-      destino: "Casablanca (CMN)",
-      duracao: "4h 30m",
-      escala: "Voo direto",
-      precoIdaVoltaXOF: 285000,
-      guiche: "+245 955 700 820"
-    }
+  const COMPANHIAS_GUINE_BISSAU = [
+    { codigo: "AT", companhia: "Royal Air Maroc", hub: "Casablanca (CMN)" },
+    { codigo: "TP", companhia: "TAP Air Portugal", hub: "Lisboa (LIS)" },
+    { codigo: "KP", companhia: "ASKY Airlines", hub: "Dakar / Lomé" },
+    { codigo: "HC", companhia: "Air Senegal", hub: "Dakar (DSS)" },
+    { codigo: "4O", companhia: "euroAtlantic airways", hub: "Lisboa (LIS)" }
   ];
 
-  const CLASSES_VOO = [
-    { id: "Económica", nome: "Económica", mult: 1.0 },
-    { id: "Executiva", nome: "Executiva", mult: 1.65 }
-  ];
-
-  let indiceVooAtual = 0;
   let tipoTrajetoVoo = "Ida e Volta";
-  let classeVoo = CLASSES_VOO[0];
   let passageirosVoo = 1;
-  let origemVoo = "Bissau (OXB)";
-  let destinoVoo = "Lisboa (LIS)";
+  let classeVoo = "Económica";
+  let origemVoo = "Lisboa (LIS)";
+  let destinoVoo = "Bissau (OXB)";
   let dataIdaVoo = "";
   let dataVoltaVoo = "";
   let detalhesPassageiroVoo = "";
   let metodoPagVoo = "Mobile Money (Orange / Telecel)";
   let contaPagVoo = "";
+  let resultadosPesquisaVoo = [];
+  let vooEscolhido = null;
+  let aPesquisarVoo = false;
+  let avisoPesquisaVoo = "";
   let estadoReservaVoo = "IDLE";
 
-  function calcularTotalVoo() {
-    const oferta = VOOS_OFERTAS[indiceVooAtual] || VOOS_OFERTAS[0];
-    const fatorTrajeto = tipoTrajetoVoo === "Só Ida" ? 0.62 : 1.0;
-    const unitario = Math.round(oferta.precoIdaVoltaXOF * fatorTrajeto * classeVoo.mult);
-    return { unitario, total: unitario * passageirosVoo, oferta };
+  async function consultarPrecosReaisVoos() {
+    aPesquisarVoo = true;
+    avisoPesquisaVoo = "";
+    estadoReservaVoo = "IDLE";
+
+    if (!ENDPOINT_API_VOOS_REAIS) {
+      resultadosPesquisaVoo = COMPANHIAS_GUINE_BISSAU.map((c) => ({
+        companhia: c.companhia,
+        codigo: c.codigo,
+        rota: `${origemVoo || c.hub} → ${destinoVoo || "Bissau (OXB)"}`,
+        precoTexto: "Preço dinâmico via API",
+        precoNumerico: null,
+        moeda: "",
+        detalhe: `Ligação habitual via ${c.hub} · Configure ENDPOINT_API_VOOS_REAIS para tarifa ao vivo`
+      }));
+      vooEscolhido = resultadosPesquisaVoo[0] || null;
+      avisoPesquisaVoo =
+        "Sem tarifa fixa ativa: ligue uma API de voos (ex.: SerpApi Google Flights / Duffel / GDS) no seu backend para obter preços reais automáticos por data.";
+      aPesquisarVoo = false;
+      return;
+    }
+
+    try {
+      const url = new URL(ENDPOINT_API_VOOS_REAIS, window.location.origin);
+      url.searchParams.set("origem", origemVoo);
+      url.searchParams.set("destino", destinoVoo);
+      url.searchParams.set("data_ida", dataIdaVoo);
+      if (tipoTrajetoVoo === "Ida e Volta" && dataVoltaVoo) {
+        url.searchParams.set("data_volta", dataVoltaVoo);
+      }
+      url.searchParams.set("trajeto", tipoTrajetoVoo);
+      url.searchParams.set("passageiros", String(passageirosVoo));
+      url.searchParams.set("classe", classeVoo);
+
+      const resp = await fetch(url.toString(), { method: "GET" });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const dados = await resp.json();
+      const lista = Array.isArray(dados.voos) ? dados.voos : Array.isArray(dados) ? dados : [];
+
+      resultadosPesquisaVoo = lista.map((item) => {
+        const valor = item.preco ?? item.price ?? null;
+        const moeda = item.moeda || item.currency || "";
+        return {
+          companhia: item.companhia || item.airline || "Companhia Aérea",
+          codigo: item.codigo || item.flight_number || "",
+          rota: item.rota || `${origemVoo} → ${destinoVoo}`,
+          precoTexto: valor !== null ? `${Number(valor).toLocaleString("pt-PT")} ${moeda}`.trim() : "Sob consulta",
+          precoNumerico: valor !== null ? Number(valor) : null,
+          moeda,
+          detalhe: item.detalhe || item.duracao || item.duration || "Tarifa retornada pela API"
+        };
+      });
+
+      vooEscolhido = resultadosPesquisaVoo[0] || null;
+      if (!resultadosPesquisaVoo.length) {
+        avisoPesquisaVoo = "Nenhuma oferta devolvida pela API para esta rota/data.";
+      }
+    } catch (err) {
+      resultadosPesquisaVoo = [];
+      vooEscolhido = null;
+      avisoPesquisaVoo = `Não foi possível obter preços automáticos agora (${err.message || "erro de rede"}).`;
+    } finally {
+      aPesquisarVoo = false;
+    }
   }
 
   function renderizarVoosUI(wrapper) {
-    const { unitario, total, oferta } = calcularTotalVoo();
-
     wrapper.innerHTML = `
       <div style="text-align:left;max-height:74vh;overflow-y:auto;padding-right:2px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-          <span style="font-size:11px;font-weight:800;color:#003580;background:#e7f0ff;padding:4px 10px;border-radius:999px;">
-            ✈️ RESERVA DE VOOS · ESTILO BOOKING
-          </span>
-          <span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;padding:3px 9px;border-radius:999px;">
-            Modo Demonstração
-          </span>
-        </div>
-
-        <div style="padding:14px;border-radius:14px;background:#f8fafc;border:1px solid #cbd5e1;margin-bottom:12px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
-            <span style="font-size:12px;font-weight:800;color:#003580;">${oferta.companhia} · ${oferta.codigo}</span>
-            <span style="font-size:11px;font-weight:700;color:#15803d;background:#dcfce7;padding:2px 8px;border-radius:999px;">${oferta.escala}</span>
-          </div>
-
-          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;">
-            <div style="font-size:16px;font-weight:800;color:#0f172a;">${origemVoo} → ${destinoVoo}</div>
-            <div style="font-size:16px;font-weight:800;color:#003580;">${unitario.toLocaleString("pt-PT")} XOF <span style="font-size:11px;font-weight:600;color:#64748b;">/ pass.</span></div>
-          </div>
-
-          <div style="font-size:12px;color:#475569;margin-top:4px;">
-            Duração aprox.: <strong>${oferta.duracao}</strong> · Guichê: <a href="tel:${oferta.guiche.replace(/\s+/g, "")}" style="color:#006ce4;font-weight:700;text-decoration:none;">${oferta.guiche}</a>
-          </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
-            <button type="button" id="btn-voo-anterior" style="padding:8px 10px;border-radius:9px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer;">
-              ◀ Rota Anterior
-            </button>
-            <button type="button" id="btn-voo-seguinte" style="padding:8px 10px;border-radius:9px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer;">
-              Próxima Rota ▶
-            </button>
-          </div>
-        </div>
-
-        <div style="padding:14px;border-radius:14px;background:#ffffff;border:1.5px solid #febb02;margin-bottom:12px;">
+        <div style="padding:14px;border-radius:14px;background:#ffffff;border:1px solid #cbd5e1;margin-bottom:12px;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
             <button type="button" data-trajeto-voo="Ida e Volta" style="padding:9px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;border:${
-              tipoTrajetoVoo === "Ida e Volta" ? "2px solid #003580" : "1px solid #d1d5db"
-            };background:${tipoTrajetoVoo === "Ida e Volta" ? "#eff6ff" : "#fff"};color:#0f172a;">
+              tipoTrajetoVoo === "Ida e Volta" ? "2px solid #0f172a" : "1px solid #d1d5db"
+            };background:${tipoTrajetoVoo === "Ida e Volta" ? "#f1f5f9" : "#fff"};color:#0f172a;">
               Ida e Volta
             </button>
             <button type="button" data-trajeto-voo="Só Ida" style="padding:9px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;border:${
-              tipoTrajetoVoo === "Só Ida" ? "2px solid #003580" : "1px solid #d1d5db"
-            };background:${tipoTrajetoVoo === "Só Ida" ? "#eff6ff" : "#fff"};color:#0f172a;">
+              tipoTrajetoVoo === "Só Ida" ? "2px solid #0f172a" : "1px solid #d1d5db"
+            };background:${tipoTrajetoVoo === "Só Ida" ? "#f1f5f9" : "#fff"};color:#0f172a;">
               Só Ida
             </button>
           </div>
@@ -2338,9 +2335,8 @@ Total: ${valorFormatado}`
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Classe</label>
               <select id="select-voo-classe" style="width:100%;padding:9px;border-radius:9px;border:1px solid #cbd5e1;font-size:13px;background:#fff;">
-                ${CLASSES_VOO.map(
-                  (c) => `<option value="${c.id}" ${classeVoo.id === c.id ? "selected" : ""}>${c.nome}</option>`
-                ).join("")}
+                <option value="Económica" ${classeVoo === "Económica" ? "selected" : ""}>Económica</option>
+                <option value="Executiva" ${classeVoo === "Executiva" ? "selected" : ""}>Executiva</option>
               </select>
             </div>
           </div>
@@ -2364,9 +2360,9 @@ Total: ${valorFormatado}`
           <input id="input-voo-origem" type="text" value="${origemVoo.replace(
             /"/g,
             "&quot;"
-          )}" style="width:100%;padding:10px;border-radius:9px;border:1px solid #cbd5e1;font-size:13px;margin-bottom:8px;box-sizing:border-box;" />
+          )}" placeholder="Ex: Lisboa (LIS), Dakar (DSS)..." style="width:100%;padding:10px;border-radius:9px;border:1px solid #cbd5e1;font-size:13px;margin-bottom:8px;box-sizing:border-box;" />
 
-          <button type="button" id="btn-voo-inverter" style="width:100%;padding:9px;border-radius:9px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">
+          <button type="button" id="btn-voo-inverter" style="width:100%;padding:9px;border-radius:9px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">
             ⇄ Inverter Origem e Destino
           </button>
 
@@ -2374,12 +2370,51 @@ Total: ${valorFormatado}`
           <input id="input-voo-destino" type="text" value="${destinoVoo.replace(
             /"/g,
             "&quot;"
-          )}" placeholder="Ex: Lisboa, Dakar, Casablanca..." style="width:100%;padding:10px;border-radius:9px;border:1px solid #cbd5e1;font-size:13px;margin-bottom:10px;box-sizing:border-box;" />
+          )}" placeholder="Bissau (OXB)" style="width:100%;padding:10px;border-radius:9px;border:1px solid #cbd5e1;font-size:13px;margin-bottom:10px;box-sizing:border-box;" />
 
-          <button type="button" id="btn-voo-pesquisar" style="width:100%;padding:11px;border:none;border-radius:10px;background:#006ce4;color:#ffffff;font-size:13px;font-weight:800;cursor:pointer;">
-            🔍 Pesquisar Voos &amp; Datas
+          <button type="button" id="btn-voo-pesquisar" style="width:100%;padding:11px;border:none;border-radius:10px;background:#0f172a;color:#ffffff;font-size:13px;font-weight:800;cursor:pointer;">
+            ${aPesquisarVoo ? "A consultar companhias aéreas..." : "🔍 Pesquisar Preços das Companhias"}
           </button>
         </div>
+
+        ${
+          avisoPesquisaVoo
+            ? `<div style="padding:10px 12px;border-radius:10px;background:#fffbeb;border:1px solid #fcd34d;color:#92400e;font-size:12px;margin-bottom:12px;">${avisoPesquisaVoo}</div>`
+            : ""
+        }
+
+        ${
+          resultadosPesquisaVoo.length > 0
+            ? `
+          <div style="margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:6px;">Companhias para a rota pesquisada</div>
+            <div style="display:grid;grid-template-columns:1fr;gap:8px;">
+              ${resultadosPesquisaVoo
+                .map((r, idx) => {
+                  const selecionado = vooEscolhido && vooEscolhido.companhia === r.companhia && vooEscolhido.rota === r.rota;
+                  return `
+                  <button type="button" data-escolher-voo="${idx}" style="text-align:left;padding:11px 12px;border-radius:11px;cursor:pointer;border:${
+                    selecionado ? "2px solid #16a34a" : "1px solid #e5e7eb"
+                  };background:${selecionado ? "#f0fdf4" : "#ffffff"};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                      <span style="font-size:13px;font-weight:800;color:#111827;">${r.companhia} ${
+                        r.codigo ? `(${r.codigo})` : ""
+                      }</span>
+                      <span style="font-size:12px;font-weight:800;color:${
+                        r.precoNumerico !== null ? "#15803d" : "#475569"
+                      };">${r.precoTexto}</span>
+                    </div>
+                    <div style="font-size:12px;color:#374151;margin-top:2px;">${r.rota}</div>
+                    <div style="font-size:11px;color:#6b7280;margin-top:2px;">${r.detalhe}</div>
+                  </button>
+                `;
+                })
+                .join("")}
+            </div>
+          </div>
+        `
+            : ""
+        }
 
         <input id="input-voo-detalhes" type="text" value="${detalhesPassageiroVoo.replace(
           /"/g,
@@ -2403,56 +2438,24 @@ Total: ${valorFormatado}`
           "&quot;"
         )}" placeholder="Número da Conta Orange / Telecel (+245...)" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />
 
-        <div style="padding:12px;border-radius:12px;background:#f0f9ff;border:1px solid #bae6fd;margin-bottom:12px;">
-          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#0f172a;">
-            <span>Total (${tipoTrajetoVoo} · ${passageirosVoo}x · ${classeVoo.nome}):</span>
-            <span style="color:#003580;font-size:16px;">${total.toLocaleString("pt-PT")} XOF</span>
-          </div>
-          <div style="font-size:11px;color:#475569;margin-top:4px;">
-            ${
-              estadoReservaVoo === "PESQUISADO"
-                ? `Disponibilidade verificada para ${origemVoo} → ${destinoVoo} (${oferta.companhia}).`
-                : "Tarifa estimada em XOF antes da emissão do bilhete."
-            }
-          </div>
-        </div>
-
-        <button type="button" id="btn-voo-confirmar" style="width:100%;padding:13px;border:none;border-radius:12px;background:#0f172a;color:#4ade80;font-size:15px;font-weight:800;cursor:pointer;">
-          Confirmar &amp; Pagar Bilhete · ${total.toLocaleString("pt-PT")} XOF
+        <button type="button" id="btn-voo-confirmar" style="width:100%;padding:13px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-size:15px;font-weight:800;cursor:pointer;">
+          Confirmar Pedido de Voo${vooEscolhido && vooEscolhido.precoNumerico !== null ? ` · ${vooEscolhido.precoTexto}` : ""}
         </button>
 
         ${
           estadoReservaVoo === "CONFIRMADO"
             ? `
           <div style="margin-top:12px;padding:12px;border-radius:12px;background:#ecfdf5;border:1.5px solid #10b981;color:#065f46;font-size:13px;">
-            <strong>✅ Pedido de voo registado (${oferta.companhia})!</strong><br/>
-            Rota: <strong>${origemVoo} → ${destinoVoo}</strong> (${tipoTrajetoVoo}, ${passageirosVoo} pass.) · Total: <strong>${total.toLocaleString(
-                "pt-PT"
-              )} XOF</strong> (Modo Demonstração).
+            <strong>✅ Pedido registado!</strong><br/>
+            Rota: <strong>${origemVoo} → ${destinoVoo}</strong> (${tipoTrajetoVoo}, ${passageirosVoo} pass., ${classeVoo})${
+              vooEscolhido ? ` · Companhia: <strong>${vooEscolhido.companhia}</strong>` : ""
+            }.
           </div>
         `
             : ""
         }
       </div>
     `;
-
-    wrapper.querySelector("#btn-voo-anterior")?.addEventListener("click", () => {
-      indiceVooAtual = (indiceVooAtual - 1 + VOOS_OFERTAS.length) % VOOS_OFERTAS.length;
-      const nova = VOOS_OFERTAS[indiceVooAtual];
-      origemVoo = nova.origem;
-      destinoVoo = nova.destino;
-      estadoReservaVoo = "IDLE";
-      renderizarVoosUI(wrapper);
-    });
-
-    wrapper.querySelector("#btn-voo-seguinte")?.addEventListener("click", () => {
-      indiceVooAtual = (indiceVooAtual + 1) % VOOS_OFERTAS.length;
-      const nova = VOOS_OFERTAS[indiceVooAtual];
-      origemVoo = nova.origem;
-      destinoVoo = nova.destino;
-      estadoReservaVoo = "IDLE";
-      renderizarVoosUI(wrapper);
-    });
 
     wrapper.querySelectorAll("[data-trajeto-voo]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -2463,12 +2466,10 @@ Total: ${valorFormatado}`
 
     wrapper.querySelector("#select-voo-passageiros")?.addEventListener("change", (e) => {
       passageirosVoo = parseInt(e.target.value, 10) || 1;
-      renderizarVoosUI(wrapper);
     });
 
     wrapper.querySelector("#select-voo-classe")?.addEventListener("change", (e) => {
-      classeVoo = CLASSES_VOO.find((c) => c.id === e.target.value) || CLASSES_VOO[0];
-      renderizarVoosUI(wrapper);
+      classeVoo = e.target.value;
     });
 
     wrapper.querySelector("#input-voo-ida")?.addEventListener("change", (e) => {
@@ -2494,9 +2495,17 @@ Total: ${valorFormatado}`
       renderizarVoosUI(wrapper);
     });
 
-    wrapper.querySelector("#btn-voo-pesquisar")?.addEventListener("click", () => {
-      estadoReservaVoo = "PESQUISADO";
+    wrapper.querySelector("#btn-voo-pesquisar")?.addEventListener("click", async () => {
+      await consultarPrecosReaisVoos();
       renderizarVoosUI(wrapper);
+    });
+
+    wrapper.querySelectorAll("[data-escolher-voo]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idx = parseInt(btn.getAttribute("data-escolher-voo"), 10);
+        vooEscolhido = resultadosPesquisaVoo[idx] || null;
+        renderizarVoosUI(wrapper);
+      });
     });
 
     wrapper.querySelector("#input-voo-detalhes")?.addEventListener("input", (e) => {
@@ -2512,19 +2521,19 @@ Total: ${valorFormatado}`
     });
 
     wrapper.querySelector("#btn-voo-confirmar")?.addEventListener("click", () => {
-      const { total: totalFinal, oferta: ofertaAtual } = calcularTotalVoo();
-      if (typeof window.iniciarPagamentoComComissao === "function") {
+      const valorBase = vooEscolhido && vooEscolhido.precoNumerico !== null ? vooEscolhido.precoNumerico : 0;
+      if (typeof window.iniciarPagamentoComComissao === "function" && valorBase > 0) {
         window.iniciarPagamentoComComissao({
           categoria: "voos",
-          servico: `${ofertaAtual.companhia} (${origemVoo} → ${destinoVoo})`,
+          servico: vooEscolhido ? `${vooEscolhido.companhia} (${origemVoo} → ${destinoVoo})` : `${origemVoo} → ${destinoVoo}`,
           clienteNome: detalhesPassageiroVoo || "Passageiro ROTA GB",
           clienteEmail: "",
           clienteTelefone: contaPagVoo || "+245000000000",
-          detalhes: `${tipoTrajetoVoo} · ${passageirosVoo} pass. · ${classeVoo.nome}${
+          detalhes: `${tipoTrajetoVoo} · ${passageirosVoo} pass. · ${classeVoo}${
             dataIdaVoo ? " · Ida: " + dataIdaVoo : ""
           }`,
-          valorBaseXOF: totalFinal,
-          metodoPagamento: `${metodoPagVoo} [DEMO]`
+          valorBaseXOF: valorBase,
+          metodoPagamento: metodoPagVoo
         }).catch(() => {});
       }
       estadoReservaVoo = "CONFIRMADO";
@@ -2940,9 +2949,6 @@ Total: ${valorFormatado}`
             <span style="font-size:11px;font-weight:800;color:#065f46;background:#d1fae5;padding:4px 10px;border-radius:999px;">
               FARMÁCIAS EM BISSAU (${FARMACIAS_BISSAU.length}) · ESCOLHA PARA ENTRAR
             </span>
-            <span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;padding:3px 9px;border-radius:999px;">
-              Modo Demonstração
-            </span>
           </div>
 
           <div style="display:grid;grid-template-columns:1fr;gap:12px;max-height:66vh;overflow-y:auto;padding-right:2px;">
@@ -3103,7 +3109,7 @@ Total: ${valorFormatado}`
             ? `
           <div style="margin-top:12px;padding:12px;border-radius:12px;background:#ecfdf5;border:1.5px solid #10b981;color:#065f46;font-size:13px;">
             <strong>✅ Pedido enviado para ${farmaciaSelecionada.nome}!</strong><br/>
-            Total: <strong>${total} XOF</strong> via <strong>${metodoPagFarmacia}</strong> (Modo Demonstração). Um estafeta em Bissau fará a recolha e entrega.
+            Total: <strong>${total} XOF</strong> via <strong>${metodoPagFarmacia}</strong>. Um estafeta em Bissau fará a recolha e entrega.
           </div>
         `
             : ""
@@ -3227,7 +3233,7 @@ Total: ${valorFormatado}`
             clienteTelefone: telRef || "+245000000000",
             detalhes: `${resumoItens}${observacaoFarmacia ? " | Obs: " + observacaoFarmacia : ""}`,
             valorBaseXOF: totalFinal || 1500,
-            metodoPagamento: `${metodoPagFarmacia} [DEMO]`
+            metodoPagamento: metodoPagFarmacia
           }).catch(() => {});
         }
 
@@ -3270,581 +3276,4 @@ Total: ${valorFormatado}`
     if (!tituloModal) return;
 
     let modalBox = tituloModal.parentElement;
-    for (let i = 0; i < 6 && modalBox && modalBox.parentElement; i++) {
-      const cabecalho = modalBox.children[0] ? (modalBox.children[0].textContent || "").trim() : "";
-      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel|voos/i.test(cabecalho)) {
-        return;
-      }
-      if (modalBox.querySelector("select") || /confirmar\s*&\s*pagar|anterior|seguinte/i.test(modalBox.textContent || "")) {
-        break;
-      }
-      modalBox = modalBox.parentElement;
-    }
-    if (!modalBox || modalBox.querySelector("#superapp-farmacia-moderna")) return;
-
-    modalBox.setAttribute("data-farmacia-modernizada", "1");
-
-    Array.from(modalBox.children).forEach((child) => {
-      if (child.contains(tituloModal)) return;
-      if (/^cancelar$/i.test((child.textContent || "").trim())) return;
-      child.style.display = "none";
-    });
-
-    const wrapper = document.createElement("div");
-    wrapper.id = "superapp-farmacia-moderna";
-    modalBox.insertBefore(wrapper, modalBox.children[1] || null);
-    renderizarFarmaciaUI(wrapper);
-  }
-
-  // =========================================================================
-  // 3. SISTEMA DE MOBILIDADE E PEDIDO DE VIAGEM (55 ROTAS DGVTT + SUPABASE)
-  // =========================================================================
-  const GRUPOS_ROTAS_DGVTT = [
-    {
-      grupo: "📍 Partidas: Centro da Cidade (Praça / Centro)",
-      rotas: [
-        { nome: "Cidade → Mercado de Bandim", baseXOF: 225 },
-        { nome: "Cidade → Cristo Redentor", baseXOF: 250 },
-        { nome: "Cidade → Belém / Missira", baseXOF: 325 },
-        { nome: "Cidade → Bairro d'Ajuda 1º e 2º fase", baseXOF: 350 },
-        { nome: "Cidade → Hospital 3 de Agosto", baseXOF: 375 },
-        { nome: "Cidade → Bairro Internacional", baseXOF: 425 },
-        { nome: "Cidade → Hotel Emb. América", baseXOF: 200 },
-        { nome: "Cidade → Bairro Militar / Prédio Nino", baseXOF: 450 },
-        { nome: "Cidade → Bairro Militar Somec", baseXOF: 475 },
-        { nome: "Cidade → B. Militar / Terminal TUB", baseXOF: 525 },
-        { nome: "Cidade → Brá / Seminário", baseXOF: 550 },
-        { nome: "Cidade → Paragem Central", baseXOF: 475 },
-        { nome: "Cidade → Guimetal", baseXOF: 525 },
-        { nome: "Cidade → São Paulo", baseXOF: 550 },
-        { nome: "Cidade → Háfia / Cruzamento", baseXOF: 575 },
-        { nome: "Cidade → Paragem Manjaco", baseXOF: 650 },
-        { nome: "Cidade → Rotunda do Aeroporto", baseXOF: 675 },
-        { nome: "Cidade → Aeroporto", baseXOF: 700 },
-        { nome: "Cidade → Base Aérea / PRAKLAS", baseXOF: 750 },
-        { nome: "Cidade → Bissalanca Poilão", baseXOF: 800 },
-        { nome: "Cidade → Enterramento", baseXOF: 200 },
-        { nome: "Cidade → STENACKS / Safim", baseXOF: 950 },
-        { nome: "Cidade → ENA (CENFA)", baseXOF: 650 },
-        { nome: "Cidade → Av. Brasil", baseXOF: 700 },
-        { nome: "Cidade → Paulo Barros", baseXOF: 775 },
-        { nome: "Cidade → Caracol", baseXOF: 175 },
-        { nome: "Cidade → Padaria Nhonho", baseXOF: 250 },
-        { nome: "Cidade → Zona 7", baseXOF: 275 },
-        { nome: "Cidade → Bairro Plano", baseXOF: 325 },
-        { nome: "Cidade → Bairro Ministro", baseXOF: 375 },
-        { nome: "Cidade → SHEL Quelelê", baseXOF: 425 },
-        { nome: "Cidade → Sobrade", baseXOF: 475 },
-        { nome: "Cidade → Ponta Neto", baseXOF: 525 },
-        { nome: "Cidade → Bôr / Terminal TUB", baseXOF: 550 },
-        { nome: "Cidade → Aldeia SOS", baseXOF: 575 },
-        { nome: "Cidade → Cemitério de N'hala", baseXOF: 600 },
-        { nome: "Cidade → Bairro Bissack (Ponte Cibe)", baseXOF: 275 },
-        { nome: "Cidade → Bissack / Terminal TUB", baseXOF: 325 },
-        { nome: "Cidade → Estado Major / QG", baseXOF: 275 },
-        { nome: "Cidade → Igreja Católica de Antula", baseXOF: 450 },
-        { nome: "Cidade → Pluba / Abílio Santos", baseXOF: 475 },
-        { nome: "Cidade → Pefine", baseXOF: 650 },
-        { nome: "Cidade → Estádio 24 de Setembro", baseXOF: 800 }
-      ]
-    },
-    {
-      grupo: "📍 Partidas: Mercado de Bandim",
-      rotas: [
-        { nome: "Mercado Bandim → SHEL / Palmeiras", baseXOF: 225 },
-        { nome: "Mercado Bandim → Chapa de Bissau", baseXOF: 275 },
-        { nome: "Mercado Bandim → Bairro d'Ajuda", baseXOF: 325 },
-        { nome: "Mercado Bandim → Hospital 3 de Agosto", baseXOF: 350 },
-        { nome: "Mercado Bandim → Bairro Internacional", baseXOF: 375 },
-        { nome: "Mercado Bandim → Bairro Militar Prédio Nino", baseXOF: 450 },
-        { nome: "Mercado Bandim → Bº Militar / Terminal TUB", baseXOF: 525 },
-        { nome: "Mercado Bandim → Paragem Central", baseXOF: 550 },
-        { nome: "Mercado Bandim → Enterramento", baseXOF: 575 },
-        { nome: "Mercado Bandim → Seminário Brá", baseXOF: 650 },
-        { nome: "Mercado Bandim → Aeroporto", baseXOF: 325 },
-        { nome: "Mercado Bandim → Safim", baseXOF: 550 }
-      ]
-    }
-  ];
-
-  const TODAS_ROTAS = GRUPOS_ROTAS_DGVTT.flatMap((g) => g.rotas);
-
-  const VEICULOS = [
-    { id: "TAXI", rotulo: "TAXI", nome: "Táxi Oficial", emoji: "🚕", mult: 2.0 },
-    { id: "PRIVADO", rotulo: "CARRO PRIVADO", nome: "Carro Privado", emoji: "🚗", mult: 2.6 },
-    { id: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", emoji: "🏍️", mult: 1.4 }
-  ];
-
-  const METODOS_PAGAMENTO = ["Orange Money", "Telecel", "Cartão", "Dinheiro Vivo"];
-
-  const MOTORISTAS_DEMO_POR_TIPO = {
-    TAXI: [
-      { nomeCompleto: "Amadu Baldé (Demo)", modeloVeiculo: "Toyota Corolla Azul/Branco", placaVeiculo: "GB-204-TX", telefone: "+245955000101", origem: "Demo" },
-      { nomeCompleto: "Mamadú Djaló (Demo)", modeloVeiculo: "Mercedes 190 Azul/Branco", placaVeiculo: "GB-512-TX", telefone: "+245955000102", origem: "Demo" }
-    ],
-    PRIVADO: [
-      { nomeCompleto: "Fátima Djassi (Demo)", modeloVeiculo: "Hyundai i10 Cinza", placaVeiculo: "GB-819-PR", telefone: "+245955000202", origem: "Demo" },
-      { nomeCompleto: "Carlos Mendes (Demo)", modeloVeiculo: "Toyota Yaris Branco", placaVeiculo: "GB-630-PR", telefone: "+245955000203", origem: "Demo" }
-    ],
-    MOTO: [
-      { nomeCompleto: "Braima Camará (Demo)", modeloVeiculo: "Haojue 125cc Vermelha", placaVeiculo: "GB-441-MT", telefone: "+245955000303", origem: "Demo" },
-      { nomeCompleto: "Suleimane Embaló (Demo)", modeloVeiculo: "Sanlg 125cc Preta", placaVeiculo: "GB-778-MT", telefone: "+245955000304", origem: "Demo" }
-    ]
-  };
-
-  let rotaAtual = TODAS_ROTAS[0];
-  let veiculoAtual = VEICULOS[0];
-  let metodoAtual = "Orange Money";
-  let listaMotoristasDisponiveis = [];
-  let indiceMotoristaAtual = 0;
-  let motoristaAtribuido = null;
-  let avisoTrocaMotorista = "";
-  let mensagemRapida = "Olá! Estou no ponto de referência em Bissau.";
-  let faseViagem = "IDLE";
-  let timerCrono = null;
-  let timerEtapa1 = null;
-  let timerEtapa2 = null;
-  let segundos = 0;
-
-  function calcularPrecoXOF() {
-    return Math.round(rotaAtual.baseXOF * veiculoAtual.mult);
-  }
-
-  function limparTimers() {
-    if (timerCrono) clearInterval(timerCrono);
-    if (timerEtapa1) clearTimeout(timerEtapa1);
-    if (timerEtapa2) clearTimeout(timerEtapa2);
-    timerCrono = null;
-    timerEtapa1 = null;
-    timerEtapa2 = null;
-  }
-
-  function formatarTempo(seg) {
-    const mm = String(Math.floor(seg / 60)).padStart(2, "0");
-    const ss = String(seg % 60).padStart(2, "0");
-    return `${mm}:${ss}`;
-  }
-
-  function normalizarMotoristaLinha(row) {
-    if (!row || typeof row !== "object") return null;
-    return {
-      nomeCompleto: String(row.nome_completo || row.nome || row.full_name || "Condutor Registado").trim(),
-      modeloVeiculo: String(row.modelo_veiculo || row.modelo_carro || row.modelo || "Veículo Registado").trim(),
-      placaVeiculo: String(row.placa_veiculo || row.matricula || row.placa || "Sem matrícula").trim(),
-      telefone: String(row.telefone || row.phone || "").trim(),
-      origem: "Supabase"
-    };
-  }
-
-  async function carregarListaMotoristas(tipoVeiculoId) {
-    const listaDemo = MOTORISTAS_DEMO_POR_TIPO[tipoVeiculoId] || MOTORISTAS_DEMO_POR_TIPO.TAXI;
-    try {
-      const client = window.supabaseClient || window.sb || (window.supabase && typeof window.supabase.from === "function" ? window.supabase : null);
-      if (client && typeof client.from === "function") {
-        const { data, error } = await client.from("motoristas").select("*").limit(50);
-        if (!error && Array.isArray(data) && data.length > 0) {
-          const filtrados = data.filter((m) => {
-            const dispOk = m.disponivel === undefined || m.disponivel === null || m.disponivel === true;
-            const aprovOk = m.aprovado === undefined || m.aprovado === null || m.aprovado === true;
-            const serv = String(m.tipo_servico || m.tipo_veiculo || m.categoria || "").toUpperCase();
-            if (!dispOk || !aprovOk) return false;
-            if (!serv) return true;
-            if (tipoVeiculoId === "MOTO") return serv.includes("MOTO");
-            if (tipoVeiculoId === "PRIVADO") return serv.includes("PRIV") || serv.includes("CARRO");
-            return serv.includes("TAXI") && !serv.includes("MOTO");
-          });
-          const base = filtrados.length > 0 ? filtrados : data;
-          const normalizados = base.map(normalizarMotoristaLinha).filter(Boolean);
-          if (normalizados.length > 0) return normalizados;
-        }
-      }
-    } catch (_) {}
-    return listaDemo;
-  }
-
-  function iniciarSequenciaEtapas(container) {
-    limparTimers();
-    faseViagem = "PROCURANDO";
-    segundos = 0;
-    renderizarPainel(container);
-
-    timerCrono = setInterval(() => {
-      segundos += 1;
-      const elCrono = container.querySelector("#cronometro-viagem-v18");
-      if (elCrono) elCrono.textContent = formatarTempo(segundos);
-    }, 1000);
-
-    timerEtapa1 = setTimeout(() => {
-      if (faseViagem === "PROCURANDO") {
-        faseViagem = "ENCONTRADO";
-        renderizarPainel(container);
-        timerEtapa2 = setTimeout(() => {
-          if (faseViagem === "ENCONTRADO") {
-            faseViagem = "EM_CURSO";
-            renderizarPainel(container);
-          }
-        }, 4500);
-      }
-    }, 3000);
-  }
-
-  function refrescarMapaBissau() {
-    [window.map, window.mapa, window.mapaBissau, window.leafletMap].forEach((m) => {
-      if (m && typeof m.invalidateSize === "function") setTimeout(() => m.invalidateSize(), 120);
-    });
-    document.querySelectorAll("[id*='map'], [class*='map'], .leaflet-container").forEach((el) => {
-      if (el.id === "superapp-painel-viagem") return;
-      const cs = window.getComputedStyle(el);
-      if (cs.display === "none" || cs.visibility === "hidden") {
-        el.style.display = "block";
-        el.style.visibility = "visible";
-      }
-      if (el.clientHeight < 220) el.style.minHeight = "260px";
-    });
-  }
-
-  function renderizarOpcoesRotas() {
-    return GRUPOS_ROTAS_DGVTT.map(
-      (grupo) => `
-        <optgroup label="${grupo.grupo}">
-          ${grupo.rotas.map((r) => `<option value="${r.baseXOF}" data-rota="${r.nome.replace(/"/g, "&quot;")}" ${r.nome === rotaAtual.nome ? "selected" : ""}>${r.nome} (${r.baseXOF} XOF)</option>`).join("")}
-        </optgroup>
-      `
-    ).join("");
-  }
-
-  function renderizarCamposPagamento() {
-    if (metodoAtual === "Dinheiro Vivo") {
-      return `
-        <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f0fdf4;border:1px solid #86efac;">
-          <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">💵 Pagamento em Dinheiro Vivo ao condutor</div>
-          <div style="font-size:12px;color:#374151;">Não precisa de número de conta nem cartão. O valor final será pago em dinheiro vivo (XOF) diretamente ao condutor.</div>
-        </div>
-      `;
-    }
-    if (metodoAtual === "Cartão") {
-      return `
-        <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
-          <label style="display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;">Número do cartão (16 dígitos)</label>
-          <input id="input-cartao-numero-v18" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div>
-              <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Validade (MM/AA)</label>
-              <input id="input-cartao-validade-v18" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
-            </div>
-            <div>
-              <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Código secreto (3 dígitos)</label>
-              <input id="input-cartao-cvv-v18" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
-            </div>
-          </div>
-          <div id="aviso-cartao-v18" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
-        </div>
-      `;
-    }
-    return `<input id="input-tel-v18" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
-  }
-
-  function renderizarCartaoMotorista() {
-    const fallback = (MOTORISTAS_DEMO_POR_TIPO[veiculoAtual.id] || MOTORISTAS_DEMO_POR_TIPO.TAXI)[0];
-    const mot = motoristaAtribuido || fallback;
-    const totalDisponiveis = listaMotoristasDisponiveis.length || 1;
-    const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
-    const telDigitos = (mot.telefone || "").replace(/\D/g, "");
-    const textoMsg = encodeURIComponent(`Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`);
-
-    return `
-      <div style="margin-top:12px;margin-bottom:12px;padding:12px;border-radius:12px;background:#ffffff;border:1px solid #d1d5db;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px;">
-          <span style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;">Dados do Motorista (${mot.origem} · ${indiceMotoristaAtual + 1}/${totalDisponiveis})</span>
-          <span style="font-size:11px;font-weight:700;color:#111827;background:#f3f4f6;padding:2px 8px;border-radius:999px;">${mot.placaVeiculo}</span>
-        </div>
-        <div style="font-size:15px;font-weight:800;color:#111827;">${mot.nomeCompleto}</div>
-        <div style="font-size:13px;color:#374151;margin-top:2px;"><strong>Veículo:</strong> ${mot.modeloVeiculo} · <strong>Matrícula:</strong> ${mot.placaVeiculo}</div>
-        <div style="font-size:12px;color:#6b7280;margin-top:2px;"><strong>Telefone:</strong> ${mot.telefone || "Não informado"}</div>
-
-        <div style="margin-top:10px;">
-          <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">Mensagem caso o motorista atrase ou não encontre si:</label>
-          <input id="input-msg-motorista-v18" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
-            <a href="${telLimpo ? `tel:${telLimpo}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;">📞 Ligar</a>
-            <a id="link-wa-v18" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
-            <a id="link-sms-v18" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
-          </div>
-          <button type="button" id="btn-trocar-motorista-v18" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
-          ${avisoTrocaMotorista ? `<div style="font-size:11px;color:#b45309;margin-top:6px;">${avisoTrocaMotorista}</div>` : ""}
-        </div>
-      </div>
-    `;
-  }
-
-  function renderizarBlocoEstado(preco) {
-    if (faseViagem === "PROCURANDO" || faseViagem === "ENCONTRADO" || faseViagem === "EM_CURSO") {
-      const fallback = (MOTORISTAS_DEMO_POR_TIPO[veiculoAtual.id] || MOTORISTAS_DEMO_POR_TIPO.TAXI)[0];
-      const mot = motoristaAtribuido || fallback;
-      const titulo = faseViagem === "PROCURANDO" ? `A procurar ${veiculoAtual.nome} disponível em Bissau...` : faseViagem === "ENCONTRADO" ? `Motorista encontrado: ${mot.nomeCompleto} (${mot.placaVeiculo}) · A caminho...` : `Viagem em curso com ${mot.nomeCompleto} (${veiculoAtual.nome})`;
-      const fundo = faseViagem === "EM_CURSO" ? "#ecfdf5" : "#fffbeb";
-      const borda = faseViagem === "EM_CURSO" ? "#10b981" : "#f59e0b";
-
-      return `
-        <div style="margin-top:16px;padding:16px;border-radius:12px;background:${fundo};border:1.5px solid ${borda};">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#92400e;margin-bottom:6px;">Modo Demonstração / Parcerias em Ativação</div>
-          <div style="font-size:16px;font-weight:800;color:#111827;margin-bottom:6px;">${titulo}</div>
-          <div style="font-size:13px;color:#374151;margin-bottom:8px;"><strong>Valor:</strong> ${preco} XOF (${veiculoAtual.rotulo} · ${metodoAtual}) · <strong>Rota:</strong> ${rotaAtual.nome}</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;">
-            <span style="padding:4px 8px;border-radius:999px;background:#fef3c7;font-weight:700;">1. A procurar motorista</span>
-            <span style="padding:4px 8px;border-radius:999px;background:${faseViagem !== "PROCURANDO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">2. A caminho</span>
-            <span style="padding:4px 8px;border-radius:999px;background:${faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">3. Viagem em curso</span>
-          </div>
-          ${faseViagem !== "PROCURANDO" ? renderizarCartaoMotorista() : ""}
-          <div id="cronometro-viagem-v18" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
-          <button type="button" id="btn-cancelar-v18" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
-          <div style="font-size:11px;color:#6b7280;margin-top:8px;">Regra de reembolso: cancelamento antes da chegada ou sem motorista disponível devolve 100% do valor simulado sem taxa.</div>
-        </div>
-      `;
-    }
-    if (faseViagem === "CANCELADA") {
-      return `<div style="margin-top:16px;padding:14px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;font-size:14px;"><strong>Viagem cancelada.</strong> Nenhum valor real foi cobrado (Modo Demonstração). Pode escolher outro veículo ou rota acima.</div>`;
-    }
-    return "";
-  }
-
-  function renderizarPainel(container) {
-    const preco = calcularPrecoXOF();
-    const comissaoEstimada = Math.round(preco * 0.1);
-
-    window.__veiculoSelecionado = { nome: veiculoAtual.nome, tipo: veiculoAtual.rotulo, precoXOF: preco };
-
-    container.innerHTML = `
-      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-          <span style="font-size:12px;font-weight:700;color:#065f46;background:#d1fae5;padding:4px 10px;border-radius:999px;">3 PASSOS RÁPIDOS · ROTA OFICIAL DGVTT BISSAU</span>
-          <span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;padding:4px 10px;border-radius:999px;">Modo Demonstração / Parcerias em Ativação</span>
-        </div>
-
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">1. Escolha para onde quer ir e o ponto de referência</label>
-        <select id="select-rota-v18" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
-        <input id="input-ref-v18" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
-
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">2. Escolha o veículo (preço final do veículo selecionado)</label>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
-          ${VEICULOS.map((v) => {
-            const ativo = v.id === veiculoAtual.id;
-            const p = Math.round(rotaAtual.baseXOF * v.mult);
-            return `
-              <button type="button" data-veiculo-v18="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
-                <div style="font-size:18px;">${v.emoji}</div>
-                <div style="font-size:12px;font-weight:700;color:#111827;margin-top:2px;">${v.nome}</div>
-                <div style="font-size:15px;font-weight:800;color:#111827;margin-top:4px;">${p} XOF</div>
-              </button>
-            `;
-          }).join("")}
-        </div>
-
-        <div style="padding:12px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#111827;">
-            <span>Total (${veiculoAtual.nome}):</span>
-            <span style="color:#15803d;font-size:17px;">${preco} XOF</span>
-          </div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px;">Rota base: ${rotaAtual.nome} (${rotaAtual.baseXOF} XOF) · Comissão estimada da plataforma: ~${comissaoEstimada} XOF.</div>
-        </div>
-
-        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">3. Método e dados para confirmar o pedido</label>
-        <select id="select-metodo-v18" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
-          ${METODOS_PAGAMENTO.map((m) => `<option value="${m}" ${metodoAtual === m ? "selected" : ""}>${m}</option>`).join("")}
-        </select>
-
-        ${renderizarCamposPagamento()}
-
-        <button type="button" id="btn-pedir-v18" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
-
-        ${renderizarBlocoEstado(preco)}
-      </div>
-    `;
-
-    const selRota = container.querySelector("#select-rota-v18");
-    if (selRota) {
-      selRota.addEventListener("change", () => {
-        const opt = selRota.options[selRota.selectedIndex];
-        rotaAtual = TODAS_ROTAS.find((r) => r.nome === opt?.getAttribute("data-rota")) || TODAS_ROTAS[0];
-        renderizarPainel(container);
-      });
-    }
-
-    container.querySelectorAll("[data-veiculo-v18]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v18")) || VEICULOS[0];
-        renderizarPainel(container);
-      });
-    });
-
-    const selMetodo = container.querySelector("#select-metodo-v18");
-    if (selMetodo) {
-      selMetodo.addEventListener("change", () => {
-        metodoAtual = selMetodo.value || "Orange Money";
-        renderizarPainel(container);
-      });
-    }
-
-    const inputNumCartao = container.querySelector("#input-cartao-numero-v18");
-    if (inputNumCartao) {
-      inputNumCartao.addEventListener("input", () => {
-        const digitos = inputNumCartao.value.replace(/\D/g, "").slice(0, 16);
-        inputNumCartao.value = digitos.replace(/(\d{4})(?=\d)/g, "$1 ");
-      });
-    }
-
-    const inputValidade = container.querySelector("#input-cartao-validade-v18");
-    if (inputValidade) {
-      inputValidade.addEventListener("input", () => {
-        const digitos = inputValidade.value.replace(/\D/g, "").slice(0, 4);
-        inputValidade.value = digitos.length > 2 ? `${digitos.slice(0, 2)}/${digitos.slice(2)}` : digitos;
-      });
-    }
-
-    const inputCvv = container.querySelector("#input-cartao-cvv-v18");
-    if (inputCvv) {
-      inputCvv.addEventListener("input", () => {
-        inputCvv.value = inputCvv.value.replace(/\D/g, "").slice(0, 3);
-      });
-    }
-
-    const inputMsg = container.querySelector("#input-msg-motorista-v18");
-    if (inputMsg) {
-      inputMsg.addEventListener("input", () => {
-        mensagemRapida = inputMsg.value;
-        const fallback = (MOTORISTAS_DEMO_POR_TIPO[veiculoAtual.id] || MOTORISTAS_DEMO_POR_TIPO.TAXI)[0];
-        const mot = motoristaAtribuido || fallback;
-        const telDigitos = (mot.telefone || "").replace(/\D/g, "");
-        const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
-        const textoEncoded = encodeURIComponent(`Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`);
-        const wa = container.querySelector("#link-wa-v18");
-        const sms = container.querySelector("#link-sms-v18");
-        if (wa) wa.href = telDigitos ? `https://wa.me/${telDigitos}?text=${textoEncoded}` : "https://wa.me/?text=" + textoEncoded;
-        if (sms && telLimpo) sms.href = `sms:${telLimpo}?body=${textoEncoded}`;
-      });
-    }
-
-    const btnTrocar = container.querySelector("#btn-trocar-motorista-v18");
-    if (btnTrocar) {
-      btnTrocar.addEventListener("click", () => {
-        if (!listaMotoristasDisponiveis.length) return;
-        if (listaMotoristasDisponiveis.length === 1) {
-          avisoTrocaMotorista = "Só existe 1 motorista disponível nesta categoria neste momento.";
-          renderizarPainel(container);
-          return;
-        }
-        indiceMotoristaAtual = (indiceMotoristaAtual + 1) % listaMotoristasDisponiveis.length;
-        motoristaAtribuido = listaMotoristasDisponiveis[indiceMotoristaAtual];
-        avisoTrocaMotorista = `Novo motorista solicitado (${indiceMotoristaAtual + 1} de ${listaMotoristasDisponiveis.length}).`;
-        iniciarSequenciaEtapas(container);
-      });
-    }
-
-    const btnPedir = container.querySelector("#btn-pedir-v18");
-    if (btnPedir) {
-      btnPedir.addEventListener("click", async () => {
-        let referenciaCliente = (container.querySelector("#input-tel-v18")?.value || "").trim();
-
-        if (metodoAtual === "Dinheiro Vivo") {
-          referenciaCliente = "Dinheiro Vivo ao condutor";
-        } else if (metodoAtual === "Cartão") {
-          const numLimpo = (container.querySelector("#input-cartao-numero-v18")?.value || "").replace(/\D/g, "");
-          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v18")?.value || "").replace(/\D/g, "");
-          const aviso = container.querySelector("#aviso-cartao-v18");
-
-          if (numLimpo.length !== 16 || cvvLimpo.length !== 3) {
-            if (aviso) {
-              aviso.style.color = "#dc2626";
-              aviso.textContent = "Preencha os 16 dígitos do cartão e o código secreto de 3 dígitos (CVV).";
-            }
-            return;
-          }
-          referenciaCliente = `Cartão **** ${numLimpo.slice(-4)}`;
-        }
-
-        avisoTrocaMotorista = "";
-        listaMotoristasDisponiveis = await carregarListaMotoristas(veiculoAtual.id);
-        indiceMotoristaAtual = 0;
-        motoristaAtribuido = listaMotoristasDisponiveis[0];
-
-        const ref = (container.querySelector("#input-ref-v18")?.value || "").trim();
-        const valor = calcularPrecoXOF();
-
-        if (typeof window.iniciarPagamentoComComissao === "function") {
-          window.iniciarPagamentoComComissao({
-            categoria: "mobilidade",
-            servico: veiculoAtual.nome,
-            clienteNome: "Cliente App Bissau",
-            clienteEmail: "",
-            clienteTelefone: referenciaCliente || "+245000000000",
-            detalhes: `${rotaAtual.nome}${ref ? " (" + ref + ")" : ""}`,
-            valorBaseXOF: valor,
-            metodoPagamento: `${metodoAtual} [DEMO]`
-          }).catch(() => {});
-        }
-
-        iniciarSequenciaEtapas(container);
-      });
-    }
-
-    const btnCancelar = container.querySelector("#btn-cancelar-v18");
-    if (btnCancelar) {
-      btnCancelar.addEventListener("click", () => {
-        limparTimers();
-        faseViagem = "CANCELADA";
-        renderizarPainel(container);
-      });
-    }
-  }
-
-  function montarPainel() {
-    refrescarMapaBissau();
-    const existente = document.getElementById("superapp-painel-viagem");
-    if (existente) return;
-
-    const botaoAntigo = Array.from(document.querySelectorAll("button")).find((b) =>
-      /pagar\s*&\s*pedir\s*viagem|pedir\s*viagem/i.test(b.textContent || "")
-    );
-    if (!botaoAntigo) return;
-
-    let alvo = botaoAntigo.parentElement;
-    for (let i = 0; i < 6 && alvo && alvo.parentElement; i++) {
-      const txt = alvo.textContent || "";
-      if (/t[áa]xi\s*oficial/i.test(txt) && /moto-?t[áa]xi/i.test(txt) && /rota/i.test(txt)) {
-        break;
-      }
-      alvo = alvo.parentElement;
-    }
-
-    if (!alvo || !alvo.parentElement) return;
-
-    const painel = document.createElement("div");
-    painel.id = "superapp-painel-viagem";
-    alvo.parentElement.insertBefore(painel, alvo);
-    alvo.style.display = "none";
-
-    renderizarPainel(painel);
-  }
-
-  // =========================================================================
-  // 4. INICIALIZAÇÃO CONJUNTA (VISUAL + VOOS + MOBILIDADE + CONDUTOR + FARMÁCIAS)
-  // =========================================================================
-  function executarTudo() {
-    modernizarBotoesServicos();
-    atualizarPainelCondutor();
-    montarPainel();
-    modernizarModalFarmacias();
-    modernizarModalVoos();
-  }
-
-  window.addEventListener("load", () => {
-    setTimeout(executarTudo, 300);
-    setTimeout(refrescarMapaBissau, 600);
-  });
-
-  document.addEventListener("click", () => {
-    setTimeout(executarTudo, 150);
-  });
-
-  setTimeout(executarTudo, 350);
-})();
+    for (let i = 0; i < 6 && modalBox && modalBox.
