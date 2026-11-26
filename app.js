@@ -2027,24 +2027,18 @@ Total: ${valorFormatado}`
   setTimeout(montarPainel, 350);
 })();
 (function () {
-  if (window.__superAppCompletoV19) return;
-  window.__superAppCompletoV19 = true;
+  if (window.__superAppCompletoV20) return;
+  window.__superAppCompletoV20 = true;
 
-  // =========================================================================
-  // CONFIGURAÇÃO GERAL (ALTERE AQUI OS SEUS DADOS REAIS)
-  // =========================================================================
   const MERCHANT_ORANGE = "955 00 00 00 (Código Merchant: 000000)";
   const MERCHANT_TELECEL = "966 00 00 00 (Conta Comerciante)";
   const WHATSAPP_SUPORTE = "245955000000";
   const PIN_CONDUTOR_PADRAO = "2450";
   const STORAGE_FOTOS_FARMACIAS = "rotagb_fotos_reais_farmacias_v1";
-
-  // Opcional: coloque aqui o URL do seu backend que consulta API real de voos
-  // Ex.: "/api/voos-bissau" (deve devolver { voos: [{ companhia, rota, preco, moeda, duracao, escalas }] })
   const ENDPOINT_API_VOOS_REAIS = "";
 
   // =========================================================================
-  // 0. VISUAL MODERNO NOS BOTÕES DE SERVIÇO
+  // 0. VISUAL MODERNO PERSISTENTE NOS BOTÕES DE SERVIÇO
   // =========================================================================
   const AJUSTES_SERVICOS_UI = {
     "trip / táxi": {
@@ -2080,6 +2074,10 @@ Total: ${valorFormatado}`
       imagem: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80"
     },
     "lojas / mercado": {
+      titulo: "Mercado",
+      imagem: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80"
+    },
+    "mercado": {
       titulo: "Mercado",
       imagem: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80"
     },
@@ -2175,13 +2173,12 @@ Total: ${valorFormatado}`
       if (!config) return;
 
       const card = el.closest("button, [role='button']") || el;
-      if (card.getAttribute("data-rotagb-modern-card") === "1") return;
       if (card.querySelector("input, select, textarea")) return;
 
       card.setAttribute("data-rotagb-modern-card", "1");
 
       const img = card.querySelector("img");
-      if (img && config.imagem) {
+      if (img && config.imagem && img.src !== config.imagem) {
         img.src = config.imagem;
         img.alt = config.titulo;
       }
@@ -2197,7 +2194,7 @@ Total: ${valorFormatado}`
           n.textContent = "Novo";
           n.style.cssText = "";
         } else if (raw.toLowerCase() === textoLimpo || Object.keys(AJUSTES_SERVICOS_UI).includes(raw.toLowerCase())) {
-          n.textContent = config.titulo;
+          if (n.textContent !== config.titulo) n.textContent = config.titulo;
           n.style.fontSize = "12px";
           n.style.fontWeight = "700";
           n.style.color = "#111827";
@@ -2252,7 +2249,7 @@ Total: ${valorFormatado}`
       }));
       vooEscolhido = resultadosPesquisaVoo[0] || null;
       avisoPesquisaVoo =
-        "Sem tarifa fixa ativa: ligue uma API de voos (ex.: SerpApi Google Flights / Duffel / GDS) no seu backend para obter preços reais automáticos por data.";
+        "Sem tarifa fixa ativa: ligue uma API de voos no seu backend para obter preços reais automáticos por data.";
       aPesquisarVoo = false;
       return;
     }
@@ -3358,4 +3355,118 @@ Total: ${valorFormatado}`
       grupo: "📍 Partidas: Mercado de Bandim",
       rotas: [
         { nome: "Mercado Bandim → SHEL / Palmeiras", baseXOF: 225 },
-        { nome: "Mercado Bandim → Chapa de Bissau", baseXOF
+        { nome: "Mercado Bandim → Chapa de Bissau", baseXOF: 275 },
+        { nome: "Mercado Bandim → Bairro d'Ajuda", baseXOF: 325 },
+        { nome: "Mercado Bandim → Hospital 3 de Agosto", baseXOF: 350 },
+        { nome: "Mercado Bandim → Bairro Internacional", baseXOF: 375 },
+        { nome: "Mercado Bandim → Bairro Militar Prédio Nino", baseXOF: 450 },
+        { nome: "Mercado Bandim → Bº Militar / Terminal TUB", baseXOF: 525 },
+        { nome: "Mercado Bandim → Paragem Central", baseXOF: 550 },
+        { nome: "Mercado Bandim → Enterramento", baseXOF: 575 },
+        { nome: "Mercado Bandim → Seminário Brá", baseXOF: 650 },
+        { nome: "Mercado Bandim → Aeroporto", baseXOF: 325 },
+        { nome: "Mercado Bandim → Safim", baseXOF: 550 }
+      ]
+    }
+  ];
+
+  const TODAS_ROTAS = GRUPOS_ROTAS_DGVTT.flatMap((g) => g.rotas);
+
+  const VEICULOS = [
+    { id: "TAXI", rotulo: "TAXI", nome: "Táxi Oficial", emoji: "🚕", mult: 2.0 },
+    { id: "PRIVADO", rotulo: "CARRO PRIVADO", nome: "Carro Privado", emoji: "🚗", mult: 2.6 },
+    { id: "MOTO", rotulo: "MOTO-TAXI", nome: "Moto-Táxi", emoji: "🏍️", mult: 1.4 }
+  ];
+
+  const METODOS_PAGAMENTO = ["Orange Money", "Telecel", "Cartão", "Dinheiro Vivo"];
+
+  const MOTORISTAS_DEMO_POR_TIPO = {
+    TAXI: [
+      { nomeCompleto: "Amadu Baldé", modeloVeiculo: "Toyota Corolla Azul/Branco", placaVeiculo: "GB-204-TX", telefone: "+245955000101", origem: "Registado" },
+      { nomeCompleto: "Mamadú Djaló", modeloVeiculo: "Mercedes 190 Azul/Branco", placaVeiculo: "GB-512-TX", telefone: "+245955000102", origem: "Registado" }
+    ],
+    PRIVADO: [
+      { nomeCompleto: "Fátima Djassi", modeloVeiculo: "Hyundai i10 Cinza", placaVeiculo: "GB-819-PR", telefone: "+245955000202", origem: "Registado" },
+      { nomeCompleto: "Carlos Mendes", modeloVeiculo: "Toyota Yaris Branco", placaVeiculo: "GB-630-PR", telefone: "+245955000203", origem: "Registado" }
+    ],
+    MOTO: [
+      { nomeCompleto: "Braima Camará", modeloVeiculo: "Haojue 125cc Vermelha", placaVeiculo: "GB-441-MT", telefone: "+245955000303", origem: "Registado" },
+      { nomeCompleto: "Suleimane Embaló", modeloVeiculo: "Sanlg 125cc Preta", placaVeiculo: "GB-778-MT", telefone: "+245955000304", origem: "Registado" }
+    ]
+  };
+
+  let rotaAtual = TODAS_ROTAS[0];
+  let veiculoAtual = VEICULOS[0];
+  let metodoAtual = "Orange Money";
+  let listaMotoristasDisponiveis = [];
+  let indiceMotoristaAtual = 0;
+  let motoristaAtribuido = null;
+  let avisoTrocaMotorista = "";
+  let mensagemRapida = "Olá! Estou no ponto de referência em Bissau.";
+  let faseViagem = "IDLE";
+  let timerCrono = null;
+  let timerEtapa1 = null;
+  let timerEtapa2 = null;
+  let segundos = 0;
+
+  function calcularPrecoXOF() {
+    return Math.round(rotaAtual.baseXOF * veiculoAtual.mult);
+  }
+
+  function limparTimers() {
+    if (timerCrono) clearInterval(timerCrono);
+    if (timerEtapa1) clearTimeout(timerEtapa1);
+    if (timerEtapa2) clearTimeout(timerEtapa2);
+    timerCrono = null;
+    timerEtapa1 = null;
+    timerEtapa2 = null;
+  }
+
+  function formatarTempo(seg) {
+    const mm = String(Math.floor(seg / 60)).padStart(2, "0");
+    const ss = String(seg % 60).padStart(2, "0");
+    return `${mm}:${ss}`;
+  }
+
+  function normalizarMotoristaLinha(row) {
+    if (!row || typeof row !== "object") return null;
+    return {
+      nomeCompleto: String(row.nome_completo || row.nome || row.full_name || "Condutor Registado").trim(),
+      modeloVeiculo: String(row.modelo_veiculo || row.modelo_carro || row.modelo || "Veículo Registado").trim(),
+      placaVeiculo: String(row.placa_veiculo || row.matricula || row.placa || "Sem matrícula").trim(),
+      telefone: String(row.telefone || row.phone || "").trim(),
+      origem: "Supabase"
+    };
+  }
+
+  async function carregarListaMotoristas(tipoVeiculoId) {
+    const listaFallback = MOTORISTAS_DEMO_POR_TIPO[tipoVeiculoId] || MOTORISTAS_DEMO_POR_TIPO.TAXI;
+    try {
+      const client = window.supabaseClient || window.sb || (window.supabase && typeof window.supabase.from === "function" ? window.supabase : null);
+      if (client && typeof client.from === "function") {
+        const { data, error } = await client.from("motoristas").select("*").limit(50);
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const filtrados = data.filter((m) => {
+            const dispOk = m.disponivel === undefined || m.disponivel === null || m.disponivel === true;
+            const aprovOk = m.aprovado === undefined || m.aprovado === null || m.aprovado === true;
+            const serv = String(m.tipo_servico || m.tipo_veiculo || m.categoria || "").toUpperCase();
+            if (!dispOk || !aprovOk) return false;
+            if (!serv) return true;
+            if (tipoVeiculoId === "MOTO") return serv.includes("MOTO");
+            if (tipoVeiculoId === "PRIVADO") return serv.includes("PRIV") || serv.includes("CARRO");
+            return serv.includes("TAXI") && !serv.includes("MOTO");
+          });
+          const base = filtrados.length > 0 ? filtrados : data;
+          const normalizados = base.map(normalizarMotoristaLinha).filter(Boolean);
+          if (normalizados.length > 0) return normalizados;
+        }
+      }
+    } catch (_) {}
+    return listaFallback;
+  }
+
+  function iniciarSequenciaEtapas(container) {
+    limparTimers();
+    faseViagem = "PROCURANDO";
+    segundos = 0;
+    renderizar
