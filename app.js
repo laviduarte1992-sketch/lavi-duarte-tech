@@ -3849,116 +3849,140 @@ Total: ${valorFormatado}`
   setTimeout(executarTudo, 350);
 })();
 (function () {
-  if (window.__voosSemDuplicacaoV2) return;
-  window.__voosSemDuplicacaoV2 = true;
+  if (window.__voosOrganizadoSemBookingV3) return;
+  window.__voosOrganizadoSemBookingV3 = true;
 
-  function limparDuplicadosForaDoModal() {
-    document.querySelectorAll("#rotagb-pesquisa-voos-limpa").forEach((barra) => {
-      const dentroModal = barra.closest("[role='dialog'], .modal, #modal-voos, [data-modal-voos]");
-      const temTituloVoo = dentroModal && /voos\s+internacionais\s*&\s*regionais/i.test(dentroModal.textContent || "");
-      if (!temTituloVoo) {
-        barra.remove();
-      }
-    });
-  }
-
-  function atualizarModalVoos() {
-    limparDuplicadosForaDoModal();
-
+  function encontrarModalVoos() {
     const titulo = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span")).find((el) => {
       const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
       return /^voos\s+internacionais\s*&\s*regionais$/i.test(txt);
     });
-    if (!titulo) return;
+    if (!titulo) return null;
 
-    // Sobe apenas até ao contentor direto do modal (e nunca fora de um modal)
-    const modal = titulo.closest("[role='dialog'], .modal, #modal-voos, [data-modal-voos]") || titulo.parentElement;
-    if (!modal || modal === document.body || modal === document.documentElement) return;
+    let atual = titulo.parentElement;
+    for (let i = 0; i < 8 && atual && atual !== document.body; i++) {
+      const txt = atual.textContent || "";
+      if (/estilo\s+booking|modo\s+demonstra[çc][ãa]o|xof\s*\/\s*pass\.?/i.test(txt)) {
+        return atual;
+      }
+      atual = atual.parentElement;
+    }
+    return titulo.closest("[role='dialog'], .modal") || titulo.parentElement;
+  }
 
-    // Evita injetar se o contentor for uma grelha/lista de cartões
-    const filhos = Array.from(modal.children || []);
-    const pareceGrelha = filhos.length >= 4 && filhos.every((c) => c.offsetWidth > 0 && c.offsetWidth < modal.offsetWidth * 0.6);
-    if (pareceGrelha) return;
+  function limparElementosAntigos(modal, barraId) {
+    Array.from(modal.querySelectorAll("div, span, p, button, section, article")).forEach((el) => {
+      if (el.id === barraId || el.closest("#" + barraId)) return;
+      if (el.querySelector("#" + barraId)) return;
 
-    // Oculta apenas "ESTILO BOOKING", "Modo Demonstração" e o bloco de rota fixa dentro do modal
-    Array.from(modal.querySelectorAll("div, span, p, button")).forEach((el) => {
-      if (el.closest("#rotagb-pesquisa-voos-limpa") || el.contains(titulo)) return;
       const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
-      if (
+      if (!txt) return;
+
+      const ehIndesejado =
         /estilo\s+booking/i.test(txt) ||
         /^modo\s+demonstra[çc][ãa]o$/i.test(txt) ||
-        (/rota\s+anterior/i.test(txt) && /pr[óo]xima\s+rota/i.test(txt) && txt.length < 320)
-      ) {
-        el.style.display = "none";
+        (/xof\s*\/\s*pass\.?/i.test(txt) && txt.length < 400) ||
+        (/rota\s+anterior/i.test(txt) && /pr[óo]xima\s+rota/i.test(txt) && txt.length < 400);
+
+      if (ehIndesejado) {
+        el.style.setProperty("display", "none", "important");
       }
-    });
-
-    // Garante que existe no máximo 1 barra em toda a página
-    if (document.querySelector("#rotagb-pesquisa-voos-limpa")) return;
-
-    const barra = document.createElement("div");
-    barra.id = "rotagb-pesquisa-voos-limpa";
-    barra.style.cssText =
-      "margin:10px 0 12px 0;padding:10px;border-radius:14px;background:#f1f5f9;border:1px solid #cbd5e1;text-align:left;max-width:100%;box-sizing:border-box;";
-
-    barra.innerHTML = `
-      <div style="display:flex;flex-wrap:wrap;gap:8px;background:#ffffff;padding:8px;border-radius:12px;border:1px solid #e2e8f0;">
-        <div style="flex:1;min-width:130px;padding:4px 8px;border-right:1px solid #e2e8f0;">
-          <div style="font-size:10px;font-weight:700;color:#64748b;">Partida</div>
-          <input id="vl-origem" type="text" value="Bissau (OXB)" style="width:100%;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
-        </div>
-        <div style="flex:1;min-width:130px;padding:4px 8px;border-right:1px solid #e2e8f0;">
-          <div style="font-size:10px;font-weight:700;color:#64748b;">Destino</div>
-          <input id="vl-destino" type="text" placeholder="Para onde vai?" style="width:100%;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
-        </div>
-        <div style="flex:1.2;min-width:165px;padding:4px 8px;border-right:1px solid #e2e8f0;">
-          <div style="font-size:10px;font-weight:700;color:#64748b;">Datas (Ida / Volta)</div>
-          <div style="display:flex;gap:4px;margin-top:2px;">
-            <input id="vl-ida" type="date" style="width:50%;border:none;outline:none;font-size:11px;color:#0f172a;background:transparent;" />
-            <input id="vl-volta" type="date" style="width:50%;border:none;outline:none;font-size:11px;color:#0f172a;background:transparent;" />
-          </div>
-        </div>
-        <div style="flex:1;min-width:135px;padding:4px 8px;">
-          <div style="font-size:10px;font-weight:700;color:#64748b;">Passageiros / Classe</div>
-          <div style="display:flex;gap:4px;margin-top:2px;">
-            <select id="vl-pass" style="border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
-              <option>1 pass.</option>
-              <option>2 pass.</option>
-              <option>3 pass.</option>
-              <option>4 pass.</option>
-            </select>
-            <select id="vl-classe" style="border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
-              <option>Económica</option>
-              <option>Executiva</option>
-            </select>
-          </div>
-        </div>
-        <button id="vl-btn" type="button" style="padding:0 16px;min-height:42px;border:none;border-radius:10px;background:#006ce4;color:#ffffff;font-weight:800;font-size:13px;cursor:pointer;">
-          Pesquisar
-        </button>
-      </div>
-      <div id="vl-res" style="margin-top:8px;font-size:12px;color:#334155;"></div>
-    `;
-
-    titulo.insertAdjacentElement("afterend", barra);
-
-    barra.querySelector("#vl-btn").addEventListener("click", () => {
-      const orig = (barra.querySelector("#vl-origem").value || "").trim() || "Bissau (OXB)";
-      const dest = (barra.querySelector("#vl-destino").value || "").trim() || "Destino a definir";
-      const ida = barra.querySelector("#vl-ida").value || "data a escolher";
-      const volta = barra.querySelector("#vl-volta").value;
-      const pass = barra.querySelector("#vl-pass").value;
-      const cls = barra.querySelector("#vl-classe").value;
-
-      barra.querySelector("#vl-res").innerHTML = `
-        <div style="padding:10px 12px;border-radius:10px;background:#ffffff;border:1px solid #cbd5e1;">
-          <strong>${orig} → ${dest}</strong> · Ida: <strong>${ida}</strong>${volta ? ` · Volta: <strong>${volta}</strong>` : ""} · ${pass} · ${cls}<br/>
-          <span style="color:#64748b;">Tarifas das companhias aéreas para a Guiné-Bissau calculadas conforme a data e disponibilidade (sem preço fixo).</span>
-        </div>
-      `;
     });
   }
 
-  window.addEventListener("load", atualizarModalVoos);
-  document.addEventListener("click", () => setTimeout(atualizarModalVoos, 120));
+  function organizarModalVoos() {
+    const modal = encontrarModalVoos();
+    if (!modal) return;
+
+    const barraId = "rotagb-barra-voos-v3";
+
+    // Remove barras duplicadas se existirem
+    const existentes = Array.from(document.querySelectorAll("#" + barraId));
+    existentes.slice(1).forEach((n) => n.remove());
+
+    limparElementosAntigos(modal, barraId);
+
+    if (!document.getElementById(barraId)) {
+      const barra = document.createElement("div");
+      barra.id = barraId;
+      barra.style.cssText =
+        "width:100%;max-width:100%;box-sizing:border-box;margin:12px 0;padding:12px;border-radius:14px;background:#f8fafc;border:1px solid #cbd5e1;text-align:left;overflow:hidden;";
+
+      barra.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box;">
+          <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;">
+            <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Partida</label>
+            <input id="v3-origem" type="text" value="Bissau (OXB)" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
+          </div>
+
+          <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;">
+            <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Destino</label>
+            <input id="v3-destino" type="text" placeholder="Ex: Lisboa (LIS), Dakar (DSS)..." style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;box-sizing:border-box;">
+            <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
+              <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Data de Ida</label>
+              <input id="v3-ida" type="date" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:600;color:#0f172a;background:transparent;" />
+            </div>
+            <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
+              <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Data de Volta</label>
+              <input id="v3-volta" type="date" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:600;color:#0f172a;background:transparent;" />
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;box-sizing:border-box;">
+            <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
+              <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Passageiros</label>
+              <select id="v3-pass" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
+                <option>1 Passageiro</option>
+                <option>2 Passageiros</option>
+                <option>3 Passageiros</option>
+                <option>4 Passageiros</option>
+              </select>
+            </div>
+            <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
+              <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Classe</label>
+              <select id="v3-classe" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
+                <option>Económica</option>
+                <option>Executiva</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="v3-btn-pesquisar" type="button" style="width:100%;box-sizing:border-box;padding:12px;border:none;border-radius:10px;background:#006ce4;color:#ffffff;font-weight:800;font-size:14px;cursor:pointer;">
+            Pesquisar Voos
+          </button>
+        </div>
+
+        <div id="v3-resultado" style="margin-top:10px;font-size:12px;color:#334155;word-wrap:break-word;"></div>
+      `;
+
+      modal.prepend(barra);
+
+      barra.querySelector("#v3-btn-pesquisar").addEventListener("click", () => {
+        const origem = (barra.querySelector("#v3-origem").value || "").trim() || "Bissau (OXB)";
+        const destino = (barra.querySelector("#v3-destino").value || "").trim() || "Destino a escolher";
+        const ida = barra.querySelector("#v3-ida").value || "não selecionada";
+        const volta = barra.querySelector("#v3-volta").value;
+        const pass = barra.querySelector("#v3-pass").value;
+        const classe = barra.querySelector("#v3-classe").value;
+
+        barra.querySelector("#v3-resultado").innerHTML = `
+          <div style="padding:10px 12px;border-radius:10px;background:#ffffff;border:1px solid #cbd5e1;">
+            <div style="font-weight:800;color:#0f172a;margin-bottom:4px;">${origem} → ${destino}</div>
+            <div>Data de Ida: <strong>${ida}</strong>${volta ? ` · Data de Volta: <strong>${volta}</strong>` : ""}</div>
+            <div>${pass} · ${classe}</div>
+            <div style="color:#64748b;margin-top:4px;">Os valores das companhias aéreas variam conforme a data e disponibilidade (sem preço fixo).</div>
+          </div>
+        `;
+      });
+    }
+  }
+
+  window.addEventListener("load", organizarModalVoos);
+  document.addEventListener("click", () => {
+    setTimeout(organizarModalVoos, 80);
+    setTimeout(organizarModalVoos, 250);
+  });
 })();
