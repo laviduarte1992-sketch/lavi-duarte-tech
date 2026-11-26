@@ -3849,25 +3849,40 @@ Total: ${valorFormatado}`
   setTimeout(executarTudo, 350);
 })();
 (function () {
-  if (window.__voosSemBookingSemFixo) return;
-  window.__voosSemBookingSemFixo = true;
+  if (window.__voosSemDuplicacaoV2) return;
+  window.__voosSemDuplicacaoV2 = true;
+
+  function limparDuplicadosForaDoModal() {
+    document.querySelectorAll("#rotagb-pesquisa-voos-limpa").forEach((barra) => {
+      const dentroModal = barra.closest("[role='dialog'], .modal, #modal-voos, [data-modal-voos]");
+      const temTituloVoo = dentroModal && /voos\s+internacionais\s*&\s*regionais/i.test(dentroModal.textContent || "");
+      if (!temTituloVoo) {
+        barra.remove();
+      }
+    });
+  }
 
   function atualizarModalVoos() {
-    const titulo = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span")).find(
-      (el) => /voos\s+internacionais\s*&\s*regionais/i.test((el.textContent || "").trim()) && (el.textContent || "").trim().length < 60
-    );
+    limparDuplicadosForaDoModal();
+
+    const titulo = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span")).find((el) => {
+      const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
+      return /^voos\s+internacionais\s*&\s*regionais$/i.test(txt);
+    });
     if (!titulo) return;
 
-    let modal = titulo.parentElement;
-    for (let i = 0; i < 6 && modal && modal.parentElement; i++) {
-      if (/estilo\s+booking|rota\s+anterior|pr[óo]xima\s+rota/i.test(modal.textContent || "")) break;
-      modal = modal.parentElement;
-    }
-    if (!modal) return;
+    // Sobe apenas até ao contentor direto do modal (e nunca fora de um modal)
+    const modal = titulo.closest("[role='dialog'], .modal, #modal-voos, [data-modal-voos]") || titulo.parentElement;
+    if (!modal || modal === document.body || modal === document.documentElement) return;
 
-    // 1. Oculta "ESTILO BOOKING", "Modo Demonstração" e o bloco de preços fixos
+    // Evita injetar se o contentor for uma grelha/lista de cartões
+    const filhos = Array.from(modal.children || []);
+    const pareceGrelha = filhos.length >= 4 && filhos.every((c) => c.offsetWidth > 0 && c.offsetWidth < modal.offsetWidth * 0.6);
+    if (pareceGrelha) return;
+
+    // Oculta apenas "ESTILO BOOKING", "Modo Demonstração" e o bloco de rota fixa dentro do modal
     Array.from(modal.querySelectorAll("div, span, p, button")).forEach((el) => {
-      if (el.closest("#rotagb-pesquisa-voos-limpa")) return;
+      if (el.closest("#rotagb-pesquisa-voos-limpa") || el.contains(titulo)) return;
       const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
       if (
         /estilo\s+booking/i.test(txt) ||
@@ -3878,12 +3893,13 @@ Total: ${valorFormatado}`
       }
     });
 
-    // 2. Insere barra horizontal limpa de pesquisa por datas (sem preços fixos)
-    if (modal.querySelector("#rotagb-pesquisa-voos-limpa")) return;
+    // Garante que existe no máximo 1 barra em toda a página
+    if (document.querySelector("#rotagb-pesquisa-voos-limpa")) return;
 
     const barra = document.createElement("div");
     barra.id = "rotagb-pesquisa-voos-limpa";
-    barra.style.cssText = "margin:10px 0 12px 0;padding:10px;border-radius:14px;background:#f1f5f9;border:1px solid #cbd5e1;text-align:left;";
+    barra.style.cssText =
+      "margin:10px 0 12px 0;padding:10px;border-radius:14px;background:#f1f5f9;border:1px solid #cbd5e1;text-align:left;max-width:100%;box-sizing:border-box;";
 
     barra.innerHTML = `
       <div style="display:flex;flex-wrap:wrap;gap:8px;background:#ffffff;padding:8px;border-radius:12px;border:1px solid #e2e8f0;">
@@ -3924,8 +3940,7 @@ Total: ${valorFormatado}`
       <div id="vl-res" style="margin-top:8px;font-size:12px;color:#334155;"></div>
     `;
 
-    const cabecalho = titulo.parentElement || modal;
-    cabecalho.insertAdjacentElement("afterend", barra);
+    titulo.insertAdjacentElement("afterend", barra);
 
     barra.querySelector("#vl-btn").addEventListener("click", () => {
       const orig = (barra.querySelector("#vl-origem").value || "").trim() || "Bissau (OXB)";
@@ -3944,6 +3959,6 @@ Total: ${valorFormatado}`
     });
   }
 
-  document.addEventListener("click", () => setTimeout(atualizarModalVoos, 100));
   window.addEventListener("load", atualizarModalVoos);
+  document.addEventListener("click", () => setTimeout(atualizarModalVoos, 120));
 })();
