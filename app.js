@@ -3276,4 +3276,86 @@ Total: ${valorFormatado}`
     if (!tituloModal) return;
 
     let modalBox = tituloModal.parentElement;
-    for (let i = 0; i < 6 && modalBox && modalBox.
+    for (let i = 0; i < 6 && modalBox && modalBox.parentElement; i++) {
+      const cabecalho = modalBox.children[0] ? (modalBox.children[0].textContent || "").trim() : "";
+      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel|voos/i.test(cabecalho)) {
+        return;
+      }
+      if (modalBox.querySelector("select") || /confirmar\s*&\s*pagar|anterior|seguinte/i.test(modalBox.textContent || "")) {
+        break;
+      }
+      modalBox = modalBox.parentElement;
+    }
+    if (!modalBox || modalBox.querySelector("#superapp-farmacia-moderna")) return;
+
+    modalBox.setAttribute("data-farmacia-modernizada", "1");
+
+    Array.from(modalBox.children).forEach((child) => {
+      if (child.contains(tituloModal)) return;
+      if (/^cancelar$/i.test((child.textContent || "").trim())) return;
+      child.style.display = "none";
+    });
+
+    const wrapper = document.createElement("div");
+    wrapper.id = "superapp-farmacia-moderna";
+    modalBox.insertBefore(wrapper, modalBox.children[1] || null);
+    renderizarFarmaciaUI(wrapper);
+  }
+
+  // =========================================================================
+  // 3. SISTEMA DE MOBILIDADE E PEDIDO DE VIAGEM (55 ROTAS DGVTT + SUPABASE)
+  // =========================================================================
+  const GRUPOS_ROTAS_DGVTT = [
+    {
+      grupo: "📍 Partidas: Centro da Cidade (Praça / Centro)",
+      rotas: [
+        { nome: "Cidade → Mercado de Bandim", baseXOF: 225 },
+        { nome: "Cidade → Cristo Redentor", baseXOF: 250 },
+        { nome: "Cidade → Belém / Missira", baseXOF: 325 },
+        { nome: "Cidade → Bairro d'Ajuda 1º e 2º fase", baseXOF: 350 },
+        { nome: "Cidade → Hospital 3 de Agosto", baseXOF: 375 },
+        { nome: "Cidade → Bairro Internacional", baseXOF: 425 },
+        { nome: "Cidade → Hotel Emb. América", baseXOF: 200 },
+        { nome: "Cidade → Bairro Militar / Prédio Nino", baseXOF: 450 },
+        { nome: "Cidade → Bairro Militar Somec", baseXOF: 475 },
+        { nome: "Cidade → B. Militar / Terminal TUB", baseXOF: 525 },
+        { nome: "Cidade → Brá / Seminário", baseXOF: 550 },
+        { nome: "Cidade → Paragem Central", baseXOF: 475 },
+        { nome: "Cidade → Guimetal", baseXOF: 525 },
+        { nome: "Cidade → São Paulo", baseXOF: 550 },
+        { nome: "Cidade → Háfia / Cruzamento", baseXOF: 575 },
+        { nome: "Cidade → Paragem Manjaco", baseXOF: 650 },
+        { nome: "Cidade → Rotunda do Aeroporto", baseXOF: 675 },
+        { nome: "Cidade → Aeroporto", baseXOF: 700 },
+        { nome: "Cidade → Base Aérea / PRAKLAS", baseXOF: 750 },
+        { nome: "Cidade → Bissalanca Poilão", baseXOF: 800 },
+        { nome: "Cidade → Enterramento", baseXOF: 200 },
+        { nome: "Cidade → STENACKS / Safim", baseXOF: 950 },
+        { nome: "Cidade → ENA (CENFA)", baseXOF: 650 },
+        { nome: "Cidade → Av. Brasil", baseXOF: 700 },
+        { nome: "Cidade → Paulo Barros", baseXOF: 775 },
+        { nome: "Cidade → Caracol", baseXOF: 175 },
+        { nome: "Cidade → Padaria Nhonho", baseXOF: 250 },
+        { nome: "Cidade → Zona 7", baseXOF: 275 },
+        { nome: "Cidade → Bairro Plano", baseXOF: 325 },
+        { nome: "Cidade → Bairro Ministro", baseXOF: 375 },
+        { nome: "Cidade → SHEL Quelelê", baseXOF: 425 },
+        { nome: "Cidade → Sobrade", baseXOF: 475 },
+        { nome: "Cidade → Ponta Neto", baseXOF: 525 },
+        { nome: "Cidade → Bôr / Terminal TUB", baseXOF: 550 },
+        { nome: "Cidade → Aldeia SOS", baseXOF: 575 },
+        { nome: "Cidade → Cemitério de N'hala", baseXOF: 600 },
+        { nome: "Cidade → Bairro Bissack (Ponte Cibe)", baseXOF: 275 },
+        { nome: "Cidade → Bissack / Terminal TUB", baseXOF: 325 },
+        { nome: "Cidade → Estado Major / QG", baseXOF: 275 },
+        { nome: "Cidade → Igreja Católica de Antula", baseXOF: 450 },
+        { nome: "Cidade → Pluba / Abílio Santos", baseXOF: 475 },
+        { nome: "Cidade → Pefine", baseXOF: 650 },
+        { nome: "Cidade → Estádio 24 de Setembro", baseXOF: 800 }
+      ]
+    },
+    {
+      grupo: "📍 Partidas: Mercado de Bandim",
+      rotas: [
+        { nome: "Mercado Bandim → SHEL / Palmeiras", baseXOF: 225 },
+        { nome: "Mercado Bandim → Chapa de Bissau", baseXOF
