@@ -3847,142 +3847,153 @@ Total: ${valorFormatado}`
   });
 
   setTimeout(executarTudo, 350);
-})();
-(function () {
-  if (window.__voosOrganizadoSemBookingV3) return;
-  window.__voosOrganizadoSemBookingV3 = true;
+})();(function () {
+  if (window.__voosModalPreenchidoV4) return;
+  window.__voosModalPreenchidoV4 = true;
 
-  function encontrarModalVoos() {
-    const titulo = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span")).find((el) => {
-      const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
-      return /^voos\s+internacionais\s*&\s*regionais$/i.test(txt);
-    });
-    if (!titulo) return null;
-
-    let atual = titulo.parentElement;
-    for (let i = 0; i < 8 && atual && atual !== document.body; i++) {
-      const txt = atual.textContent || "";
-      if (/estilo\s+booking|modo\s+demonstra[çc][ãa]o|xof\s*\/\s*pass\.?/i.test(txt)) {
-        return atual;
-      }
-      atual = atual.parentElement;
+  function obterCaixaModal(titulo) {
+    let el = titulo.parentElement;
+    for (let i = 0; i < 6 && el && el !== document.body; i++) {
+      const temCancelar = Array.from(el.querySelectorAll("button")).some((b) =>
+        /^cancelar$/i.test((b.textContent || "").trim())
+      );
+      if (temCancelar) return el;
+      el = el.parentElement;
     }
     return titulo.closest("[role='dialog'], .modal") || titulo.parentElement;
   }
 
-  function limparElementosAntigos(modal, barraId) {
-    Array.from(modal.querySelectorAll("div, span, p, button, section, article")).forEach((el) => {
-      if (el.id === barraId || el.closest("#" + barraId)) return;
-      if (el.querySelector("#" + barraId)) return;
+  function limparTextosIndesejados(caixa, barraId) {
+    const walker = document.createTreeWalker(caixa, NodeFilter.SHOW_TEXT);
+    const nosTexto = [];
+    let no;
+    while ((no = walker.nextNode())) {
+      if (no.parentElement && no.parentElement.closest("#" + barraId)) continue;
+      nosTexto.push(no);
+    }
 
-      const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
-      if (!txt) return;
+    nosTexto.forEach((n) => {
+      const t = (n.nodeValue || "").replace(/\s+/g, " ").trim();
+      if (!t) return;
+      if (
+        /estilo\s+booking/i.test(t) ||
+        /^modo\s+demonstra[çc][ãa]o$/i.test(t) ||
+        /xof\s*\/\s*pass\.?/i.test(t) ||
+        /^rota\s+anterior$/i.test(t) ||
+        /^pr[óo]xima\s+rota$/i.test(t)
+      ) {
+        n.nodeValue = "";
+      }
+    });
 
-      const ehIndesejado =
-        /estilo\s+booking/i.test(txt) ||
-        /^modo\s+demonstra[çc][ãa]o$/i.test(txt) ||
-        (/xof\s*\/\s*pass\.?/i.test(txt) && txt.length < 400) ||
-        (/rota\s+anterior/i.test(txt) && /pr[óo]xima\s+rota/i.test(txt) && txt.length < 400);
-
-      if (ehIndesejado) {
-        el.style.setProperty("display", "none", "important");
+    // Oculta apenas cartões antigos de rota/preço que tenham ficado vazios ou com XOF/pass.
+    Array.from(caixa.querySelectorAll("div, button, section")).forEach((item) => {
+      if (item.id === barraId || item.closest("#" + barraId)) return;
+      if (item.querySelector("#" + barraId) || item.querySelector("button")) {
+        const ehBotaoCancelar = /^cancelar$/i.test((item.textContent || "").trim());
+        if (ehBotaoCancelar) return;
+      }
+      const txt = (item.textContent || "").replace(/\s+/g, " ").trim();
+      if (txt && txt.length < 280 && /xof\s*\/\s*pass\.?|atlantic\s+express/i.test(txt)) {
+        item.style.setProperty("display", "none", "important");
       }
     });
   }
 
-  function organizarModalVoos() {
-    const modal = encontrarModalVoos();
-    if (!modal) return;
+  function renderizarModalVoos() {
+    const titulo = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span")).find((el) => {
+      const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
+      return /^voos\s+internacionais\s*&\s*regionais$/i.test(txt);
+    });
+    if (!titulo) return;
 
-    const barraId = "rotagb-barra-voos-v3";
+    const caixa = obterCaixaModal(titulo);
+    if (!caixa) return;
 
-    // Remove barras duplicadas se existirem
-    const existentes = Array.from(document.querySelectorAll("#" + barraId));
-    existentes.slice(1).forEach((n) => n.remove());
+    const barraId = "rotagb-barra-voos-v4";
+    limparTextosIndesejados(caixa, barraId);
 
-    limparElementosAntigos(modal, barraId);
+    if (caixa.querySelector("#" + barraId)) return;
 
-    if (!document.getElementById(barraId)) {
-      const barra = document.createElement("div");
-      barra.id = barraId;
-      barra.style.cssText =
-        "width:100%;max-width:100%;box-sizing:border-box;margin:12px 0;padding:12px;border-radius:14px;background:#f8fafc;border:1px solid #cbd5e1;text-align:left;overflow:hidden;";
+    const barra = document.createElement("div");
+    barra.id = barraId;
+    barra.style.cssText =
+      "width:100%;max-width:100%;box-sizing:border-box;margin:10px 0 12px 0;padding:12px;border-radius:14px;background:#f8fafc;border:1px solid #cbd5e1;text-align:left;";
 
-      barra.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box;">
-          <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;">
-            <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Partida</label>
-            <input id="v3-origem" type="text" value="Bissau (OXB)" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
-          </div>
-
-          <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;">
-            <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Destino</label>
-            <input id="v3-destino" type="text" placeholder="Ex: Lisboa (LIS), Dakar (DSS)..." style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
-          </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;box-sizing:border-box;">
-            <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
-              <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Data de Ida</label>
-              <input id="v3-ida" type="date" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:600;color:#0f172a;background:transparent;" />
-            </div>
-            <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
-              <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Data de Volta</label>
-              <input id="v3-volta" type="date" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:600;color:#0f172a;background:transparent;" />
-            </div>
-          </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;box-sizing:border-box;">
-            <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
-              <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Passageiros</label>
-              <select id="v3-pass" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
-                <option>1 Passageiro</option>
-                <option>2 Passageiros</option>
-                <option>3 Passageiros</option>
-                <option>4 Passageiros</option>
-              </select>
-            </div>
-            <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
-              <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Classe</label>
-              <select id="v3-classe" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
-                <option>Económica</option>
-                <option>Executiva</option>
-              </select>
-            </div>
-          </div>
-
-          <button id="v3-btn-pesquisar" type="button" style="width:100%;box-sizing:border-box;padding:12px;border:none;border-radius:10px;background:#006ce4;color:#ffffff;font-weight:800;font-size:14px;cursor:pointer;">
-            Pesquisar Voos
-          </button>
+    barra.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box;">
+        <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;">
+          <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Partida</label>
+          <input id="v4-origem" type="text" value="Bissau (OXB)" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
         </div>
 
-        <div id="v3-resultado" style="margin-top:10px;font-size:12px;color:#334155;word-wrap:break-word;"></div>
-      `;
+        <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;">
+          <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Destino</label>
+          <input id="v4-destino" type="text" placeholder="Ex: Lisboa (LIS), Dakar (DSS)..." style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
+        </div>
 
-      modal.prepend(barra);
-
-      barra.querySelector("#v3-btn-pesquisar").addEventListener("click", () => {
-        const origem = (barra.querySelector("#v3-origem").value || "").trim() || "Bissau (OXB)";
-        const destino = (barra.querySelector("#v3-destino").value || "").trim() || "Destino a escolher";
-        const ida = barra.querySelector("#v3-ida").value || "não selecionada";
-        const volta = barra.querySelector("#v3-volta").value;
-        const pass = barra.querySelector("#v3-pass").value;
-        const classe = barra.querySelector("#v3-classe").value;
-
-        barra.querySelector("#v3-resultado").innerHTML = `
-          <div style="padding:10px 12px;border-radius:10px;background:#ffffff;border:1px solid #cbd5e1;">
-            <div style="font-weight:800;color:#0f172a;margin-bottom:4px;">${origem} → ${destino}</div>
-            <div>Data de Ida: <strong>${ida}</strong>${volta ? ` · Data de Volta: <strong>${volta}</strong>` : ""}</div>
-            <div>${pass} · ${classe}</div>
-            <div style="color:#64748b;margin-top:4px;">Os valores das companhias aéreas variam conforme a data e disponibilidade (sem preço fixo).</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;box-sizing:border-box;">
+          <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
+            <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Data de Ida</label>
+            <input id="v4-ida" type="date" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:600;color:#0f172a;background:transparent;" />
           </div>
-        `;
-      });
-    }
+          <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
+            <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Data de Volta</label>
+            <input id="v4-volta" type="date" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:600;color:#0f172a;background:transparent;" />
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;box-sizing:border-box;">
+          <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
+            <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Passageiros</label>
+            <select id="v4-pass" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
+              <option>1 Passageiro</option>
+              <option>2 Passageiros</option>
+              <option>3 Passageiros</option>
+              <option>4 Passageiros</option>
+            </select>
+          </div>
+          <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;box-sizing:border-box;min-width:0;">
+            <label style="display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px;">Classe</label>
+            <select id="v4-classe" style="width:100%;box-sizing:border-box;border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
+              <option>Económica</option>
+              <option>Executiva</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="v4-btn-pesquisar" type="button" style="width:100%;box-sizing:border-box;padding:12px;border:none;border-radius:10px;background:#006ce4;color:#ffffff;font-weight:800;font-size:14px;cursor:pointer;">
+          Pesquisar Voos
+        </button>
+      </div>
+
+      <div id="v4-resultado" style="margin-top:10px;font-size:12px;color:#334155;"></div>
+    `;
+
+    titulo.insertAdjacentElement("afterend", barra);
+
+    barra.querySelector("#v4-btn-pesquisar").addEventListener("click", () => {
+      const origem = (barra.querySelector("#v4-origem").value || "").trim() || "Bissau (OXB)";
+      const destino = (barra.querySelector("#v4-destino").value || "").trim() || "Destino a escolher";
+      const ida = barra.querySelector("#v4-ida").value || "não selecionada";
+      const volta = barra.querySelector("#v4-volta").value;
+      const pass = barra.querySelector("#v4-pass").value;
+      const classe = barra.querySelector("#v4-classe").value;
+
+      barra.querySelector("#v4-resultado").innerHTML = `
+        <div style="padding:10px 12px;border-radius:10px;background:#ffffff;border:1px solid #cbd5e1;">
+          <div style="font-weight:800;color:#0f172a;margin-bottom:4px;">${origem} → ${destino}</div>
+          <div>Data de Ida: <strong>${ida}</strong>${volta ? ` · Data de Volta: <strong>${volta}</strong>` : ""}</div>
+          <div>${pass} · ${classe}</div>
+          <div style="color:#64748b;margin-top:4px;">Os preços reais das companhias aéreas variam conforme a data e disponibilidade (sem preço fixo).</div>
+        </div>
+      `;
+    });
   }
 
-  window.addEventListener("load", organizarModalVoos);
+  window.addEventListener("load", renderizarModalVoos);
   document.addEventListener("click", () => {
-    setTimeout(organizarModalVoos, 80);
-    setTimeout(organizarModalVoos, 250);
+    setTimeout(renderizarModalVoos, 90);
+    setTimeout(renderizarModalVoos, 260);
   });
 })();
