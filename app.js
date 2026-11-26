@@ -3849,14 +3849,12 @@ Total: ${valorFormatado}`
   setTimeout(executarTudo, 350);
 })();
 (function () {
-  if (window.__voosBarraLimpaSemPrecoFixo) return;
-  window.__voosBarraLimpaSemPrecoFixo = true;
+  if (window.__voosSemBookingSemFixo) return;
+  window.__voosSemBookingSemFixo = true;
 
-  function limparModalVoos() {
+  function atualizarModalVoos() {
     const titulo = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span")).find(
-      (el) =>
-        /voos\s+internacionais\s*&\s*regionais/i.test((el.textContent || "").trim()) &&
-        (el.textContent || "").trim().length < 60
+      (el) => /voos\s+internacionais\s*&\s*regionais/i.test((el.textContent || "").trim()) && (el.textContent || "").trim().length < 60
     );
     if (!titulo) return;
 
@@ -3867,88 +3865,85 @@ Total: ${valorFormatado}`
     }
     if (!modal) return;
 
-    // Remove textos "estilo Booking", "Modo Demonstração" e cartões com preço fixo
+    // 1. Oculta "ESTILO BOOKING", "Modo Demonstração" e o bloco de preços fixos
     Array.from(modal.querySelectorAll("div, span, p, button")).forEach((el) => {
-      if (el.closest("#rotagb-barra-voos-limpa")) return;
+      if (el.closest("#rotagb-pesquisa-voos-limpa")) return;
       const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
       if (
         /estilo\s+booking/i.test(txt) ||
         /^modo\s+demonstra[çc][ãa]o$/i.test(txt) ||
-        (/rota\s+anterior/i.test(txt) && /pr[óo]xima\s+rota/i.test(txt) && txt.length < 300)
+        (/rota\s+anterior/i.test(txt) && /pr[óo]xima\s+rota/i.test(txt) && txt.length < 320)
       ) {
         el.style.display = "none";
       }
     });
 
-    if (modal.querySelector("#rotagb-barra-voos-limpa")) return;
+    // 2. Insere barra horizontal limpa de pesquisa por datas (sem preços fixos)
+    if (modal.querySelector("#rotagb-pesquisa-voos-limpa")) return;
 
     const barra = document.createElement("div");
-    barra.id = "rotagb-barra-voos-limpa";
-    barra.style.cssText =
-      "margin:10px 0 12px 0;padding:12px;border-radius:14px;background:#f1f5f9;border:1px solid #cbd5e1;text-align:left;";
+    barra.id = "rotagb-pesquisa-voos-limpa";
+    barra.style.cssText = "margin:10px 0 12px 0;padding:10px;border-radius:14px;background:#f1f5f9;border:1px solid #cbd5e1;text-align:left;";
 
     barra.innerHTML = `
-      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;background:#ffffff;padding:8px;border-radius:12px;border:1px solid #e2e8f0;">
-        <div style="flex:1;min-width:140px;padding:6px 10px;border-right:1px solid #e2e8f0;">
-          <div style="font-size:11px;color:#64748b;font-weight:600;">Partida</div>
-          <input id="voo-limpo-origem" type="text" value="Bissau (OXB)" style="width:100%;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
+      <div style="display:flex;flex-wrap:wrap;gap:8px;background:#ffffff;padding:8px;border-radius:12px;border:1px solid #e2e8f0;">
+        <div style="flex:1;min-width:130px;padding:4px 8px;border-right:1px solid #e2e8f0;">
+          <div style="font-size:10px;font-weight:700;color:#64748b;">Partida</div>
+          <input id="vl-origem" type="text" value="Bissau (OXB)" style="width:100%;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
         </div>
-        <div style="flex:1;min-width:140px;padding:6px 10px;border-right:1px solid #e2e8f0;">
-          <div style="font-size:11px;color:#64748b;font-weight:600;">Destino</div>
-          <input id="voo-limpo-destino" type="text" placeholder="Para onde vai?" style="width:100%;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
+        <div style="flex:1;min-width:130px;padding:4px 8px;border-right:1px solid #e2e8f0;">
+          <div style="font-size:10px;font-weight:700;color:#64748b;">Destino</div>
+          <input id="vl-destino" type="text" placeholder="Para onde vai?" style="width:100%;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;background:transparent;" />
         </div>
-        <div style="flex:1.2;min-width:170px;padding:6px 10px;border-right:1px solid #e2e8f0;">
-          <div style="font-size:11px;color:#64748b;font-weight:600;">Datas (Ida / Volta)</div>
+        <div style="flex:1.2;min-width:165px;padding:4px 8px;border-right:1px solid #e2e8f0;">
+          <div style="font-size:10px;font-weight:700;color:#64748b;">Datas (Ida / Volta)</div>
           <div style="display:flex;gap:4px;margin-top:2px;">
-            <input id="voo-limpo-ida" type="date" style="border:none;outline:none;font-size:12px;color:#0f172a;background:transparent;width:50%;" />
-            <input id="voo-limpo-volta" type="date" style="border:none;outline:none;font-size:12px;color:#0f172a;background:transparent;width:50%;" />
+            <input id="vl-ida" type="date" style="width:50%;border:none;outline:none;font-size:11px;color:#0f172a;background:transparent;" />
+            <input id="vl-volta" type="date" style="width:50%;border:none;outline:none;font-size:11px;color:#0f172a;background:transparent;" />
           </div>
         </div>
-        <div style="flex:1;min-width:140px;padding:6px 10px;">
-          <div style="font-size:11px;color:#64748b;font-weight:600;">Passageiros / Classe</div>
+        <div style="flex:1;min-width:135px;padding:4px 8px;">
+          <div style="font-size:10px;font-weight:700;color:#64748b;">Passageiros / Classe</div>
           <div style="display:flex;gap:4px;margin-top:2px;">
-            <select id="voo-limpo-pass" style="border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
+            <select id="vl-pass" style="border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
               <option>1 pass.</option>
               <option>2 pass.</option>
               <option>3 pass.</option>
               <option>4 pass.</option>
             </select>
-            <select id="voo-limpo-classe" style="border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
+            <select id="vl-classe" style="border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;background:transparent;">
               <option>Económica</option>
               <option>Executiva</option>
             </select>
           </div>
         </div>
-        <button id="voo-limpo-buscar" type="button" style="padding:0 18px;min-height:46px;border:none;border-radius:10px;background:#006ce4;color:#ffffff;font-weight:800;font-size:13px;cursor:pointer;">
+        <button id="vl-btn" type="button" style="padding:0 16px;min-height:42px;border:none;border-radius:10px;background:#006ce4;color:#ffffff;font-weight:800;font-size:13px;cursor:pointer;">
           Pesquisar
         </button>
       </div>
-      <div id="voo-limpo-resultado" style="margin-top:10px;font-size:12px;color:#334155;"></div>
+      <div id="vl-res" style="margin-top:8px;font-size:12px;color:#334155;"></div>
     `;
 
     const cabecalho = titulo.parentElement || modal;
     cabecalho.insertAdjacentElement("afterend", barra);
 
-    barra.querySelector("#voo-limpo-buscar").addEventListener("click", () => {
-      const orig = (barra.querySelector("#voo-limpo-origem").value || "").trim() || "Bissau (OXB)";
-      const dest = (barra.querySelector("#voo-limpo-destino").value || "").trim() || "Destino por definir";
-      const ida = barra.querySelector("#voo-limpo-ida").value || "data a escolher";
-      const volta = barra.querySelector("#voo-limpo-volta").value;
-      const pass = barra.querySelector("#voo-limpo-pass").value;
-      const cls = barra.querySelector("#voo-limpo-classe").value;
-      const res = barra.querySelector("#voo-limpo-resultado");
+    barra.querySelector("#vl-btn").addEventListener("click", () => {
+      const orig = (barra.querySelector("#vl-origem").value || "").trim() || "Bissau (OXB)";
+      const dest = (barra.querySelector("#vl-destino").value || "").trim() || "Destino a definir";
+      const ida = barra.querySelector("#vl-ida").value || "data a escolher";
+      const volta = barra.querySelector("#vl-volta").value;
+      const pass = barra.querySelector("#vl-pass").value;
+      const cls = barra.querySelector("#vl-classe").value;
 
-      res.innerHTML = `
+      barra.querySelector("#vl-res").innerHTML = `
         <div style="padding:10px 12px;border-radius:10px;background:#ffffff;border:1px solid #cbd5e1;">
-          <strong>Pesquisa:</strong> ${orig} → ${dest} · <strong>Ida:</strong> ${ida}${volta ? ` · <strong>Volta:</strong> ${volta}` : ""} · ${pass} · ${cls}<br/>
-          <span style="color:#64748b;">Os preços reais das companhias aéreas para a Guiné-Bissau variam conforme a data e disponibilidade (sem preço fixo).</span>
+          <strong>${orig} → ${dest}</strong> · Ida: <strong>${ida}</strong>${volta ? ` · Volta: <strong>${volta}</strong>` : ""} · ${pass} · ${cls}<br/>
+          <span style="color:#64748b;">Tarifas das companhias aéreas para a Guiné-Bissau calculadas conforme a data e disponibilidade (sem preço fixo).</span>
         </div>
       `;
     });
   }
 
-  const obs = new MutationObserver(() => limparModalVoos());
-  if (document.body) obs.observe(document.body, { childList: true, subtree: true });
-  window.addEventListener("load", limparModalVoos);
-  document.addEventListener("click", () => setTimeout(limparModalVoos, 80));
+  document.addEventListener("click", () => setTimeout(atualizarModalVoos, 100));
+  window.addEventListener("load", atualizarModalVoos);
 })();
