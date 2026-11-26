@@ -2027,8 +2027,8 @@ Total: ${valorFormatado}`
   setTimeout(montarPainel, 350);
 })();
 (function () {
-  if (window.__superAppCompletoV17) return;
-  window.__superAppCompletoV17 = true;
+  if (window.__superAppCompletoV18) return;
+  window.__superAppCompletoV18 = true;
 
   // =========================================================================
   // CONFIGURAÇÃO DA CONTA COMERCIANTE (ALTERE AQUI OS SEUS DADOS REAIS)
@@ -2145,7 +2145,7 @@ Total: ${valorFormatado}`
     injetarEstiloModernoBotoes();
 
     Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span")).forEach((el) => {
-      if (el.closest("#superapp-farmacia-moderna, #superapp-painel-viagem")) return;
+      if (el.closest("#superapp-farmacia-moderna, #superapp-painel-viagem, #superapp-voos-moderno")) return;
       const t = (el.textContent || "").trim();
       if (t === "Go anywhere") el.textContent = "Ir a qualquer lugar";
       else if (t === "Get anything delivered") el.textContent = "Pedir entregas";
@@ -2153,7 +2153,11 @@ Total: ${valorFormatado}`
 
     const candidatos = Array.from(document.querySelectorAll("button, [role='button'], a, div"));
     candidatos.forEach((el) => {
-      if (el.closest("#superapp-farmacia-moderna, #superapp-painel-viagem, #bloqueio-ganhos-motorista, #wrapper-recarga-merchant")) {
+      if (
+        el.closest(
+          "#superapp-farmacia-moderna, #superapp-painel-viagem, #superapp-voos-moderno, #bloqueio-ganhos-motorista, #wrapper-recarga-merchant"
+        )
+      ) {
         return;
       }
       if (el.children.length > 4) return;
@@ -2198,6 +2202,391 @@ Total: ${valorFormatado}`
         }
       });
     });
+  }
+
+  // =========================================================================
+  // 0B. EXPERIÊNCIA MODERNA DE VOOS (ESTILO BOOKING / COMPANHIA AÉREA)
+  // =========================================================================
+  const VOOS_OFERTAS = [
+    {
+      id: "voo-lisboa",
+      companhia: "Atlantic Express",
+      codigo: "AX 412",
+      origem: "Bissau (OXB)",
+      destino: "Lisboa (LIS)",
+      duracao: "5h 15m",
+      escala: "1 escala · Sal / Cabo Verde",
+      precoIdaVoltaXOF: 320000,
+      guiche: "+245 955 700 800"
+    },
+    {
+      id: "voo-dakar",
+      companhia: "Senegal Air",
+      codigo: "HC 208",
+      origem: "Bissau (OXB)",
+      destino: "Dakar (DSS)",
+      duracao: "1h 10m",
+      escala: "Voo direto",
+      precoIdaVoltaXOF: 145000,
+      guiche: "+245 955 700 810"
+    },
+    {
+      id: "voo-casablanca",
+      companhia: "Royal Air Maroc",
+      codigo: "AT 564",
+      origem: "Bissau (OXB)",
+      destino: "Casablanca (CMN)",
+      duracao: "4h 30m",
+      escala: "Voo direto",
+      precoIdaVoltaXOF: 285000,
+      guiche: "+245 955 700 820"
+    }
+  ];
+
+  const CLASSES_VOO = [
+    { id: "Económica", nome: "Económica", mult: 1.0 },
+    { id: "Executiva", nome: "Executiva", mult: 1.65 }
+  ];
+
+  let indiceVooAtual = 0;
+  let tipoTrajetoVoo = "Ida e Volta";
+  let classeVoo = CLASSES_VOO[0];
+  let passageirosVoo = 1;
+  let origemVoo = "Bissau (OXB)";
+  let destinoVoo = "Lisboa (LIS)";
+  let dataIdaVoo = "";
+  let dataVoltaVoo = "";
+  let detalhesPassageiroVoo = "";
+  let metodoPagVoo = "Mobile Money (Orange / Telecel)";
+  let contaPagVoo = "";
+  let estadoReservaVoo = "IDLE";
+
+  function calcularTotalVoo() {
+    const oferta = VOOS_OFERTAS[indiceVooAtual] || VOOS_OFERTAS[0];
+    const fatorTrajeto = tipoTrajetoVoo === "Só Ida" ? 0.62 : 1.0;
+    const unitario = Math.round(oferta.precoIdaVoltaXOF * fatorTrajeto * classeVoo.mult);
+    return { unitario, total: unitario * passageirosVoo, oferta };
+  }
+
+  function renderizarVoosUI(wrapper) {
+    const { unitario, total, oferta } = calcularTotalVoo();
+
+    wrapper.innerHTML = `
+      <div style="text-align:left;max-height:74vh;overflow-y:auto;padding-right:2px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <span style="font-size:11px;font-weight:800;color:#003580;background:#e7f0ff;padding:4px 10px;border-radius:999px;">
+            ✈️ RESERVA DE VOOS · ESTILO BOOKING
+          </span>
+          <span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;padding:3px 9px;border-radius:999px;">
+            Modo Demonstração
+          </span>
+        </div>
+
+        <div style="padding:14px;border-radius:14px;background:#f8fafc;border:1px solid #cbd5e1;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:12px;font-weight:800;color:#003580;">${oferta.companhia} · ${oferta.codigo}</span>
+            <span style="font-size:11px;font-weight:700;color:#15803d;background:#dcfce7;padding:2px 8px;border-radius:999px;">${oferta.escala}</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;">
+            <div style="font-size:16px;font-weight:800;color:#0f172a;">${origemVoo} → ${destinoVoo}</div>
+            <div style="font-size:16px;font-weight:800;color:#003580;">${unitario.toLocaleString("pt-PT")} XOF <span style="font-size:11px;font-weight:600;color:#64748b;">/ pass.</span></div>
+          </div>
+
+          <div style="font-size:12px;color:#475569;margin-top:4px;">
+            Duração aprox.: <strong>${oferta.duracao}</strong> · Guichê: <a href="tel:${oferta.guiche.replace(/\s+/g, "")}" style="color:#006ce4;font-weight:700;text-decoration:none;">${oferta.guiche}</a>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+            <button type="button" id="btn-voo-anterior" style="padding:8px 10px;border-radius:9px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer;">
+              ◀ Rota Anterior
+            </button>
+            <button type="button" id="btn-voo-seguinte" style="padding:8px 10px;border-radius:9px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer;">
+              Próxima Rota ▶
+            </button>
+          </div>
+        </div>
+
+        <div style="padding:14px;border-radius:14px;background:#ffffff;border:1.5px solid #febb02;margin-bottom:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <button type="button" data-trajeto-voo="Ida e Volta" style="padding:9px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;border:${
+              tipoTrajetoVoo === "Ida e Volta" ? "2px solid #003580" : "1px solid #d1d5db"
+            };background:${tipoTrajetoVoo === "Ida e Volta" ? "#eff6ff" : "#fff"};color:#0f172a;">
+              Ida e Volta
+            </button>
+            <button type="button" data-trajeto-voo="Só Ida" style="padding:9px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;border:${
+              tipoTrajetoVoo === "Só Ida" ? "2px solid #003580" : "1px solid #d1d5db"
+            };background:${tipoTrajetoVoo === "Só Ida" ? "#eff6ff" : "#fff"};color:#0f172a;">
+              Só Ida
+            </button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Passageiros</label>
+              <select id="select-voo-passageiros" style="width:100%;padding:9px;border-radius:9px;border:1px solid #cbd5e1;font-size:13px;background:#fff;">
+                ${[1, 2, 3, 4, 5, 6]
+                  .map(
+                    (n) =>
+                      `<option value="${n}" ${passageirosVoo === n ? "selected" : ""}>${n} ${
+                        n === 1 ? "Passageiro" : "Passageiros"
+                      }</option>`
+                  )
+                  .join("")}
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Classe</label>
+              <select id="select-voo-classe" style="width:100%;padding:9px;border-radius:9px;border:1px solid #cbd5e1;font-size:13px;background:#fff;">
+                ${CLASSES_VOO.map(
+                  (c) => `<option value="${c.id}" ${classeVoo.id === c.id ? "selected" : ""}>${c.nome}</option>`
+                ).join("")}
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Data de Ida</label>
+              <input id="input-voo-ida" type="date" value="${dataIdaVoo}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #cbd5e1;font-size:12px;box-sizing:border-box;background:#fff;" />
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Data de Volta</label>
+              <input id="input-voo-volta" type="date" value="${dataVoltaVoo}" ${
+                tipoTrajetoVoo === "Só Ida" ? "disabled" : ""
+              } style="width:100%;padding:9px;border-radius:9px;border:1px solid #cbd5e1;font-size:12px;box-sizing:border-box;background:${
+                tipoTrajetoVoo === "Só Ida" ? "#f1f5f9" : "#fff"
+              };" />
+            </div>
+          </div>
+
+          <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Origem</label>
+          <input id="input-voo-origem" type="text" value="${origemVoo.replace(
+            /"/g,
+            "&quot;"
+          )}" style="width:100%;padding:10px;border-radius:9px;border:1px solid #cbd5e1;font-size:13px;margin-bottom:8px;box-sizing:border-box;" />
+
+          <button type="button" id="btn-voo-inverter" style="width:100%;padding:9px;border-radius:9px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">
+            ⇄ Inverter Origem e Destino
+          </button>
+
+          <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Destino</label>
+          <input id="input-voo-destino" type="text" value="${destinoVoo.replace(
+            /"/g,
+            "&quot;"
+          )}" placeholder="Ex: Lisboa, Dakar, Casablanca..." style="width:100%;padding:10px;border-radius:9px;border:1px solid #cbd5e1;font-size:13px;margin-bottom:10px;box-sizing:border-box;" />
+
+          <button type="button" id="btn-voo-pesquisar" style="width:100%;padding:11px;border:none;border-radius:10px;background:#006ce4;color:#ffffff;font-size:13px;font-weight:800;cursor:pointer;">
+            🔍 Pesquisar Voos &amp; Datas
+          </button>
+        </div>
+
+        <input id="input-voo-detalhes" type="text" value="${detalhesPassageiroVoo.replace(
+          /"/g,
+          "&quot;"
+        )}" placeholder="Nome do passageiro, passaporte ou preferência..." style="width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;box-sizing:border-box;" />
+
+        <label style="display:block;font-size:12px;font-weight:800;color:#111827;margin-bottom:4px;">Método de Pagamento</label>
+        <select id="select-voo-pag" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:8px;background:#fff;">
+          <option value="Mobile Money (Orange / Telecel)" ${
+            metodoPagVoo === "Mobile Money (Orange / Telecel)" ? "selected" : ""
+          }>Mobile Money (Orange / Telecel)</option>
+          <option value="Orange Money" ${metodoPagVoo === "Orange Money" ? "selected" : ""}>Orange Money</option>
+          <option value="Telecel" ${metodoPagVoo === "Telecel" ? "selected" : ""}>Telecel</option>
+          <option value="Cartão de Débito / Crédito" ${
+            metodoPagVoo === "Cartão de Débito / Crédito" ? "selected" : ""
+          }>Cartão de Débito / Crédito</option>
+        </select>
+
+        <input id="input-voo-conta" type="text" value="${contaPagVoo.replace(
+          /"/g,
+          "&quot;"
+        )}" placeholder="Número da Conta Orange / Telecel (+245...)" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />
+
+        <div style="padding:12px;border-radius:12px;background:#f0f9ff;border:1px solid #bae6fd;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#0f172a;">
+            <span>Total (${tipoTrajetoVoo} · ${passageirosVoo}x · ${classeVoo.nome}):</span>
+            <span style="color:#003580;font-size:16px;">${total.toLocaleString("pt-PT")} XOF</span>
+          </div>
+          <div style="font-size:11px;color:#475569;margin-top:4px;">
+            ${
+              estadoReservaVoo === "PESQUISADO"
+                ? `Disponibilidade verificada para ${origemVoo} → ${destinoVoo} (${oferta.companhia}).`
+                : "Tarifa estimada em XOF antes da emissão do bilhete."
+            }
+          </div>
+        </div>
+
+        <button type="button" id="btn-voo-confirmar" style="width:100%;padding:13px;border:none;border-radius:12px;background:#0f172a;color:#4ade80;font-size:15px;font-weight:800;cursor:pointer;">
+          Confirmar &amp; Pagar Bilhete · ${total.toLocaleString("pt-PT")} XOF
+        </button>
+
+        ${
+          estadoReservaVoo === "CONFIRMADO"
+            ? `
+          <div style="margin-top:12px;padding:12px;border-radius:12px;background:#ecfdf5;border:1.5px solid #10b981;color:#065f46;font-size:13px;">
+            <strong>✅ Pedido de voo registado (${oferta.companhia})!</strong><br/>
+            Rota: <strong>${origemVoo} → ${destinoVoo}</strong> (${tipoTrajetoVoo}, ${passageirosVoo} pass.) · Total: <strong>${total.toLocaleString(
+                "pt-PT"
+              )} XOF</strong> (Modo Demonstração).
+          </div>
+        `
+            : ""
+        }
+      </div>
+    `;
+
+    wrapper.querySelector("#btn-voo-anterior")?.addEventListener("click", () => {
+      indiceVooAtual = (indiceVooAtual - 1 + VOOS_OFERTAS.length) % VOOS_OFERTAS.length;
+      const nova = VOOS_OFERTAS[indiceVooAtual];
+      origemVoo = nova.origem;
+      destinoVoo = nova.destino;
+      estadoReservaVoo = "IDLE";
+      renderizarVoosUI(wrapper);
+    });
+
+    wrapper.querySelector("#btn-voo-seguinte")?.addEventListener("click", () => {
+      indiceVooAtual = (indiceVooAtual + 1) % VOOS_OFERTAS.length;
+      const nova = VOOS_OFERTAS[indiceVooAtual];
+      origemVoo = nova.origem;
+      destinoVoo = nova.destino;
+      estadoReservaVoo = "IDLE";
+      renderizarVoosUI(wrapper);
+    });
+
+    wrapper.querySelectorAll("[data-trajeto-voo]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tipoTrajetoVoo = btn.getAttribute("data-trajeto-voo") || "Ida e Volta";
+        renderizarVoosUI(wrapper);
+      });
+    });
+
+    wrapper.querySelector("#select-voo-passageiros")?.addEventListener("change", (e) => {
+      passageirosVoo = parseInt(e.target.value, 10) || 1;
+      renderizarVoosUI(wrapper);
+    });
+
+    wrapper.querySelector("#select-voo-classe")?.addEventListener("change", (e) => {
+      classeVoo = CLASSES_VOO.find((c) => c.id === e.target.value) || CLASSES_VOO[0];
+      renderizarVoosUI(wrapper);
+    });
+
+    wrapper.querySelector("#input-voo-ida")?.addEventListener("change", (e) => {
+      dataIdaVoo = e.target.value;
+    });
+
+    wrapper.querySelector("#input-voo-volta")?.addEventListener("change", (e) => {
+      dataVoltaVoo = e.target.value;
+    });
+
+    wrapper.querySelector("#input-voo-origem")?.addEventListener("input", (e) => {
+      origemVoo = e.target.value;
+    });
+
+    wrapper.querySelector("#input-voo-destino")?.addEventListener("input", (e) => {
+      destinoVoo = e.target.value;
+    });
+
+    wrapper.querySelector("#btn-voo-inverter")?.addEventListener("click", () => {
+      const temp = origemVoo;
+      origemVoo = destinoVoo || "Bissau (OXB)";
+      destinoVoo = temp || "Lisboa (LIS)";
+      renderizarVoosUI(wrapper);
+    });
+
+    wrapper.querySelector("#btn-voo-pesquisar")?.addEventListener("click", () => {
+      estadoReservaVoo = "PESQUISADO";
+      renderizarVoosUI(wrapper);
+    });
+
+    wrapper.querySelector("#input-voo-detalhes")?.addEventListener("input", (e) => {
+      detalhesPassageiroVoo = e.target.value;
+    });
+
+    wrapper.querySelector("#select-voo-pag")?.addEventListener("change", (e) => {
+      metodoPagVoo = e.target.value;
+    });
+
+    wrapper.querySelector("#input-voo-conta")?.addEventListener("input", (e) => {
+      contaPagVoo = e.target.value;
+    });
+
+    wrapper.querySelector("#btn-voo-confirmar")?.addEventListener("click", () => {
+      const { total: totalFinal, oferta: ofertaAtual } = calcularTotalVoo();
+      if (typeof window.iniciarPagamentoComComissao === "function") {
+        window.iniciarPagamentoComComissao({
+          categoria: "voos",
+          servico: `${ofertaAtual.companhia} (${origemVoo} → ${destinoVoo})`,
+          clienteNome: detalhesPassageiroVoo || "Passageiro ROTA GB",
+          clienteEmail: "",
+          clienteTelefone: contaPagVoo || "+245000000000",
+          detalhes: `${tipoTrajetoVoo} · ${passageirosVoo} pass. · ${classeVoo.nome}${
+            dataIdaVoo ? " · Ida: " + dataIdaVoo : ""
+          }`,
+          valorBaseXOF: totalFinal,
+          metodoPagamento: `${metodoPagVoo} [DEMO]`
+        }).catch(() => {});
+      }
+      estadoReservaVoo = "CONFIRMADO";
+      renderizarVoosUI(wrapper);
+    });
+  }
+
+  function limparVoosDeOutrosModais() {
+    document.querySelectorAll("#superapp-voos-moderno").forEach((el) => {
+      const box = el.parentElement;
+      if (!box) {
+        el.remove();
+        return;
+      }
+      const cabecalho = box.children[0] ? (box.children[0].textContent || "").trim() : "";
+      const ehModalVoo = /voos\s+internacionais\s*&\s*regionais/i.test(cabecalho);
+      if (!ehModalVoo) {
+        Array.from(box.children).forEach((ch) => {
+          if (ch !== el) ch.style.display = "";
+        });
+        box.removeAttribute("data-voos-modernizado");
+        el.remove();
+      }
+    });
+  }
+
+  function modernizarModalVoos() {
+    limparVoosDeOutrosModais();
+
+    const elementos = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span, button"));
+    const tituloModal = elementos.find((el) => {
+      if (el.id === "superapp-voos-moderno" || el.closest("#superapp-voos-moderno")) return false;
+      const t = (el.textContent || "").replace(/\s+/g, " ").trim();
+      if (!t || t.length > 70) return false;
+      return /voos\s+internacionais\s*&\s*regionais/i.test(t);
+    });
+    if (!tituloModal) return;
+
+    let modalBox = tituloModal.parentElement;
+    for (let i = 0; i < 6 && modalBox && modalBox.parentElement; i++) {
+      if (
+        modalBox.querySelector("select") ||
+        /confirmar\s*&\s*pagar\s*bilhete|pesquisar\s*voos\s*&\s*datas/i.test(modalBox.textContent || "")
+      ) {
+        break;
+      }
+      modalBox = modalBox.parentElement;
+    }
+    if (!modalBox || modalBox.querySelector("#superapp-voos-moderno")) return;
+
+    modalBox.setAttribute("data-voos-modernizado", "1");
+
+    Array.from(modalBox.children).forEach((child) => {
+      if (child.contains(tituloModal)) return;
+      if (/^cancelar$/i.test((child.textContent || "").trim())) return;
+      child.style.display = "none";
+    });
+
+    const wrapper = document.createElement("div");
+    wrapper.id = "superapp-voos-moderno";
+    modalBox.insertBefore(wrapper, modalBox.children[1] || null);
+    renderizarVoosUI(wrapper);
   }
 
   // =========================================================================
@@ -2875,7 +3264,7 @@ Total: ${valorFormatado}`
       if (el.id === "superapp-farmacia-moderna" || el.closest("#superapp-farmacia-moderna")) return false;
       const t = (el.textContent || "").replace(/\s+/g, " ").trim();
       if (!t || t.length > 60) return false;
-      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel/i.test(t)) return false;
+      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel|voos/i.test(t)) return false;
       return /farm[áa]cias\s+principais\s+em\s+bissau/i.test(t);
     });
     if (!tituloModal) return;
@@ -2883,7 +3272,7 @@ Total: ${valorFormatado}`
     let modalBox = tituloModal.parentElement;
     for (let i = 0; i < 6 && modalBox && modalBox.parentElement; i++) {
       const cabecalho = modalBox.children[0] ? (modalBox.children[0].textContent || "").trim() : "";
-      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel/i.test(cabecalho)) {
+      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel|voos/i.test(cabecalho)) {
         return;
       }
       if (modalBox.querySelector("select") || /confirmar\s*&\s*pagar|anterior|seguinte/i.test(modalBox.textContent || "")) {
@@ -3081,7 +3470,7 @@ Total: ${valorFormatado}`
 
     timerCrono = setInterval(() => {
       segundos += 1;
-      const elCrono = container.querySelector("#cronometro-viagem-v17");
+      const elCrono = container.querySelector("#cronometro-viagem-v18");
       if (elCrono) elCrono.textContent = formatarTempo(segundos);
     }, 1000);
 
@@ -3137,22 +3526,22 @@ Total: ${valorFormatado}`
       return `
         <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
           <label style="display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;">Número do cartão (16 dígitos)</label>
-          <input id="input-cartao-numero-v17" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
+          <input id="input-cartao-numero-v18" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Validade (MM/AA)</label>
-              <input id="input-cartao-validade-v17" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-validade-v18" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Código secreto (3 dígitos)</label>
-              <input id="input-cartao-cvv-v17" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-cvv-v18" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
           </div>
-          <div id="aviso-cartao-v17" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
+          <div id="aviso-cartao-v18" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
         </div>
       `;
     }
-    return `<input id="input-tel-v17" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
+    return `<input id="input-tel-v18" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
   }
 
   function renderizarCartaoMotorista() {
@@ -3175,13 +3564,13 @@ Total: ${valorFormatado}`
 
         <div style="margin-top:10px;">
           <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">Mensagem caso o motorista atrase ou não encontre si:</label>
-          <input id="input-msg-motorista-v17" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
+          <input id="input-msg-motorista-v18" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
             <a href="${telLimpo ? `tel:${telLimpo}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;">📞 Ligar</a>
-            <a id="link-wa-v17" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
-            <a id="link-sms-v17" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
+            <a id="link-wa-v18" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
+            <a id="link-sms-v18" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
           </div>
-          <button type="button" id="btn-trocar-motorista-v17" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
+          <button type="button" id="btn-trocar-motorista-v18" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
           ${avisoTrocaMotorista ? `<div style="font-size:11px;color:#b45309;margin-top:6px;">${avisoTrocaMotorista}</div>` : ""}
         </div>
       </div>
@@ -3207,8 +3596,8 @@ Total: ${valorFormatado}`
             <span style="padding:4px 8px;border-radius:999px;background:${faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">3. Viagem em curso</span>
           </div>
           ${faseViagem !== "PROCURANDO" ? renderizarCartaoMotorista() : ""}
-          <div id="cronometro-viagem-v17" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
-          <button type="button" id="btn-cancelar-v17" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
+          <div id="cronometro-viagem-v18" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
+          <button type="button" id="btn-cancelar-v18" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
           <div style="font-size:11px;color:#6b7280;margin-top:8px;">Regra de reembolso: cancelamento antes da chegada ou sem motorista disponível devolve 100% do valor simulado sem taxa.</div>
         </div>
       `;
@@ -3233,8 +3622,8 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">1. Escolha para onde quer ir e o ponto de referência</label>
-        <select id="select-rota-v17" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
-        <input id="input-ref-v17" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
+        <select id="select-rota-v18" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
+        <input id="input-ref-v18" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">2. Escolha o veículo (preço final do veículo selecionado)</label>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
@@ -3242,7 +3631,7 @@ Total: ${valorFormatado}`
             const ativo = v.id === veiculoAtual.id;
             const p = Math.round(rotaAtual.baseXOF * v.mult);
             return `
-              <button type="button" data-veiculo-v17="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
+              <button type="button" data-veiculo-v18="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
                 <div style="font-size:18px;">${v.emoji}</div>
                 <div style="font-size:12px;font-weight:700;color:#111827;margin-top:2px;">${v.nome}</div>
                 <div style="font-size:15px;font-weight:800;color:#111827;margin-top:4px;">${p} XOF</div>
@@ -3260,19 +3649,19 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">3. Método e dados para confirmar o pedido</label>
-        <select id="select-metodo-v17" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
+        <select id="select-metodo-v18" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
           ${METODOS_PAGAMENTO.map((m) => `<option value="${m}" ${metodoAtual === m ? "selected" : ""}>${m}</option>`).join("")}
         </select>
 
         ${renderizarCamposPagamento()}
 
-        <button type="button" id="btn-pedir-v17" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
+        <button type="button" id="btn-pedir-v18" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
 
         ${renderizarBlocoEstado(preco)}
       </div>
     `;
 
-    const selRota = container.querySelector("#select-rota-v17");
+    const selRota = container.querySelector("#select-rota-v18");
     if (selRota) {
       selRota.addEventListener("change", () => {
         const opt = selRota.options[selRota.selectedIndex];
@@ -3281,14 +3670,14 @@ Total: ${valorFormatado}`
       });
     }
 
-    container.querySelectorAll("[data-veiculo-v17]").forEach((btn) => {
+    container.querySelectorAll("[data-veiculo-v18]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v17")) || VEICULOS[0];
+        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v18")) || VEICULOS[0];
         renderizarPainel(container);
       });
     });
 
-    const selMetodo = container.querySelector("#select-metodo-v17");
+    const selMetodo = container.querySelector("#select-metodo-v18");
     if (selMetodo) {
       selMetodo.addEventListener("change", () => {
         metodoAtual = selMetodo.value || "Orange Money";
@@ -3296,7 +3685,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputNumCartao = container.querySelector("#input-cartao-numero-v17");
+    const inputNumCartao = container.querySelector("#input-cartao-numero-v18");
     if (inputNumCartao) {
       inputNumCartao.addEventListener("input", () => {
         const digitos = inputNumCartao.value.replace(/\D/g, "").slice(0, 16);
@@ -3304,7 +3693,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputValidade = container.querySelector("#input-cartao-validade-v17");
+    const inputValidade = container.querySelector("#input-cartao-validade-v18");
     if (inputValidade) {
       inputValidade.addEventListener("input", () => {
         const digitos = inputValidade.value.replace(/\D/g, "").slice(0, 4);
@@ -3312,14 +3701,14 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputCvv = container.querySelector("#input-cartao-cvv-v17");
+    const inputCvv = container.querySelector("#input-cartao-cvv-v18");
     if (inputCvv) {
       inputCvv.addEventListener("input", () => {
         inputCvv.value = inputCvv.value.replace(/\D/g, "").slice(0, 3);
       });
     }
 
-    const inputMsg = container.querySelector("#input-msg-motorista-v17");
+    const inputMsg = container.querySelector("#input-msg-motorista-v18");
     if (inputMsg) {
       inputMsg.addEventListener("input", () => {
         mensagemRapida = inputMsg.value;
@@ -3328,14 +3717,14 @@ Total: ${valorFormatado}`
         const telDigitos = (mot.telefone || "").replace(/\D/g, "");
         const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
         const textoEncoded = encodeURIComponent(`Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`);
-        const wa = container.querySelector("#link-wa-v17");
-        const sms = container.querySelector("#link-sms-v17");
+        const wa = container.querySelector("#link-wa-v18");
+        const sms = container.querySelector("#link-sms-v18");
         if (wa) wa.href = telDigitos ? `https://wa.me/${telDigitos}?text=${textoEncoded}` : "https://wa.me/?text=" + textoEncoded;
         if (sms && telLimpo) sms.href = `sms:${telLimpo}?body=${textoEncoded}`;
       });
     }
 
-    const btnTrocar = container.querySelector("#btn-trocar-motorista-v17");
+    const btnTrocar = container.querySelector("#btn-trocar-motorista-v18");
     if (btnTrocar) {
       btnTrocar.addEventListener("click", () => {
         if (!listaMotoristasDisponiveis.length) return;
@@ -3351,17 +3740,17 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnPedir = container.querySelector("#btn-pedir-v17");
+    const btnPedir = container.querySelector("#btn-pedir-v18");
     if (btnPedir) {
       btnPedir.addEventListener("click", async () => {
-        let referenciaCliente = (container.querySelector("#input-tel-v17")?.value || "").trim();
+        let referenciaCliente = (container.querySelector("#input-tel-v18")?.value || "").trim();
 
         if (metodoAtual === "Dinheiro Vivo") {
           referenciaCliente = "Dinheiro Vivo ao condutor";
         } else if (metodoAtual === "Cartão") {
-          const numLimpo = (container.querySelector("#input-cartao-numero-v17")?.value || "").replace(/\D/g, "");
-          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v17")?.value || "").replace(/\D/g, "");
-          const aviso = container.querySelector("#aviso-cartao-v17");
+          const numLimpo = (container.querySelector("#input-cartao-numero-v18")?.value || "").replace(/\D/g, "");
+          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v18")?.value || "").replace(/\D/g, "");
+          const aviso = container.querySelector("#aviso-cartao-v18");
 
           if (numLimpo.length !== 16 || cvvLimpo.length !== 3) {
             if (aviso) {
@@ -3378,7 +3767,7 @@ Total: ${valorFormatado}`
         indiceMotoristaAtual = 0;
         motoristaAtribuido = listaMotoristasDisponiveis[0];
 
-        const ref = (container.querySelector("#input-ref-v17")?.value || "").trim();
+        const ref = (container.querySelector("#input-ref-v18")?.value || "").trim();
         const valor = calcularPrecoXOF();
 
         if (typeof window.iniciarPagamentoComComissao === "function") {
@@ -3398,7 +3787,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnCancelar = container.querySelector("#btn-cancelar-v17");
+    const btnCancelar = container.querySelector("#btn-cancelar-v18");
     if (btnCancelar) {
       btnCancelar.addEventListener("click", () => {
         limparTimers();
@@ -3438,13 +3827,14 @@ Total: ${valorFormatado}`
   }
 
   // =========================================================================
-  // 4. INICIALIZAÇÃO CONJUNTA (VISUAL + MOBILIDADE + CONDUTOR + FARMÁCIAS)
+  // 4. INICIALIZAÇÃO CONJUNTA (VISUAL + VOOS + MOBILIDADE + CONDUTOR + FARMÁCIAS)
   // =========================================================================
   function executarTudo() {
     modernizarBotoesServicos();
     atualizarPainelCondutor();
     montarPainel();
     modernizarModalFarmacias();
+    modernizarModalVoos();
   }
 
   window.addEventListener("load", () => {
