@@ -3848,3 +3848,217 @@ Total: ${valorFormatado}`
 
   setTimeout(executarTudo, 350);
 })();
+(function () {
+  if (window.__ajustarModalVoosLimpo) return;
+  window.__ajustarModalVoosLimpo = true;
+
+  // Opcional: ligue aqui o URL do seu servidor que busca tarifas reais por data
+  // Ex.: "/api/voos-bissau" (deve devolver { voos: [{ companhia, rota, preco, moeda, detalhe }] })
+  const ENDPOINT_API_VOOS = "";
+
+  const COMPANHIAS_OXB = [
+    { companhia: "TAP Air Portugal", hub: "Lisboa (LIS)" },
+    { companhia: "Royal Air Maroc", hub: "Casablanca (CMN)" },
+    { companhia: "ASKY Airlines", hub: "Dakar / Lomé" },
+    { companhia: "Air Senegal", hub: "Dakar (DSS)" },
+    { companhia: "euroAtlantic airways", hub: "Lisboa (LIS)" }
+  ];
+
+  let origem = "Bissau (OXB)";
+  let destino = "Lisboa (LIS)";
+  let dataIda = "";
+  let dataVolta = "";
+  let passageiros = "1 Passageiro";
+  let classe = "Económica";
+  let resultados = [];
+  let mensagem = "";
+  let pesquisando = false;
+
+  async function pesquisarVoosPorData(boxResultados) {
+    if (!dataIda) {
+      mensagem = "Escolha a Data de Ida antes de pesquisar.";
+      resultados = [];
+      renderResultados(boxResultados);
+      return;
+    }
+
+    pesquisando = true;
+    mensagem = "";
+    renderResultados(boxResultados);
+
+    if (!ENDPOINT_API_VOOS) {
+      resultados = COMPANHIAS_OXB.map((c) => ({
+        companhia: c.companhia,
+        rota: `${origem} → ${destino}`,
+        datas: dataVolta ? `${dataIda} a ${dataVolta}` : `${dataIda} (Só Ida)`,
+        preco: "Preço em tempo real pendente de API",
+        detalhe: `${passageiros} · ${classe} · Ligue ENDPOINT_API_VOOS para tarifa real automática`
+      }));
+      mensagem = "Sem preço fixo: configure ENDPOINT_API_VOOS no servidor para calcular tarifas reais por data.";
+      pesquisando = false;
+      renderResultados(boxResultados);
+      return;
+    }
+
+    try {
+      const url = new URL(ENDPOINT_API_VOOS, window.location.origin);
+      url.searchParams.set("origem", origem);
+      url.searchParams.set("destino", destino);
+      url.searchParams.set("data_ida", dataIda);
+      if (dataVolta) url.searchParams.set("data_volta", dataVolta);
+      url.searchParams.set("passageiros", passageiros);
+      url.searchParams.set("classe", classe);
+
+      const resp = await fetch(url.toString());
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const json = await resp.json();
+      const lista = Array.isArray(json.voos) ? json.voos : Array.isArray(json) ? json : [];
+
+      resultados = lista.map((v) => ({
+        companhia: v.companhia || v.airline || "Companhia Aérea",
+        rota: v.rota || `${origem} → ${destino}`,
+        datas: dataVolta ? `${dataIda} a ${dataVolta}` : `${dataIda} (Só Ida)`,
+        preco: v.preco != null ? `${Number(v.preco).toLocaleString("pt-PT")} ${v.moeda || "XOF"}` : "Sob consulta",
+        detalhe: v.detalhe || `${passageiros} · ${classe}`
+      }));
+
+      if (!resultados.length) {
+        mensagem = "Nenhum voo encontrado para as datas selecionadas.";
+      }
+    } catch (e) {
+      resultados = [];
+      mensagem = `Erro ao consultar preços (${e.message || "rede"}).`;
+    } finally {
+      pesquisando = false;
+      renderResultados(boxResultados);
+    }
+  }
+
+  function renderResultados(box) {
+    if (!box) return;
+    if (pesquisando) {
+      box.innerHTML = `<div style="padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #cbd5e1;font-size:13px;color:#0f172a;">A pesquisar tarifas reais para ${dataIda}...</div>`;
+      return;
+    }
+    if (!resultados.length && !mensagem) {
+      box.innerHTML = "";
+      return;
+    }
+    box.innerHTML = `
+      ${
+        mensagem
+          ? `<div style="padding:9px 11px;border-radius:9px;background:#fffbeb;border:1px solid #fcd34d;color:#92400e;font-size:12px;margin-bottom:8px;">${mensagem}</div>`
+          : ""
+      }
+      <div style="display:grid;grid-template-columns:1fr;gap:8px;">
+        ${resultados
+          .map(
+            (r) => `
+          <div style="padding:11px 12px;border-radius:11px;background:#ffffff;border:1px solid #cbd5e1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+              <strong style="font-size:13px;color:#0f172a;">${r.companhia}</strong>
+              <span style="font-size:12px;font-weight:800;color:#15803d;">${r.preco}</span>
+            </div>
+            <div style="font-size:12px;color:#334155;margin-top:2px;">${r.rota} · ${r.datas}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px;">${r.detalhe}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    `;
+  }
+
+  function limparModalVoos() {
+    const titulo = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span")).find(
+      (el) => /voos\s+internacionais\s*&\s*regionais/i.test((el.textContent || "").trim()) && (el.textContent || "").trim().length < 60
+    );
+    if (!titulo) return;
+
+    let modal = titulo.parentElement;
+    for (let i = 0; i < 6 && modal && modal.parentElement; i++) {
+      if (/estilo\s+booking|rota\s+anterior/i.test(modal.textContent || "")) break;
+      modal = modal.parentElement;
+    }
+    if (!modal) return;
+
+    // 1. Esconde o selo "RESERVA DE VOOS · ESTILO BOOKING", "Modo Demonstração" e o cartão de preço fixo
+    Array.from(modal.querySelectorAll("div, span, p, button")).forEach((el) => {
+      if (el.closest("#rotagb-barra-pesquisa-voos")) return;
+      const txt = (el.textContent || "").replace(/\s+/g, " ").trim();
+      if (
+        /^.*reserva\s+de\s+voos\s*·\s*estilo\s+booking$/i.test(txt) ||
+        /^modo\s+demonstra[çc][ãa]o$/i.test(txt)
+      ) {
+        el.style.display = "none";
+      }
+      if (/rota\s+anterior/i.test(txt) && /pr[óo]xima\s+rota/i.test(txt) && txt.length < 260) {
+        el.style.display = "none";
+      }
+    });
+
+    // 2. Insere a barra de pesquisa por datas (sem preços fixos) uma única vez
+    if (modal.querySelector("#rotagb-barra-pesquisa-voos")) return;
+
+    const barra = document.createElement("div");
+    barra.id = "rotagb-barra-pesquisa-voos";
+    barra.style.cssText =
+      "margin:10px 0 12px 0;padding:12px;border-radius:14px;background:#003b95;color:#ffffff;";
+
+    barra.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr;gap:8px;">
+        <div style="background:#ffffff;color:#0f172a;border-radius:10px;padding:8px 10px;">
+          <div style="font-size:10px;font-weight:700;color:#64748b;">Partida</div>
+          <input id="v-origem" type="text" value="${origem}" style="width:100%;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;" />
+        </div>
+        <div style="background:#ffffff;color:#0f172a;border-radius:10px;padding:8px 10px;">
+          <div style="font-size:10px;font-weight:700;color:#64748b;">Destino</div>
+          <input id="v-destino" type="text" value="${destino}" style="width:100%;border:none;outline:none;font-size:13px;font-weight:700;color:#0f172a;" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:#ffffff;color:#0f172a;border-radius:10px;padding:8px 10px;">
+            <div style="font-size:10px;font-weight:700;color:#64748b;">Data de Ida</div>
+            <input id="v-ida" type="date" style="width:100%;border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;" />
+          </div>
+          <div style="background:#ffffff;color:#0f172a;border-radius:10px;padding:8px 10px;">
+            <div style="font-size:10px;font-weight:700;color:#64748b;">Data de Volta (opcional)</div>
+            <input id="v-volta" type="date" style="width:100%;border:none;outline:none;font-size:12px;font-weight:700;color:#0f172a;" />
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <select id="v-pass" style="background:#ffffff;color:#0f172a;border:none;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:700;">
+            <option>1 Passageiro</option>
+            <option>2 Passageiros</option>
+            <option>3 Passageiros</option>
+            <option>4 Passageiros</option>
+          </select>
+          <select id="v-classe" style="background:#ffffff;color:#0f172a;border:none;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:700;">
+            <option>Económica</option>
+            <option>Executiva</option>
+          </select>
+        </div>
+        <button type="button" id="v-btn-pesquisar" style="width:100%;padding:11px;border:none;border-radius:10px;background:#006ce4;color:#ffffff;font-size:14px;font-weight:800;cursor:pointer;">
+          🔍 Pesquisar Voos por Data
+        </button>
+      </div>
+      <div id="v-resultados" style="margin-top:10px;"></div>
+    `;
+
+    const cabecalho = titulo.parentElement || modal;
+    cabecalho.insertAdjacentElement("afterend", barra);
+
+    const boxRes = barra.querySelector("#v-resultados");
+    barra.querySelector("#v-origem").addEventListener("input", (e) => (origem = e.target.value));
+    barra.querySelector("#v-destino").addEventListener("input", (e) => (destino = e.target.value));
+    barra.querySelector("#v-ida").addEventListener("change", (e) => (dataIda = e.target.value));
+    barra.querySelector("#v-volta").addEventListener("change", (e) => (dataVolta = e.target.value));
+    barra.querySelector("#v-pass").addEventListener("change", (e) => (passageiros = e.target.value));
+    barra.querySelector("#v-classe").addEventListener("change", (e) => (classe = e.target.value));
+    barra.querySelector("#v-btn-pesquisar").addEventListener("click", () => pesquisarVoosPorData(boxRes));
+  }
+
+  const obs = new MutationObserver(() => limparModalVoos());
+  if (document.body) obs.observe(document.body, { childList: true, subtree: true });
+  window.addEventListener("load", limparModalVoos);
+  document.addEventListener("click", () => setTimeout(limparModalVoos, 80));
+})();
