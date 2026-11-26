@@ -2027,8 +2027,8 @@ Total: ${valorFormatado}`
   setTimeout(montarPainel, 350);
 })();
 (function () {
-  if (window.__superAppCompletoV15) return;
-  window.__superAppCompletoV15 = true;
+  if (window.__superAppCompletoV17) return;
+  window.__superAppCompletoV17 = true;
 
   // =========================================================================
   // CONFIGURAÇÃO DA CONTA COMERCIANTE (ALTERE AQUI OS SEUS DADOS REAIS)
@@ -2038,6 +2038,167 @@ Total: ${valorFormatado}`
   const WHATSAPP_SUPORTE = "245955000000";
   const PIN_CONDUTOR_PADRAO = "2450";
   const STORAGE_FOTOS_FARMACIAS = "rotagb_fotos_reais_farmacias_v1";
+
+  // =========================================================================
+  // 0. VISUAL MODERNO ESTILO UBER / BOOKING NOS BOTÕES DE SERVIÇO
+  // =========================================================================
+  const AJUSTES_SERVICOS_UI = {
+    "trip / táxi": {
+      titulo: "Táxi",
+      imagem: "https://images.unsplash.com/photo-1556122071-e404eaedb77f?auto=format&fit=crop&w=600&q=80"
+    },
+    "táxi": {
+      titulo: "Táxi",
+      imagem: "https://images.unsplash.com/photo-1556122071-e404eaedb77f?auto=format&fit=crop&w=600&q=80"
+    },
+    "aluguer": {
+      titulo: "Aluguer",
+      imagem: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80"
+    },
+    "toca-toca": {
+      titulo: "Toca-toca",
+      imagem: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80"
+    },
+    "voos": {
+      titulo: "Voos",
+      imagem: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80"
+    },
+    "hotéis": {
+      titulo: "Hotéis",
+      imagem: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80"
+    },
+    "apartamentos": {
+      titulo: "Apartamentos",
+      imagem: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80"
+    },
+    "restaurantes": {
+      titulo: "Restaurantes",
+      imagem: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80"
+    },
+    "lojas / mercado": {
+      titulo: "Mercado",
+      imagem: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80"
+    },
+    "farmácias": {
+      titulo: "Farmácias",
+      imagem: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=600&q=80"
+    },
+    "conveniência": {
+      titulo: "Conveniência",
+      imagem: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=600&q=80"
+    }
+  };
+
+  function injetarEstiloModernoBotoes() {
+    if (document.getElementById("rotagb-estilo-uber-booking")) return;
+    const style = document.createElement("style");
+    style.id = "rotagb-estilo-uber-booking";
+    style.textContent = `
+      [data-rotagb-modern-card="1"] {
+        background: #f6f6f6 !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 14px !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+        padding: 10px 8px !important;
+        min-height: 98px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        transition: transform 0.14s ease, background-color 0.14s ease, border-color 0.14s ease !important;
+      }
+      [data-rotagb-modern-card="1"]:hover {
+        background: #eef2f6 !important;
+        border-color: #cbd5e1 !important;
+        transform: translateY(-1px) !important;
+      }
+      [data-rotagb-modern-card="1"]:active {
+        transform: scale(0.98) !important;
+      }
+      [data-rotagb-modern-card="1"] img {
+        width: 44px !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        object-fit: cover !important;
+        border-radius: 10px !important;
+        margin: 0 !important;
+        display: block !important;
+      }
+      [data-rotagb-badge-novo="1"] {
+        position: static !important;
+        display: inline-block !important;
+        background: #dcfce7 !important;
+        color: #166534 !important;
+        font-size: 10px !important;
+        font-weight: 800 !important;
+        padding: 1px 6px !important;
+        border-radius: 999px !important;
+        line-height: 1.3 !important;
+        margin-top: 2px !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function modernizarBotoesServicos() {
+    injetarEstiloModernoBotoes();
+
+    Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span")).forEach((el) => {
+      if (el.closest("#superapp-farmacia-moderna, #superapp-painel-viagem")) return;
+      const t = (el.textContent || "").trim();
+      if (t === "Go anywhere") el.textContent = "Ir a qualquer lugar";
+      else if (t === "Get anything delivered") el.textContent = "Pedir entregas";
+    });
+
+    const candidatos = Array.from(document.querySelectorAll("button, [role='button'], a, div"));
+    candidatos.forEach((el) => {
+      if (el.closest("#superapp-farmacia-moderna, #superapp-painel-viagem, #bloqueio-ganhos-motorista, #wrapper-recarga-merchant")) {
+        return;
+      }
+      if (el.children.length > 4) return;
+      const textoLimpo = (el.textContent || "")
+        .replace(/\s+/g, " ")
+        .replace(/\bnovo\b/gi, "")
+        .trim()
+        .toLowerCase();
+
+      const config = AJUSTES_SERVICOS_UI[textoLimpo];
+      if (!config) return;
+
+      const card = el.closest("button, [role='button']") || el;
+      if (card.getAttribute("data-rotagb-modern-card") === "1") return;
+      if (card.querySelector("input, select, textarea")) return;
+
+      card.setAttribute("data-rotagb-modern-card", "1");
+
+      const img = card.querySelector("img");
+      if (img && config.imagem) {
+        img.src = config.imagem;
+        img.alt = config.titulo;
+      }
+
+      const nodesTexto = Array.from(card.querySelectorAll("span, p, div, strong, small, label")).filter(
+        (n) => n.children.length === 0 && (n.textContent || "").trim().length > 0
+      );
+
+      nodesTexto.forEach((n) => {
+        const raw = (n.textContent || "").trim();
+        if (/^novo$/i.test(raw)) {
+          n.setAttribute("data-rotagb-badge-novo", "1");
+          n.textContent = "Novo";
+          n.style.cssText = "";
+        } else if (raw.toLowerCase() === textoLimpo || Object.keys(AJUSTES_SERVICOS_UI).includes(raw.toLowerCase())) {
+          n.textContent = config.titulo;
+          n.style.fontSize = "12px";
+          n.style.fontWeight = "700";
+          n.style.color = "#111827";
+          n.style.lineHeight = "1.2";
+          n.style.margin = "0";
+        }
+      });
+    });
+  }
 
   // =========================================================================
   // 1. PAINEL DO CONDUTOR: PRIVACIDADE DE GANHOS + RECARGA MERCHANT ACCOUNT
@@ -2256,7 +2417,7 @@ Total: ${valorFormatado}`
   }
 
   // =========================================================================
-  // 2. SISTEMA DE FARMÁCIAS EM BISSAU (REIDRATADO COM FOTOS JÁ CARREGADAS)
+  // 2. SISTEMA DE FARMÁCIAS EM BISSAU (ISOLADO APENAS PARA O MODAL FARMÁCIAS)
   // =========================================================================
   const FARMACIAS_BISSAU = [
     {
@@ -2687,39 +2848,50 @@ Total: ${valorFormatado}`
     }
   }
 
-  function modernizarModalFarmacias() {
+  function limparFarmaciaDeOutrosModais() {
     document.querySelectorAll("#superapp-farmacia-moderna").forEach((el) => {
-      const boxTxt = (el.parentElement?.textContent || "").toLowerCase();
-      if (/mercado|loja|restaurante|conveni[eê]ncia/.test(boxTxt) && !/farm[áa]cias\s+principais/i.test(boxTxt)) {
-        Array.from(el.parentElement.children).forEach((ch) => {
+      const box = el.parentElement;
+      if (!box) {
+        el.remove();
+        return;
+      }
+      const cabecalho = box.children[0] ? (box.children[0].textContent || "").trim() : "";
+      const ehModalFarmacia = /farm[áa]cias\s+principais\s+em\s+bissau/i.test(cabecalho);
+      if (!ehModalFarmacia) {
+        Array.from(box.children).forEach((ch) => {
           if (ch !== el) ch.style.display = "";
         });
+        box.removeAttribute("data-farmacia-modernizada");
         el.remove();
       }
     });
+  }
+
+  function modernizarModalFarmacias() {
+    limparFarmaciaDeOutrosModais();
 
     const elementos = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span, button"));
     const tituloModal = elementos.find((el) => {
       if (el.id === "superapp-farmacia-moderna" || el.closest("#superapp-farmacia-moderna")) return false;
       const t = (el.textContent || "").replace(/\s+/g, " ").trim();
       if (!t || t.length > 60) return false;
-      if (/mercado|loja|restaurante|conveni[eê]ncia/i.test(t)) return false;
+      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel/i.test(t)) return false;
       return /farm[áa]cias\s+principais\s+em\s+bissau/i.test(t);
     });
     if (!tituloModal) return;
 
     let modalBox = tituloModal.parentElement;
     for (let i = 0; i < 6 && modalBox && modalBox.parentElement; i++) {
-      const txt = modalBox.textContent || "";
-      if (/mercado|loja|restaurante|conveni[eê]ncia/i.test(txt) && !/farm[áa]cias\s+principais\s+em\s+bissau/i.test(txt)) {
+      const cabecalho = modalBox.children[0] ? (modalBox.children[0].textContent || "").trim() : "";
+      if (/apartamento|mercado|loja|restaurante|conveni[eê]ncia|hotel/i.test(cabecalho)) {
         return;
       }
-      if (modalBox.querySelector("select") || /confirmar\s*&\s*pagar|anterior|seguinte/i.test(txt)) {
+      if (modalBox.querySelector("select") || /confirmar\s*&\s*pagar|anterior|seguinte/i.test(modalBox.textContent || "")) {
         break;
       }
       modalBox = modalBox.parentElement;
     }
-    if (!modalBox || modalBox.getAttribute("data-farmacia-modernizada") === "1") return;
+    if (!modalBox || modalBox.querySelector("#superapp-farmacia-moderna")) return;
 
     modalBox.setAttribute("data-farmacia-modernizada", "1");
 
@@ -2909,7 +3081,7 @@ Total: ${valorFormatado}`
 
     timerCrono = setInterval(() => {
       segundos += 1;
-      const elCrono = container.querySelector("#cronometro-viagem-v15");
+      const elCrono = container.querySelector("#cronometro-viagem-v17");
       if (elCrono) elCrono.textContent = formatarTempo(segundos);
     }, 1000);
 
@@ -2965,22 +3137,22 @@ Total: ${valorFormatado}`
       return `
         <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;">
           <label style="display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;">Número do cartão (16 dígitos)</label>
-          <input id="input-cartao-numero-v15" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
+          <input id="input-cartao-numero-v17" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" style="width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;letter-spacing:1px;margin-bottom:10px;box-sizing:border-box;background:#fff;" />
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Validade (MM/AA)</label>
-              <input id="input-cartao-validade-v15" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-validade-v17" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
             <div>
               <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:4px;">Código secreto (3 dígitos)</label>
-              <input id="input-cartao-cvv-v15" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
+              <input id="input-cartao-cvv-v17" type="password" inputmode="numeric" maxlength="3" placeholder="123" style="width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;box-sizing:border-box;background:#fff;" />
             </div>
           </div>
-          <div id="aviso-cartao-v15" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
+          <div id="aviso-cartao-v17" style="font-size:11px;color:#b45309;margin-top:8px;">Modo Demonstração: simulação local de cartão (não introduza dados reais).</div>
         </div>
       `;
     }
-    return `<input id="input-tel-v15" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
+    return `<input id="input-tel-v17" type="tel" placeholder="+245 955..." style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:12px;box-sizing:border-box;" />`;
   }
 
   function renderizarCartaoMotorista() {
@@ -3003,13 +3175,13 @@ Total: ${valorFormatado}`
 
         <div style="margin-top:10px;">
           <label style="display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:4px;">Mensagem caso o motorista atrase ou não encontre si:</label>
-          <input id="input-msg-motorista-v15" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
+          <input id="input-msg-motorista-v17" type="text" value="${mensagemRapida.replace(/"/g, "&quot;")}" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d1d5db;font-size:12px;box-sizing:border-box;margin-bottom:8px;" />
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
             <a href="${telLimpo ? `tel:${telLimpo}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;">📞 Ligar</a>
-            <a id="link-wa-v15" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
-            <a id="link-sms-v15" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:999px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
+            <a id="link-wa-v17" href="${telDigitos ? `https://wa.me/${telDigitos}?text=${textoMsg}` : "https://wa.me/?text=" + textoMsg}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#0f766e;color:#fff;font-size:12px;font-weight:700;">💬 WhatsApp</a>
+            <a id="link-sms-v17" href="${telLimpo ? `sms:${telLimpo}?body=${textoMsg}` : "javascript:void(0)"}" style="text-align:center;text-decoration:none;padding:9px 6px;border-radius:9px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;">✉️ SMS</a>
           </div>
-          <button type="button" id="btn-trocar-motorista-v15" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
+          <button type="button" id="btn-trocar-motorista-v17" style="width:100%;padding:9px;border-radius:9px;border:1px solid #d97706;background:#fffbeb;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">🔄 Motorista demorou ou não atende? Tentar outro disponível</button>
           ${avisoTrocaMotorista ? `<div style="font-size:11px;color:#b45309;margin-top:6px;">${avisoTrocaMotorista}</div>` : ""}
         </div>
       </div>
@@ -3035,8 +3207,8 @@ Total: ${valorFormatado}`
             <span style="padding:4px 8px;border-radius:999px;background:${faseViagem === "EM_CURSO" ? "#d1fae5" : "#f3f4f6"};font-weight:700;">3. Viagem em curso</span>
           </div>
           ${faseViagem !== "PROCURANDO" ? renderizarCartaoMotorista() : ""}
-          <div id="cronometro-viagem-v15" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
-          <button type="button" id="btn-cancelar-v15" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
+          <div id="cronometro-viagem-v17" style="font-size:22px;font-weight:800;color:#b45309;margin-bottom:12px;">${formatarTempo(segundos)}</div>
+          <button type="button" id="btn-cancelar-v17" style="width:100%;padding:12px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Cancelar Viagem &amp; Reembolso Imediato (Modo Demo)</button>
           <div style="font-size:11px;color:#6b7280;margin-top:8px;">Regra de reembolso: cancelamento antes da chegada ou sem motorista disponível devolve 100% do valor simulado sem taxa.</div>
         </div>
       `;
@@ -3061,8 +3233,8 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">1. Escolha para onde quer ir e o ponto de referência</label>
-        <select id="select-rota-v15" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
-        <input id="input-ref-v15" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
+        <select id="select-rota-v17" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:10px;background:#fff;">${renderizarOpcoesRotas()}</select>
+        <input id="input-ref-v17" type="text" placeholder="Ponto de referência (ex: Perto do Mercado, portão...)" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:14px;margin-bottom:14px;box-sizing:border-box;" />
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">2. Escolha o veículo (preço final do veículo selecionado)</label>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
@@ -3070,7 +3242,7 @@ Total: ${valorFormatado}`
             const ativo = v.id === veiculoAtual.id;
             const p = Math.round(rotaAtual.baseXOF * v.mult);
             return `
-              <button type="button" data-veiculo-v15="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
+              <button type="button" data-veiculo-v17="${v.id}" style="padding:12px 8px;border-radius:12px;cursor:pointer;text-align:center;border:${ativo ? "2px solid #16a34a" : "1px solid #d1d5db"};background:${ativo ? "#f0fdf4" : "#ffffff"};">
                 <div style="font-size:18px;">${v.emoji}</div>
                 <div style="font-size:12px;font-weight:700;color:#111827;margin-top:2px;">${v.nome}</div>
                 <div style="font-size:15px;font-weight:800;color:#111827;margin-top:4px;">${p} XOF</div>
@@ -3088,19 +3260,19 @@ Total: ${valorFormatado}`
         </div>
 
         <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">3. Método e dados para confirmar o pedido</label>
-        <select id="select-metodo-v15" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
+        <select id="select-metodo-v17" style="width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;font-size:13px;margin-bottom:10px;background:#fff;">
           ${METODOS_PAGAMENTO.map((m) => `<option value="${m}" ${metodoAtual === m ? "selected" : ""}>${m}</option>`).join("")}
         </select>
 
         ${renderizarCamposPagamento()}
 
-        <button type="button" id="btn-pedir-v15" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
+        <button type="button" id="btn-pedir-v17" style="width:100%;padding:14px;border:none;border-radius:12px;background:#16a34a;color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;">Pedir ${veiculoAtual.nome} · ${preco} XOF</button>
 
         ${renderizarBlocoEstado(preco)}
       </div>
     `;
 
-    const selRota = container.querySelector("#select-rota-v15");
+    const selRota = container.querySelector("#select-rota-v17");
     if (selRota) {
       selRota.addEventListener("change", () => {
         const opt = selRota.options[selRota.selectedIndex];
@@ -3109,14 +3281,14 @@ Total: ${valorFormatado}`
       });
     }
 
-    container.querySelectorAll("[data-veiculo-v15]").forEach((btn) => {
+    container.querySelectorAll("[data-veiculo-v17]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v15")) || VEICULOS[0];
+        veiculoAtual = VEICULOS.find((v) => v.id === btn.getAttribute("data-veiculo-v17")) || VEICULOS[0];
         renderizarPainel(container);
       });
     });
 
-    const selMetodo = container.querySelector("#select-metodo-v15");
+    const selMetodo = container.querySelector("#select-metodo-v17");
     if (selMetodo) {
       selMetodo.addEventListener("change", () => {
         metodoAtual = selMetodo.value || "Orange Money";
@@ -3124,7 +3296,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputNumCartao = container.querySelector("#input-cartao-numero-v15");
+    const inputNumCartao = container.querySelector("#input-cartao-numero-v17");
     if (inputNumCartao) {
       inputNumCartao.addEventListener("input", () => {
         const digitos = inputNumCartao.value.replace(/\D/g, "").slice(0, 16);
@@ -3132,7 +3304,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputValidade = container.querySelector("#input-cartao-validade-v15");
+    const inputValidade = container.querySelector("#input-cartao-validade-v17");
     if (inputValidade) {
       inputValidade.addEventListener("input", () => {
         const digitos = inputValidade.value.replace(/\D/g, "").slice(0, 4);
@@ -3140,14 +3312,14 @@ Total: ${valorFormatado}`
       });
     }
 
-    const inputCvv = container.querySelector("#input-cartao-cvv-v15");
+    const inputCvv = container.querySelector("#input-cartao-cvv-v17");
     if (inputCvv) {
       inputCvv.addEventListener("input", () => {
         inputCvv.value = inputCvv.value.replace(/\D/g, "").slice(0, 3);
       });
     }
 
-    const inputMsg = container.querySelector("#input-msg-motorista-v15");
+    const inputMsg = container.querySelector("#input-msg-motorista-v17");
     if (inputMsg) {
       inputMsg.addEventListener("input", () => {
         mensagemRapida = inputMsg.value;
@@ -3156,14 +3328,14 @@ Total: ${valorFormatado}`
         const telDigitos = (mot.telefone || "").replace(/\D/g, "");
         const telLimpo = (mot.telefone || "").replace(/[^\d+]/g, "");
         const textoEncoded = encodeURIComponent(`Olá ${mot.nomeCompleto}, estou na rota ${rotaAtual.nome} (${veiculoAtual.nome}). ${mensagemRapida}`);
-        const wa = container.querySelector("#link-wa-v15");
-        const sms = container.querySelector("#link-sms-v15");
+        const wa = container.querySelector("#link-wa-v17");
+        const sms = container.querySelector("#link-sms-v17");
         if (wa) wa.href = telDigitos ? `https://wa.me/${telDigitos}?text=${textoEncoded}` : "https://wa.me/?text=" + textoEncoded;
         if (sms && telLimpo) sms.href = `sms:${telLimpo}?body=${textoEncoded}`;
       });
     }
 
-    const btnTrocar = container.querySelector("#btn-trocar-motorista-v15");
+    const btnTrocar = container.querySelector("#btn-trocar-motorista-v17");
     if (btnTrocar) {
       btnTrocar.addEventListener("click", () => {
         if (!listaMotoristasDisponiveis.length) return;
@@ -3179,17 +3351,17 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnPedir = container.querySelector("#btn-pedir-v15");
+    const btnPedir = container.querySelector("#btn-pedir-v17");
     if (btnPedir) {
       btnPedir.addEventListener("click", async () => {
-        let referenciaCliente = (container.querySelector("#input-tel-v15")?.value || "").trim();
+        let referenciaCliente = (container.querySelector("#input-tel-v17")?.value || "").trim();
 
         if (metodoAtual === "Dinheiro Vivo") {
           referenciaCliente = "Dinheiro Vivo ao condutor";
         } else if (metodoAtual === "Cartão") {
-          const numLimpo = (container.querySelector("#input-cartao-numero-v15")?.value || "").replace(/\D/g, "");
-          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v15")?.value || "").replace(/\D/g, "");
-          const aviso = container.querySelector("#aviso-cartao-v15");
+          const numLimpo = (container.querySelector("#input-cartao-numero-v17")?.value || "").replace(/\D/g, "");
+          const cvvLimpo = (container.querySelector("#input-cartao-cvv-v17")?.value || "").replace(/\D/g, "");
+          const aviso = container.querySelector("#aviso-cartao-v17");
 
           if (numLimpo.length !== 16 || cvvLimpo.length !== 3) {
             if (aviso) {
@@ -3206,7 +3378,7 @@ Total: ${valorFormatado}`
         indiceMotoristaAtual = 0;
         motoristaAtribuido = listaMotoristasDisponiveis[0];
 
-        const ref = (container.querySelector("#input-ref-v15")?.value || "").trim();
+        const ref = (container.querySelector("#input-ref-v17")?.value || "").trim();
         const valor = calcularPrecoXOF();
 
         if (typeof window.iniciarPagamentoComComissao === "function") {
@@ -3226,7 +3398,7 @@ Total: ${valorFormatado}`
       });
     }
 
-    const btnCancelar = container.querySelector("#btn-cancelar-v15");
+    const btnCancelar = container.querySelector("#btn-cancelar-v17");
     if (btnCancelar) {
       btnCancelar.addEventListener("click", () => {
         limparTimers();
@@ -3266,9 +3438,10 @@ Total: ${valorFormatado}`
   }
 
   // =========================================================================
-  // 4. INICIALIZAÇÃO CONJUNTA (MOBILIDADE + CONDUTOR + FARMÁCIAS)
+  // 4. INICIALIZAÇÃO CONJUNTA (VISUAL + MOBILIDADE + CONDUTOR + FARMÁCIAS)
   // =========================================================================
   function executarTudo() {
+    modernizarBotoesServicos();
     atualizarPainelCondutor();
     montarPainel();
     modernizarModalFarmacias();
@@ -3280,7 +3453,7 @@ Total: ${valorFormatado}`
   });
 
   document.addEventListener("click", () => {
-    setTimeout(executarTudo, 200);
+    setTimeout(executarTudo, 150);
   });
 
   setTimeout(executarTudo, 350);
